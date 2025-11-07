@@ -1125,64 +1125,110 @@
       // Mostrar mensaje de carga
       const loadingId = addMessageToChat('loading', '🎼 Pensando...');
       
-      try {
-        // Llamar a la API de Claude
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            system: `Eres un asistente experto en teoría musical y entrenamiento auditivo. 
-Tu trabajo es ayudar a estudiantes universitarios de música a comprender conceptos teóricos.
-
-Contexto: Estás integrado en una aplicación web de entrenamiento auditivo que incluye:
-- Intervalos (ascendentes y descendentes)
-- Acordes tríadas (Mayor, Menor, Aumentado, Disminuido, Suspendidos)
-- Inversiones de acordes (fundamental, 1ª y 2ª inversión)
-- Acordes de séptima (Mayor 7, Menor 7, Dominante 7, etc.)
-- Progresiones armónicas (I-IV-V-I, I-V-vi-IV, ii-V-I, etc.)
-- Escalas (Mayor, menor natural, armónica, melódica, pentatónicas, modos)
-
-Responde de manera:
-- Clara y educativa
-- Con ejemplos prácticos
-- En español
-- Concisa pero completa (máximo 200 palabras)
-- Usando emojis cuando sea apropiado para hacer más amigable la explicación
-- Si te preguntan sobre ejercicios específicos de la app, explica cómo funcionan
-
-Si la pregunta no está relacionada con música, indica amablemente que solo puedes ayudar con teoría musical.`,
-            messages: [
-              { role: 'user', content: message }
-            ]
-          })
-        });
-
-        const data = await response.json();
-        
-        // Remover mensaje de carga
+      // Respuestas predefinidas del asistente de teoría musical
+      const response = getMusicTheoryResponse(message);
+      
+      // Simular un pequeño delay para que se sienta más natural
+      setTimeout(() => {
         removeMessageFromChat(loadingId);
-        
-        // Agregar respuesta del asistente
-        if (data.content && data.content[0]) {
-          const assistantMessage = data.content[0].text;
-          addMessageToChat('assistant', assistantMessage);
-          chatHistory.push({ user: message, assistant: assistantMessage });
-        } else {
-          addMessageToChat('assistant', 'Lo siento, hubo un error. Por favor intenta de nuevo.');
-        }
-        
-      } catch (error) {
-        console.error('Error en el chat:', error);
-        removeMessageFromChat(loadingId);
-        addMessageToChat('assistant', 'Lo siento, no pude conectarme al asistente. Por favor intenta de nuevo.');
+        addMessageToChat('assistant', response);
+        chatHistory.push({ user: message, assistant: response });
+        sendButton.disabled = false;
+      }, 800);
+    }
+
+    function getMusicTheoryResponse(question) {
+      const q = question.toLowerCase();
+      
+      // Intervalos
+      if (q.includes('tercera mayor') || q.includes('3ra mayor') || q.includes('3m')) {
+        return '🎵 <strong>Tercera Mayor</strong><br><br>Es un intervalo de <strong>4 semitonos</strong> (2 tonos).<br><br><strong>Características:</strong><br>• Sonido brillante y alegre<br>• Base del acorde mayor<br>• Ejemplo: Do-Mi, Sol-Si<br><br><strong>En la app:</strong> Encuéntralo en la sección de Intervalos. Su sonido es el inicio de "Oh When the Saints". 🎺';
       }
       
-      // Rehabilitar botón de envío
-      sendButton.disabled = false;
+      if (q.includes('tercera menor') || q.includes('3ra menor')) {
+        return '🎵 <strong>Tercera Menor</strong><br><br>Es un intervalo de <strong>3 semitonos</strong> (1 tono + ½).<br><br><strong>Características:</strong><br>• Sonido oscuro y melancólico<br>• Base del acorde menor<br>• Ejemplo: Do-Mib, La-Do<br><br><strong>En la app:</strong> Lo encontrarás en Intervalos. Aparece en "Greensleeves". 🎼';
+      }
+      
+      if (q.includes('quinta justa') || q.includes('5ta justa')) {
+        return '🎵 <strong>Quinta Justa</strong><br><br>Es un intervalo de <strong>7 semitonos</strong> (3 tonos + ½).<br><br><strong>Características:</strong><br>• El más consonante después de la octava<br>• Base de todos los acordes<br>• Sonido estable y fuerte<br>• Ejemplo: Do-Sol, Re-La<br><br><strong>Referencia:</strong> Inicio de "Star Wars". ⭐';
+      }
+      
+      if (q.includes('tritono') || q.includes('cuarta aumentada')) {
+        return '🎵 <strong>Tritono</strong><br><br>Es un intervalo de <strong>6 semitonos</strong> (3 tonos exactos).<br><br><strong>Características:</strong><br>• El más disonante<br>• Llamado "Diabolus in Musica" en la Edad Media<br>• Divide la octava en dos partes iguales<br>• Ejemplo: Do-Fa#, Si-Fa<br><br><strong>Lo escuchas en:</strong> Los Simpsons, Black Sabbath 🎸';
+      }
+      
+      // Acordes
+      if (q.includes('acorde mayor') || q.includes('triada mayor')) {
+        return '🎹 <strong>Acorde Mayor</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J<br>Intervalos: 0, 4, 7 semitonos<br><br><strong>Características:</strong><br>• Sonido alegre y brillante<br>• Estable y consonante<br>• Ejemplo: Do mayor = Do-Mi-Sol<br><br><strong>En la app:</strong> Practica en "Tríadas". Es uno de los 4 acordes básicos. 🎵';
+      }
+      
+      if (q.includes('acorde menor') || q.includes('triada menor')) {
+        return '🎹 <strong>Acorde Menor</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5J<br>Intervalos: 0, 3, 7 semitonos<br><br><strong>Características:</strong><br>• Sonido triste y melancólico<br>• Más oscuro que el mayor<br>• Ejemplo: La menor = La-Do-Mi<br><br><strong>Diferencia con mayor:</strong> Solo cambia la tercera (de 4 a 3 semitonos). 🎼';
+      }
+      
+      if (q.includes('aumentado')) {
+        return '🎹 <strong>Acorde Aumentado</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5A<br>Intervalos: 0, 4, 8 semitonos<br><br><strong>Características:</strong><br>• Sonido tenso e inestable<br>• Simétrico (divide octava en 3 partes iguales)<br>• Usado para crear tensión<br>• Ejemplo: Do+ = Do-Mi-Sol#<br><br><strong>En la app:</strong> Disponible en "Tríadas". ✨';
+      }
+      
+      if (q.includes('disminuido')) {
+        return '🎹 <strong>Acorde Disminuido</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5d<br>Intervalos: 0, 3, 6 semitonos<br><br><strong>Características:</strong><br>• Muy tenso y disonante<br>• Necesita resolver<br>• Usado en transiciones<br>• Ejemplo: Si° = Si-Re-Fa<br><br><strong>Tip:</strong> Dos terceras menores apiladas. 🎵';
+      }
+      
+      // Inversiones
+      if (q.includes('inversion') || q.includes('inversión')) {
+        return '🔄 <strong>Inversiones de Acordes</strong><br><br><strong>Fundamental:</strong> Notas en orden 1-3-5<br>Ejemplo: Do-Mi-Sol<br><br><strong>1ª Inversión:</strong> La 3ª es el bajo<br>Ejemplo: Mi-Sol-Do<br><br><strong>2ª Inversión:</strong> La 5ª es el bajo<br>Ejemplo: Sol-Do-Mi<br><br><strong>En la app:</strong> Sección "Inversiones" tiene ejercicios específicos de Mayor y Menor. 🎹';
+      }
+      
+      // Séptimas
+      if (q.includes('mayor 7') || q.includes('maj7')) {
+        return '7️⃣ <strong>Acorde Mayor 7</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J - 7M<br>Intervalos: 0, 4, 7, 11 semitonos<br><br><strong>Características:</strong><br>• Sonido sofisticado, jazz<br>• Muy consonante<br>• Ejemplo: Cmaj7 = Do-Mi-Sol-Si<br><br><strong>Uso:</strong> Jazz, bossa nova, baladas. 🎷';
+      }
+      
+      if (q.includes('dominante 7') || q.includes('acorde 7') || (q.includes('septima') && q.includes('dominante'))) {
+        return '7️⃣ <strong>Acorde Dominante 7</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J - 7m<br>Intervalos: 0, 4, 7, 10 semitonos<br><br><strong>Características:</strong><br>• Tenso, quiere resolver<br>• Fundamental en blues y jazz<br>• Ejemplo: C7 = Do-Mi-Sol-Sib<br><br><strong>Función:</strong> Resolver a la tónica (V7→I). 🎸';
+      }
+      
+      if (q.includes('menor 7') || q.includes('m7')) {
+        return '7️⃣ <strong>Acorde Menor 7</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5J - 7m<br>Intervalos: 0, 3, 7, 10 semitonos<br><br><strong>Características:</strong><br>• Sonido suave y melancólico<br>• Muy usado en jazz y R&B<br>• Ejemplo: Dm7 = Re-Fa-La-Do<br><br><strong>Uso común:</strong> Función de ii en ii-V-I. 🎹';
+      }
+      
+      // Progresiones
+      if (q.includes('progresion') || q.includes('progresión')) {
+        return '🎼 <strong>Progresiones Armónicas</strong><br><br>Son secuencias de acordes que crean movimiento musical.<br><br><strong>Ejemplos en la app:</strong><br><br>• <strong>I-IV-V-I:</strong> Clásica, rock básico<br>• <strong>I-V-vi-IV:</strong> Pop moderno ("Let It Be")<br>• <strong>ii-V-I:</strong> Jazz estándar<br><br><strong>En números romanos:</strong><br>I = tónica, ii = supertónica, V = dominante, etc. 🎵';
+      }
+      
+      // Escalas
+      if (q.includes('escala mayor')) {
+        return '🎶 <strong>Escala Mayor</strong><br><br><strong>Patrón:</strong> T - T - st - T - T - T - st<br><br><strong>Ejemplo Do Mayor:</strong><br>Do-Re-Mi-Fa-Sol-La-Si-Do<br><br><strong>Características:</strong><br>• Sonido alegre y brillante<br>• Base de la música occidental<br>• 7 notas + octava<br><br><strong>En la app:</strong> Modo Estudio muestra los intervalos visualmente. 🎵';
+      }
+      
+      if (q.includes('escala menor') || q.includes('menor natural')) {
+        return '🎶 <strong>Escala Menor Natural</strong><br><br><strong>Patrón:</strong> T - st - T - T - st - T - T<br><br><strong>Ejemplo La menor:</strong><br>La-Si-Do-Re-Mi-Fa-Sol-La<br><br><strong>Características:</strong><br>• Sonido triste y oscuro<br>• Relativa menor de Do Mayor<br>• Mismas notas, diferente centro tonal<br><br><strong>Relación:</strong> Comienza en el 6º grado de su mayor relativa. 🎼';
+      }
+      
+      if (q.includes('armonica') || q.includes('armónica')) {
+        return '🎶 <strong>Escala Menor Armónica</strong><br><br><strong>Patrón:</strong> T - st - T - T - st - T+st - st<br><br><strong>Ejemplo:</strong><br>La-Si-Do-Re-Mi-Fa-Sol#-La<br><br><strong>Diferencia con natural:</strong><br>La 7ª está elevada medio tono (Sol# en vez de Sol).<br><br><strong>Sonido:</strong> Exótico, usado en música clásica, flamenca y metal. 🎸';
+      }
+      
+      if (q.includes('pentatonica') || q.includes('pentatónica')) {
+        return '🎶 <strong>Escalas Pentatónicas</strong><br><br><strong>5 notas (sin st):</strong><br><br><strong>Mayor:</strong> 1-2-3-5-6<br>Do-Re-Mi-Sol-La<br><br><strong>Menor:</strong> 1-b3-4-5-b7<br>La-Do-Re-Mi-Sol<br><br><strong>Características:</strong><br>• Sin disonancias<br>• Muy usadas en rock, blues, folk<br>• Fáciles de improvisar<br><br><strong>Ejemplos:</strong> Solos de guitarra, música asiática. 🎸';
+      }
+      
+      // Preguntas generales
+      if (q.includes('intervalo')) {
+        return '🎵 <strong>¿Qué es un Intervalo?</strong><br><br>Es la distancia entre dos notas musicales.<br><br><strong>Se miden en:</strong><br>• Semitonos (la mínima distancia)<br>• Tonos (2 semitonos)<br><br><strong>Tipos en la app:</strong><br>• Melódicos: notas sucesivas<br>• Armónicos: notas simultáneas<br><br><strong>12 intervalos:</strong> Desde 2ª menor hasta octava. 🎼';
+      }
+      
+      if (q.includes('tono') && q.includes('semitono')) {
+        return '🎵 <strong>Tonos y Semitonos</strong><br><br><strong>Semitono (st):</strong><br>• La distancia más pequeña<br>• Ejemplo: Do→Do# o Mi→Fa<br><br><strong>Tono (T):</strong><br>• 2 semitonos<br>• Ejemplo: Do→Re o Mi→Fa#<br><br><strong>En el piano:</strong><br>• Semitono = tecla siguiente<br>• Tono = saltar una tecla<br><br>Son la base para construir escalas y acordes. 🎹';
+      }
+      
+      if (q.includes('como') && (q.includes('estudi') || q.includes('practi') || q.includes('mejor'))) {
+        return '📚 <strong>Consejos para Estudiar</strong><br><br><strong>1. Modo Estudio:</strong><br>• Familiarízate con cada sonido<br>• Escucha varias veces<br><br><strong>2. Modo Prueba:</strong><br>• Empieza con pocos elementos<br>• Aumenta dificultad gradualmente<br><br><strong>3. Práctica diaria:</strong><br>• 15-20 min es suficiente<br>• Constancia > Cantidad<br><br><strong>4. Visualiza + Escucha</strong><br>• Usa las escalas visuales<br>• Canta los intervalos<br><br>¡La repetición es clave! 🎯';
+      }
+      
+      // Respuesta por defecto
+      return '🎵 <strong>Pregunta sobre teoría musical</strong><br><br>Puedo ayudarte con:<br><br>• <strong>Intervalos:</strong> "¿Qué es una tercera mayor?"<br>• <strong>Acordes:</strong> "Explica el acorde aumentado"<br>• <strong>Inversiones:</strong> "¿Qué es la primera inversión?"<br>• <strong>Séptimas:</strong> "Diferencia entre Maj7 y 7"<br>• <strong>Progresiones:</strong> "¿Qué es I-IV-V?"<br>• <strong>Escalas:</strong> "Explica la escala menor armónica"<br><br>Haz tu pregunta sobre teoría musical. 🎼';
     }
 
     function addMessageToChat(type, content) {
@@ -1663,4 +1709,5 @@ Si la pregunta no está relacionada con música, indica amablemente que solo pue
   </script>
 </body>
 </html>
+
 
