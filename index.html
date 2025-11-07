@@ -35,11 +35,14 @@
 
     header {
       text-align: center;
-      margin-bottom: 40px;
-      padding: 30px 20px;
+      margin-bottom: 30px;
+      padding: 25px 20px;
       background: linear-gradient(135deg, var(--primary), #9c5cff);
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     h1 {
@@ -51,6 +54,35 @@
     .subtitle {
       color: rgba(255, 255, 255, 0.9);
       font-size: 1.1em;
+    }
+
+    .mobile-indicator {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: none;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-indicator {
+        display: block;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+      }
+      
+      header {
+        padding: 20px 15px;
+        margin-bottom: 20px;
+      }
     }
 
     .study-item-card {
@@ -71,6 +103,271 @@
 
     .study-item-card:active {
       transform: scale(0.98);
+    }
+
+    .scale-visualization {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .scale-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+
+    .scale-note {
+      background: var(--primary);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      position: relative;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    .scale-interval {
+      color: #666;
+      font-size: 0.85em;
+      font-weight: normal;
+      padding: 0 8px;
+    }
+
+    .interval-whole {
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .interval-half {
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .staff-container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 15px;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .staff-lines {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .mode-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .chat-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), #9c5cff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.5);
+      transition: all 0.3s;
+      z-index: 1000;
+      font-size: 1.8em;
+    }
+
+    .chat-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.7);
+    }
+
+    .chat-container {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      width: 400px;
+      height: 600px;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+    }
+
+    .chat-container.open {
+      display: flex;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), #9c5cff);
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .chat-message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      line-height: 1.5;
+      animation: slideIn 0.3s;
+    }
+
+    .chat-message.user {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-message.assistant {
+      background: rgba(108, 99, 255, 0.1);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-message.loading {
+      background: rgba(108, 99, 255, 0.1);
+      color: var(--text-muted);
+      align-self: flex-start;
+    }
+
+    .chat-input-area {
+      padding: 15px;
+      border-top: 2px solid rgba(108, 99, 255, 0.3);
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--card-hover);
+      border: 2px solid rgba(108, 99, 255, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--text);
+      font-size: 1em;
+      resize: none;
+      font-family: inherit;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .chat-send {
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: all 0.3s;
+    }
+
+    .chat-send:hover {
+      background: #9c5cff;
+    }
+
+    .chat-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chat-suggestions {
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 2px solid rgba(108, 99, 255, 0.3);
+    }
+
+    .suggestion-chip {
+      background: rgba(108, 99, 255, 0.2);
+      border: 1px solid rgba(108, 99, 255, 0.4);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .suggestion-chip:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .chat-container {
+        width: calc(100% - 40px);
+        height: 500px;
+        right: 20px;
+        bottom: 90px;
+      }
+      
+      .chat-button {
+        right: 20px;
+        bottom: 20px;
+      }
     }
 
     .mode-selector {
@@ -385,6 +682,32 @@
       .options-grid { grid-template-columns: 1fr; }
       .score-board { flex-direction: column; gap: 15px; }
       .toggle-group { justify-content: center; }
+      
+      .exercise-area {
+        padding: 20px;
+        margin-top: 20px;
+      }
+      
+      .play-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .scale-diagram {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .scale-interval {
+        transform: rotate(90deg);
+        margin: 5px 0;
+      }
     }
   </style>
 </head>
@@ -399,6 +722,9 @@
     <header>
       <h1>🎼 Entrenamiento Auditivo Musical</h1>
       <p class="subtitle">por @Andres_ChBFl • Colombia • 2025</p>
+      <div class="mobile-indicator">
+        ⬇️ Desliza hacia abajo para comenzar los ejercicios
+      </div>
     </header>
 
     <!-- Pestañas de Modo -->
@@ -551,7 +877,7 @@
             <strong style="color: var(--primary);">📧 Contacto:</strong> 
             <a href="mailto:achavez@uniquindio.edu.co" 
                style="color: var(--success); text-decoration: none;">
-              archavez@uniquindio.edu.co
+              achavez@uniquindio.edu.co
             </a>
           </p>
           
@@ -571,6 +897,61 @@
     </footer>
   </div>
 
+  <!-- CHAT DE IA -->
+  <div class="chat-button" onclick="toggleChat()" id="chatButton">
+    💬
+  </div>
+
+  <div class="chat-container" id="chatContainer">
+    <div class="chat-header">
+      <h3>🎵 Asistente Musical IA</h3>
+      <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    
+    <div class="chat-suggestions">
+      <div class="suggestion-chip" onclick="askQuestion('¿Qué es un intervalo de tercera mayor?')">
+        Tercera mayor
+      </div>
+      <div class="suggestion-chip" onclick="askQuestion('Explica las inversiones de acordes')">
+        Inversiones
+      </div>
+      <div class="suggestion-chip" onclick="askQuestion('¿Cómo reconocer un acorde menor?')">
+        Acorde menor
+      </div>
+      <div class="suggestion-chip" onclick="askQuestion('¿Qué es una progresión armónica?')">
+        Progresiones
+      </div>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message assistant">
+        ¡Hola! Soy tu asistente de teoría musical. Puedo ayudarte con:
+        <br><br>
+        • Intervalos y sus características<br>
+        • Acordes (tríadas y séptimas)<br>
+        • Inversiones de acordes<br>
+        • Progresiones armónicas<br>
+        • Escalas y modos<br>
+        • Conceptos de solfeo y armonía<br>
+        <br>
+        ¿En qué puedo ayudarte?
+      </div>
+    </div>
+    
+    <div class="chat-input-area">
+      <textarea 
+        class="chat-input" 
+        id="chatInput" 
+        placeholder="Pregunta sobre teoría musical..."
+        rows="1"
+        onkeypress="handleChatKeyPress(event)"
+      ></textarea>
+      <button class="chat-send" onclick="sendMessage()" id="sendButton">
+        ➤
+      </button>
+    </div>
+  </div>
+
   <script>
     // ==================== CONFIGURACIÓN ====================
     const synth = new Tone.PolySynth(Tone.Synth).toDestination();
@@ -579,6 +960,7 @@
     let viewMode = 'study'; // 'study' o 'test'
     let currentQuestion = null;
     let answered = false;
+    let chatHistory = [];
     
     const scores = {
       correct: 0,
@@ -596,6 +978,45 @@
     const triadasProgress = {
       correctAnswers: 0,
       unlockedChords: ['Mayor', 'Menor', 'Aumentado', 'Disminuido']
+    };
+
+    // Notas musicales
+    const noteNames = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
+    
+    // Información detallada de escalas
+    const scaleDetails = {
+      'Mayor': {
+        pattern: ['T', 'T', 'st', 'T', 'T', 'T', 'st'],
+        notes: ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si', 'Do']
+      },
+      'Menor Natural': {
+        pattern: ['T', 'st', 'T', 'T', 'st', 'T', 'T'],
+        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa', 'Sol', 'La']
+      },
+      'Menor Armónica': {
+        pattern: ['T', 'st', 'T', 'T', 'st', 'T+st', 'st'],
+        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa', 'Sol♯', 'La']
+      },
+      'Menor Melódica': {
+        pattern: ['T', 'st', 'T', 'T', 'T', 'T', 'st'],
+        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa♯', 'Sol♯', 'La']
+      },
+      'Pentatónica Mayor': {
+        pattern: ['T', 'T', 'T+st', 'T', 'T+st'],
+        notes: ['Do', 'Re', 'Mi', 'Sol', 'La', 'Do']
+      },
+      'Pentatónica Menor': {
+        pattern: ['T+st', 'T', 'T', 'T+st', 'T'],
+        notes: ['La', 'Do', 'Re', 'Mi', 'Sol', 'La']
+      },
+      'Blues': {
+        pattern: ['T+st', 'T', 'st', 'st', 'T+st', 'T'],
+        notes: ['La', 'Do', 'Re', 'Re♯', 'Mi', 'Sol', 'La']
+      },
+      'Dórica': {
+        pattern: ['T', 'st', 'T', 'T', 'T', 'st', 'T'],
+        notes: ['Re', 'Mi', 'Fa', 'Sol', 'La', 'Si', 'Do', 'Re']
+      }
     };
 
     // ==================== DATOS MUSICALES ====================
@@ -667,6 +1088,125 @@
       updateView();
     }
 
+    // ==================== CHAT DE IA ====================
+    function toggleChat() {
+      const chatContainer = document.getElementById('chatContainer');
+      chatContainer.classList.toggle('open');
+    }
+
+    function handleChatKeyPress(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function askQuestion(question) {
+      document.getElementById('chatInput').value = question;
+      sendMessage();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      // Limpiar input
+      input.value = '';
+      
+      // Agregar mensaje del usuario
+      addMessageToChat('user', message);
+      
+      // Deshabilitar botón de envío
+      const sendButton = document.getElementById('sendButton');
+      sendButton.disabled = true;
+      
+      // Mostrar mensaje de carga
+      const loadingId = addMessageToChat('loading', '🎼 Pensando...');
+      
+      try {
+        // Llamar a la API de Claude
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: `Eres un asistente experto en teoría musical y entrenamiento auditivo. 
+Tu trabajo es ayudar a estudiantes universitarios de música a comprender conceptos teóricos.
+
+Contexto: Estás integrado en una aplicación web de entrenamiento auditivo que incluye:
+- Intervalos (ascendentes y descendentes)
+- Acordes tríadas (Mayor, Menor, Aumentado, Disminuido, Suspendidos)
+- Inversiones de acordes (fundamental, 1ª y 2ª inversión)
+- Acordes de séptima (Mayor 7, Menor 7, Dominante 7, etc.)
+- Progresiones armónicas (I-IV-V-I, I-V-vi-IV, ii-V-I, etc.)
+- Escalas (Mayor, menor natural, armónica, melódica, pentatónicas, modos)
+
+Responde de manera:
+- Clara y educativa
+- Con ejemplos prácticos
+- En español
+- Concisa pero completa (máximo 200 palabras)
+- Usando emojis cuando sea apropiado para hacer más amigable la explicación
+- Si te preguntan sobre ejercicios específicos de la app, explica cómo funcionan
+
+Si la pregunta no está relacionada con música, indica amablemente que solo puedes ayudar con teoría musical.`,
+            messages: [
+              { role: 'user', content: message }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        
+        // Remover mensaje de carga
+        removeMessageFromChat(loadingId);
+        
+        // Agregar respuesta del asistente
+        if (data.content && data.content[0]) {
+          const assistantMessage = data.content[0].text;
+          addMessageToChat('assistant', assistantMessage);
+          chatHistory.push({ user: message, assistant: assistantMessage });
+        } else {
+          addMessageToChat('assistant', 'Lo siento, hubo un error. Por favor intenta de nuevo.');
+        }
+        
+      } catch (error) {
+        console.error('Error en el chat:', error);
+        removeMessageFromChat(loadingId);
+        addMessageToChat('assistant', 'Lo siento, no pude conectarme al asistente. Por favor intenta de nuevo.');
+      }
+      
+      // Rehabilitar botón de envío
+      sendButton.disabled = false;
+    }
+
+    function addMessageToChat(type, content) {
+      const messagesContainer = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      const messageId = 'msg-' + Date.now();
+      
+      messageDiv.className = `chat-message ${type}`;
+      messageDiv.id = messageId;
+      messageDiv.innerHTML = content.replace(/\n/g, '<br>');
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      return messageId;
+    }
+
+    function removeMessageFromChat(messageId) {
+      const message = document.getElementById(messageId);
+      if (message) {
+        message.remove();
+      }
+    }
+
     // ==================== CAMBIO DE VISTA ====================
     function setViewMode(mode) {
       viewMode = mode;
@@ -735,13 +1275,68 @@
       
       items.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = 'option-btn';
+        card.style.background = 'var(--card-hover)';
+        card.style.padding = '25px';
+        card.style.borderRadius = '12px';
+        card.style.border = '2px solid rgba(108, 99, 255, 0.3)';
         card.style.cursor = 'pointer';
-        card.innerHTML = `
-          <div style="font-size: 1.2em; margin-bottom: 8px;">${item.description || item.name}</div>
-          <div style="font-size: 2em;">🔊</div>
+        card.style.transition = 'all 0.3s';
+        
+        card.onmouseover = () => {
+          card.style.transform = 'scale(1.02)';
+          card.style.borderColor = 'var(--primary)';
+          card.style.boxShadow = '0 8px 20px rgba(108, 99, 255, 0.3)';
+        };
+        
+        card.onmouseout = () => {
+          card.style.transform = 'scale(1)';
+          card.style.borderColor = 'rgba(108, 99, 255, 0.3)';
+          card.style.boxShadow = 'none';
+        };
+        
+        let cardContent = `
+          <div style="font-size: 1.2em; margin-bottom: 8px; font-weight: bold; color: var(--primary);">
+            ${item.description || item.name}
+          </div>
+          <div style="font-size: 2em; margin: 15px 0;">🔊</div>
         `;
         
+        // Agregar visualización especial para escalas
+        if (currentMode === 'escalas' && scaleDetails[item.name]) {
+          const details = scaleDetails[item.name];
+          
+          cardContent += `
+            <div class="scale-visualization">
+              <div class="scale-diagram">
+                ${details.notes.map((note, i) => {
+                  let intervalText = '';
+                  if (i < details.pattern.length) {
+                    const pattern = details.pattern[i];
+                    if (pattern === 'T') {
+                      intervalText = '<span class="scale-interval interval-whole">→ Tono →</span>';
+                    } else if (pattern === 'st') {
+                      intervalText = '<span class="scale-interval interval-half">→ ½ →</span>';
+                    } else if (pattern === 'T+st') {
+                      intervalText = '<span class="scale-interval interval-whole">→ Tono+½ →</span>';
+                    }
+                  }
+                  return `
+                    <div class="scale-note">${note}</div>
+                    ${intervalText}
+                  `;
+                }).join('')}
+              </div>
+              <div style="margin-top: 15px; padding: 10px; background: rgba(108, 99, 255, 0.1); border-radius: 8px;">
+                <small style="color: #666;">
+                  <span class="interval-whole">T = Tono completo (2 semitonos)</span> • 
+                  <span class="interval-half">½ = Semitono (1 semitono)</span>
+                </small>
+              </div>
+            </div>
+          `;
+        }
+        
+        card.innerHTML = cardContent;
         card.onclick = () => playStudyItem(item);
         container.appendChild(card);
       });
