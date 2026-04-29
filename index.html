@@ -362,7 +362,7 @@ function updateView() {
   } else {
     s.style.display = 'none'; t.style.display = 'block';
     updateSettingsPanel();
-    nextQuestion();
+    nextQuestion(false);
   }
 }
 
@@ -548,7 +548,7 @@ async function playSound() {
 }
 
 // ==================== PREGUNTAS ====================
-function nextQuestion() {
+function nextQuestion(autoPlay = true) {
   let options = [], correctIndex = 0;
 
   if (currentMode === 'intervalos') {
@@ -578,7 +578,7 @@ function nextQuestion() {
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   renderOptions(options, correctIndex);
-  setTimeout(() => playSound(), 300);
+  if (autoPlay) setTimeout(() => playSound(), 300);
 }
 
 function renderOptions(options, correctIndex) {
@@ -622,7 +622,7 @@ function updateScoreboard() {
 
 function resetScore() {
   scores.correct = scores.incorrect = scores.streak = 0;
-  updateScoreboard(); nextQuestion();
+  updateScoreboard(); nextQuestion(false);
 }
 
 // ==================== CHAT ====================
