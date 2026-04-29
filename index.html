@@ -770,7 +770,7 @@
       </div>
     </div>
 
-    <div class="exercise-area">
+    <div class="exercise-area" id="exerciseArea">
       <!-- MODO ESTUDIO -->
       <div id="studyArea" style="display: none;">
         <h2 style="text-align: center; margin-bottom: 30px; color: var(--primary);">
@@ -1254,14 +1254,19 @@
     }
 
     // ==================== CAMBIO DE VISTA ====================
+    function scrollToExerciseArea() {
+      document.getElementById('exerciseArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function setViewMode(mode) {
       viewMode = mode;
-      
+
       // Actualizar botones
       document.getElementById('studyModeBtn').className = mode === 'study' ? 'btn btn-success' : 'btn';
       document.getElementById('testModeBtn').className = mode === 'test' ? 'btn btn-success' : 'btn';
-      
+
       updateView();
+      scrollToExerciseArea();
     }
 
     function updateView() {
@@ -1544,6 +1549,7 @@
       });
       document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
       updateView();
+      scrollToExerciseArea();
     }
 
     // ==================== GENERACIÓN DE PREGUNTAS ====================
