@@ -3,1717 +3,795 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrenamiento Auditivo - @Andres_ChBFl</title>
+  <title>Entrenamiento Auditivo - Prof. Andrés Chávez</title>
   <script src="https://cdn.jsdelivr.net/npm/tone@14/build/Tone.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     :root {
-      --bg: #0f0f1e;
-      --card: #1a1a2e;
-      --card-hover: #232340;
-      --primary: #6c63ff;
-      --success: #06d6a0;
-      --danger: #ef476f;
-      --warning: #ffd166;
-      --text: #e0e0e0;
-      --text-muted: #a0a0a0;
-    }
-
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 25px 20px;
-      background: linear-gradient(135deg, var(--primary), #9c5cff);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      color: white;
-    }
-
-    .subtitle {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 1.1em;
-    }
-
-    .mobile-indicator {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 15px;
-      display: none;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    @media (max-width: 768px) {
-      .mobile-indicator {
-        display: block;
-      }
-      
-      h1 {
-        font-size: 1.8em;
-      }
-      
-      header {
-        padding: 20px 15px;
-        margin-bottom: 20px;
-      }
-    }
-
-    .study-item-card {
-      background: var(--card-hover);
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: 2px solid rgba(108, 99, 255, 0.3);
-    }
-
-    .study-item-card:hover {
-      transform: scale(1.05);
-      border-color: var(--primary);
-      box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
-    }
-
-    .study-item-card:active {
-      transform: scale(0.98);
-    }
-
-    .scale-visualization {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .scale-diagram {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin: 15px 0;
-      flex-wrap: wrap;
-    }
-
-    .scale-note {
-      background: var(--primary);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      position: relative;
-      min-width: 45px;
-      text-align: center;
-    }
-
-    .scale-interval {
-      color: #666;
-      font-size: 0.85em;
-      font-weight: normal;
-      padding: 0 8px;
-    }
-
-    .interval-whole {
-      color: var(--success);
-      font-weight: bold;
-    }
-
-    .interval-half {
-      color: var(--danger);
-      font-weight: bold;
-    }
-
-    .staff-container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 15px;
-      min-height: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .staff-lines {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .mode-selector {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .chat-button {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--primary), #9c5cff);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.5);
-      transition: all 0.3s;
-      z-index: 1000;
-      font-size: 1.8em;
-    }
-
-    .chat-button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.7);
-    }
-
-    .chat-container {
-      position: fixed;
-      bottom: 100px;
-      right: 30px;
-      width: 400px;
-      height: 600px;
-      background: var(--card);
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      display: none;
-      flex-direction: column;
-      z-index: 999;
-      overflow: hidden;
-    }
-
-    .chat-container.open {
-      display: flex;
-    }
-
-    .chat-header {
-      background: linear-gradient(135deg, var(--primary), #9c5cff);
-      padding: 20px;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .chat-header h3 {
-      margin: 0;
-      font-size: 1.2em;
-    }
-
-    .chat-close {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5em;
-      cursor: pointer;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .chat-message {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      line-height: 1.5;
-      animation: slideIn 0.3s;
-    }
-
-    .chat-message.user {
-      background: var(--primary);
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    .chat-message.assistant {
-      background: rgba(108, 99, 255, 0.1);
-      color: var(--text);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-
-    .chat-message.loading {
-      background: rgba(108, 99, 255, 0.1);
-      color: var(--text-muted);
-      align-self: flex-start;
-    }
-
-    .chat-input-area {
-      padding: 15px;
-      border-top: 2px solid rgba(108, 99, 255, 0.3);
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-input {
-      flex: 1;
-      background: var(--card-hover);
-      border: 2px solid rgba(108, 99, 255, 0.3);
-      border-radius: 10px;
-      padding: 12px;
-      color: var(--text);
-      font-size: 1em;
-      resize: none;
-      font-family: inherit;
-    }
-
-    .chat-input:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
-    .chat-send {
-      background: var(--primary);
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      color: white;
-      cursor: pointer;
-      font-size: 1.2em;
-      transition: all 0.3s;
-    }
-
-    .chat-send:hover {
-      background: #9c5cff;
-    }
-
-    .chat-send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .chat-suggestions {
-      padding: 10px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      border-bottom: 2px solid rgba(108, 99, 255, 0.3);
-    }
-
-    .suggestion-chip {
-      background: rgba(108, 99, 255, 0.2);
-      border: 1px solid rgba(108, 99, 255, 0.4);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85em;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .suggestion-chip:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .chat-container {
-        width: calc(100% - 40px);
-        height: 500px;
-        right: 20px;
-        bottom: 90px;
-      }
-      
-      .chat-button {
-        right: 20px;
-        bottom: 20px;
-      }
-    }
-
-    .mode-selector {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .mode-card {
-      background: var(--card);
-      padding: 25px;
-      border-radius: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 3px solid transparent;
-      text-align: center;
-    }
-
-    .mode-card:hover {
-      background: var(--card-hover);
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .mode-card.active {
-      border-color: var(--primary);
-      background: var(--card-hover);
-      box-shadow: 0 0 20px rgba(108, 99, 255, 0.4);
-    }
-
-    .mode-icon {
-      font-size: 3em;
-      margin-bottom: 10px;
-    }
-
-    .mode-title {
-      font-size: 1.3em;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .exercise-area {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .settings-panel {
-      background: rgba(108, 99, 255, 0.1);
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 30px;
-    }
-
-    .settings-title {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: var(--primary);
-    }
-
-    .toggle-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-
-    .toggle-btn {
-      background: var(--card-hover);
-      color: var(--text);
-      border: 2px solid rgba(108, 99, 255, 0.3);
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.95em;
-    }
-
-    .toggle-btn:hover {
-      border-color: var(--primary);
-    }
-
-    .toggle-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .progress-info {
-      background: rgba(6, 214, 160, 0.1);
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 15px;
-      text-align: center;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--success), var(--primary));
-      transition: width 0.5s ease;
-    }
-
-    .unlock-message {
-      color: var(--success);
-      font-weight: bold;
-      margin-top: 10px;
-      animation: pulse 1s infinite;
-    }
-
-    .score-board {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: rgba(108, 99, 255, 0.1);
-      border-radius: 15px;
-    }
-
-    .score-item {
-      text-align: center;
-    }
-
-    .score-label {
-      color: var(--text-muted);
-      font-size: 0.9em;
-      margin-bottom: 5px;
-    }
-
-    .score-value {
-      font-size: 2em;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
+      --bg: #0f0f1e; --card: #1a1a2e; --card-hover: #232340;
+      --primary: #6c63ff; --success: #06d6a0; --danger: #ef476f;
+      --warning: #ffd166; --text: #e0e0e0; --text-muted: #a0a0a0;
+    }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 30px; padding: 25px 20px; background: linear-gradient(135deg, var(--primary), #9c5cff); border-radius: 20px; box-shadow: 0 10px 30px rgba(108,99,255,0.3); position: sticky; top: 0; z-index: 100; }
+    h1 { font-size: 2.5em; margin-bottom: 10px; color: white; }
+    .subtitle { color: rgba(255,255,255,0.9); font-size: 1.1em; }
+    .mobile-indicator { background: rgba(255,255,255,0.2); padding: 12px; border-radius: 10px; margin-top: 15px; display: none; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+    .mode-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 35px; }
+    .mode-card { background: var(--card); padding: 22px 15px; border-radius: 15px; cursor: pointer; transition: all 0.3s; border: 3px solid transparent; text-align: center; }
+    .mode-card:hover { background: var(--card-hover); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .mode-card.active { border-color: var(--primary); background: var(--card-hover); box-shadow: 0 0 20px rgba(108,99,255,0.4); }
+    .mode-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .mode-title { font-size: 1.15em; font-weight: bold; margin-bottom: 4px; }
+
+    .exercise-area { background: var(--card); border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+
+    .settings-panel { background: rgba(108,99,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 30px; }
+    .settings-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; color: var(--primary); }
+    .settings-section { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid rgba(108,99,255,0.2); }
+    .settings-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .settings-section h4 { color: var(--text); margin-bottom: 10px; font-size: 1em; }
+
+    .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .toggle-btn { background: var(--card-hover); color: var(--text); border: 2px solid rgba(108,99,255,0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.25s; font-size: 0.9em; }
+    .toggle-btn:hover { border-color: var(--primary); }
+    .toggle-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+    .selection-info { color: var(--text-muted); font-size: 0.85em; margin-top: 6px; }
+
+    .score-board { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; padding: 20px; background: rgba(108,99,255,0.1); border-radius: 15px; }
+    .score-item { text-align: center; }
+    .score-label { color: var(--text-muted); font-size: 0.9em; margin-bottom: 5px; }
+    .score-value { font-size: 2em; font-weight: bold; color: var(--primary); }
     .score-value.success { color: var(--success); }
-    .score-value.danger { color: var(--danger); }
+    .score-value.danger  { color: var(--danger); }
 
-    .play-controls {
-      text-align: center;
-      margin: 30px 0;
-    }
-
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 1.1em;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 600;
-      margin: 5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
+    .play-controls { text-align: center; margin: 30px 0; }
+    .btn { background: var(--primary); color: white; border: none; padding: 14px 28px; font-size: 1.05em; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; margin: 5px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108,99,255,0.4); }
+    .btn:active { transform: translateY(0); }
     .btn-success { background: var(--success); }
-    .btn-danger { background: var(--danger); }
+    .btn-danger  { background: var(--danger); }
     .btn-warning { background: var(--warning); color: #000; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 25px 0; }
+    .option-btn { background: var(--card-hover); color: var(--text); border: 2px solid rgba(108,99,255,0.3); padding: 18px; font-size: 1em; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-weight: 500; }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary); background: rgba(108,99,255,0.2); transform: scale(1.03); }
+    .option-btn.correct  { background: var(--success); border-color: var(--success); color: white; animation: pulse 0.5s; }
+    .option-btn.incorrect{ background: var(--danger);  border-color: var(--danger);  color: white; animation: shake 0.5s; }
+    .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
-    .options-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin: 30px 0;
-    }
+    .feedback { text-align: center; font-size: 1.4em; font-weight: bold; margin: 20px 0; padding: 20px; border-radius: 10px; min-height: 65px; display: flex; align-items: center; justify-content: center; }
+    .feedback.correct  { background: rgba(6,214,160,0.2);  color: var(--success); }
+    .feedback.incorrect{ background: rgba(239,71,111,0.2); color: var(--danger); }
 
-    .option-btn {
-      background: var(--card-hover);
-      color: var(--text);
-      border: 2px solid rgba(108, 99, 255, 0.3);
-      padding: 20px;
-      font-size: 1.1em;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
+    /* Study mode */
+    .scale-visualization { background: rgba(255,255,255,0.04); padding: 18px; border-radius: 10px; margin-top: 12px; }
+    .scale-diagram { display: flex; justify-content: center; align-items: center; gap: 5px; margin: 12px 0; flex-wrap: wrap; }
+    .scale-note { background: var(--primary); color: white; padding: 9px 13px; border-radius: 7px; font-weight: bold; min-width: 38px; text-align: center; font-size: 0.85em; }
+    .scale-interval { font-size: 0.72em; padding: 0 3px; }
+    .int-t  { color: var(--success); font-weight: bold; }
+    .int-st { color: var(--warning); font-weight: bold; }
+    .int-ts { color: var(--danger);  font-weight: bold; }
 
-    .option-btn:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: rgba(108, 99, 255, 0.2);
-      transform: scale(1.05);
-    }
+    /* Chat */
+    .chat-button { position: fixed; bottom: 28px; right: 28px; width: 58px; height: 58px; background: linear-gradient(135deg, var(--primary), #9c5cff); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(108,99,255,0.5); transition: all 0.3s; z-index: 1000; font-size: 1.7em; border: none; color: white; }
+    .chat-button:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(108,99,255,0.7); }
+    .chat-container { position: fixed; bottom: 98px; right: 28px; width: 400px; height: 580px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 999; overflow: hidden; border: 1px solid rgba(108,99,255,0.3); }
+    .chat-container.open { display: flex; }
+    .chat-header { background: linear-gradient(135deg, var(--primary), #9c5cff); padding: 18px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+    .chat-header h3 { margin: 0; font-size: 1.1em; }
+    .chat-close { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; line-height: 1; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .chat-message { max-width: 85%; padding: 11px 15px; border-radius: 12px; line-height: 1.55; font-size: 0.92em; animation: slideIn 0.25s; }
+    .chat-message.user      { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chat-message.assistant { background: rgba(108,99,255,0.12); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(108,99,255,0.2); }
+    .chat-message.loading   { background: rgba(108,99,255,0.08); color: var(--text-muted); align-self: flex-start; }
+    .chat-suggestions { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 7px; border-bottom: 1px solid rgba(108,99,255,0.2); }
+    .suggestion-chip { background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.3); padding: 5px 11px; border-radius: 20px; font-size: 0.8em; cursor: pointer; transition: all 0.2s; color: var(--text); }
+    .suggestion-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .chat-input-area { padding: 13px; border-top: 1px solid rgba(108,99,255,0.3); display: flex; gap: 8px; }
+    .chat-input { flex: 1; background: var(--card-hover); border: 2px solid rgba(108,99,255,0.3); border-radius: 10px; padding: 11px; color: var(--text); font-size: 0.92em; resize: none; font-family: inherit; }
+    .chat-input:focus { outline: none; border-color: var(--primary); }
+    .chat-send { background: var(--primary); border: none; border-radius: 10px; padding: 11px 18px; color: white; cursor: pointer; font-size: 1.1em; transition: background 0.2s; }
+    .chat-send:hover { background: #9c5cff; }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .option-btn.correct {
-      background: var(--success);
-      border-color: var(--success);
-      color: white;
-      animation: pulse 0.5s;
-    }
+    .start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center; padding: 20px; }
+    .start-overlay h2 { font-size: 2.4em; margin-bottom: 18px; color: var(--primary); }
+    .start-overlay p  { font-size: 1.15em; margin-bottom: 28px; color: var(--text-muted); }
 
-    .option-btn.incorrect {
-      background: var(--danger);
-      border-color: var(--danger);
-      color: white;
-      animation: shake 0.5s;
-    }
-
-    .option-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    .option-btn.locked {
-      opacity: 0.4;
-      position: relative;
-    }
-
-    .option-btn.locked::after {
-      content: '🔒';
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      font-size: 0.8em;
-    }
-
-    .feedback {
-      text-align: center;
-      font-size: 1.5em;
-      font-weight: bold;
-      margin: 20px 0;
-      padding: 20px;
-      border-radius: 10px;
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .feedback.correct {
-      background: rgba(6, 214, 160, 0.2);
-      color: var(--success);
-    }
-
-    .feedback.incorrect {
-      background: rgba(239, 71, 111, 0.2);
-      color: var(--danger);
-    }
-
-    .start-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .start-overlay h2 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: var(--primary);
-    }
-
-    .start-overlay p {
-      font-size: 1.2em;
-      margin-bottom: 30px;
-      color: var(--text-muted);
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
+    @keyframes pulse   { 0%,100%{transform:scale(1)}   50%{transform:scale(1.05)} }
+    @keyframes shake   { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px)} 75%{transform:translateX(9px)} }
+    @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
     @media (max-width: 768px) {
       h1 { font-size: 1.8em; }
-      .mode-selector { grid-template-columns: 1fr; }
+      .mobile-indicator { display: block; }
+      header { padding: 18px 14px; margin-bottom: 18px; }
+      .mode-selector { grid-template-columns: repeat(2, 1fr); }
       .options-grid { grid-template-columns: 1fr; }
-      .score-board { flex-direction: column; gap: 15px; }
+      .score-board { flex-direction: column; gap: 12px; }
       .toggle-group { justify-content: center; }
-      
-      .exercise-area {
-        padding: 20px;
-        margin-top: 20px;
-      }
-      
-      .play-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .scale-diagram {
-        flex-direction: column;
-        gap: 5px;
-      }
-      
-      .scale-interval {
-        transform: rotate(90deg);
-        margin: 5px 0;
-      }
+      .exercise-area { padding: 18px; margin-top: 18px; }
+      .play-controls { display: flex; flex-direction: column; gap: 8px; }
+      .btn { width: 100%; justify-content: center; }
+      .chat-container { width: calc(100% - 36px); height: 490px; right: 18px; bottom: 85px; }
+      .chat-button { right: 18px; bottom: 18px; }
+      .scale-diagram { flex-direction: column; gap: 3px; }
     }
   </style>
 </head>
 <body>
-  <div id="startOverlay" class="start-overlay">
-    <h2>🎵 Entrenamiento Auditivo Musical</h2>
-    <p>Haz clic para activar el sonido y comenzar</p>
-    <button class="btn btn-success" onclick="initAudio()">▶ INICIAR</button>
+
+<div id="startOverlay" class="start-overlay">
+  <h2>🎵 Entrenamiento Auditivo Musical</h2>
+  <p>Haz clic para activar el sonido y comenzar</p>
+  <button class="btn btn-success" onclick="initAudio()">▶ INICIAR</button>
+</div>
+
+<div class="container">
+  <header>
+    <h1>🎼 Entrenamiento Auditivo Musical</h1>
+    <p class="subtitle">por Prof. Andrés Chávez • Universidad del Quindío • 2025</p>
+    <div class="mobile-indicator">⬇️ Desliza hacia abajo para comenzar</div>
+  </header>
+
+  <div style="display:flex;justify-content:center;gap:15px;margin-bottom:22px;flex-wrap:wrap;">
+    <button class="btn btn-success" onclick="setViewMode('study')" id="studyModeBtn">📚 Modo Estudio</button>
+    <button class="btn"            onclick="setViewMode('test')"  id="testModeBtn">✏️ Modo Prueba</button>
   </div>
 
-  <div class="container">
-    <header>
-      <h1>🎼 Entrenamiento Auditivo Musical</h1>
-      <p class="subtitle">por @Andres_ChBFl • Colombia • 2025</p>
-      <div class="mobile-indicator">
-        ⬇️ Desliza hacia abajo para comenzar los ejercicios
-      </div>
-    </header>
+  <div class="mode-selector">
+    <div class="mode-card active" onclick="setMode('intervalos')"  data-mode="intervalos">
+      <div class="mode-icon">🎵</div>
+      <div class="mode-title">Intervalos</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Melódicos y Armónicos</p>
+    </div>
+    <div class="mode-card" onclick="setMode('triadas')"    data-mode="triadas">
+      <div class="mode-icon">🎹</div>
+      <div class="mode-title">Tríadas</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">4 tipos básicos</p>
+    </div>
+    <div class="mode-card" onclick="setMode('inversiones')" data-mode="inversiones">
+      <div class="mode-icon">🔄</div>
+      <div class="mode-title">Inversiones</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Fundamental, 1ª y 2ª</p>
+    </div>
+    <div class="mode-card" onclick="setMode('septimas')"   data-mode="septimas">
+      <div class="mode-icon">7️⃣</div>
+      <div class="mode-title">Séptimas</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Acordes de 4 notas</p>
+    </div>
+    <div class="mode-card" onclick="setMode('progresiones')" data-mode="progresiones">
+      <div class="mode-icon">🎼</div>
+      <div class="mode-title">Progresiones</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Secuencias Armónicas</p>
+    </div>
+    <div class="mode-card" onclick="setMode('escalas')"    data-mode="escalas">
+      <div class="mode-icon">🎶</div>
+      <div class="mode-title">Escalas</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Mayor, Menor y Modos</p>
+    </div>
+  </div>
 
-    <!-- Pestañas de Modo -->
-    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-      <button class="btn btn-success" onclick="setViewMode('study')" id="studyModeBtn">
-        📚 Modo Estudio
-      </button>
-      <button class="btn" onclick="setViewMode('test')" id="testModeBtn">
-        ✏️ Modo Prueba
-      </button>
+  <div class="exercise-area" id="exerciseArea">
+    <!-- MODO ESTUDIO -->
+    <div id="studyArea" style="display:none;">
+      <h2 style="text-align:center;margin-bottom:25px;color:var(--primary);">📚 Modo Estudio — Explora y Aprende</h2>
+      <p style="text-align:center;margin-bottom:25px;color:var(--text-muted);">Haz clic en cada tarjeta para escuchar el sonido</p>
+      <div id="studyContent" class="options-grid"></div>
     </div>
 
-    <div class="mode-selector">
-      <div class="mode-card active" onclick="setMode('intervalos')" data-mode="intervalos">
-        <div class="mode-icon">🎵</div>
-        <div class="mode-title">Intervalos</div>
-        <p>Ascendentes y Descendentes</p>
+    <!-- MODO PRUEBA -->
+    <div id="testArea" style="display:none;">
+      <div id="settingsPanel" class="settings-panel">
+        <div class="settings-title">⚙️ Configuración Personalizada</div>
+        <div id="settingsContent"></div>
       </div>
-      <div class="mode-card" onclick="setMode('triadas')" data-mode="triadas">
-        <div class="mode-icon">🎹</div>
-        <div class="mode-title">Tríadas</div>
-        <p>Progresivo: 4 tipos básicos</p>
-      </div>
-      <div class="mode-card" onclick="setMode('inversiones')" data-mode="inversiones">
-        <div class="mode-icon">🔄</div>
-        <div class="mode-title">Inversiones</div>
-        <p>Fundamental, 1ª y 2ª</p>
-      </div>
-      <div class="mode-card" onclick="setMode('septimas')" data-mode="septimas">
-        <div class="mode-icon">7️⃣</div>
-        <div class="mode-title">Séptimas</div>
-        <p>Acordes de 4 notas</p>
-      </div>
-      <div class="mode-card" onclick="setMode('progresiones')" data-mode="progresiones">
-        <div class="mode-icon">🎼</div>
-        <div class="mode-title">Progresiones</div>
-        <p>Secuencias de Acordes</p>
-      </div>
-      <div class="mode-card" onclick="setMode('escalas')" data-mode="escalas">
-        <div class="mode-icon">🎶</div>
-        <div class="mode-title">Escalas</div>
-        <p>Mayor, Menor y Modos</p>
-      </div>
-    </div>
-
-    <div class="exercise-area" id="exerciseArea">
-      <!-- MODO ESTUDIO -->
-      <div id="studyArea" style="display: none;">
-        <h2 style="text-align: center; margin-bottom: 30px; color: var(--primary);">
-          📚 Modo Estudio - Explora y Aprende
-        </h2>
-        <p style="text-align: center; margin-bottom: 30px; color: var(--text-muted);">
-          Haz clic en cada opción para escuchar y familiarizarte con los sonidos
-        </p>
-        <div id="studyContent" class="options-grid"></div>
-      </div>
-
-      <!-- MODO PRUEBA -->
-      <div id="testArea">
-        <!-- Panel de configuración -->
-        <div id="settingsPanel" class="settings-panel">
-          <div class="settings-title">⚙️ Configuración</div>
-          <div id="settingsContent"></div>
-        </div>
-
       <div class="score-board">
-        <div class="score-item">
-          <div class="score-label">Correctas</div>
-          <div class="score-value success" id="correctScore">0</div>
-        </div>
-        <div class="score-item">
-          <div class="score-label">Incorrectas</div>
-          <div class="score-value danger" id="incorrectScore">0</div>
-        </div>
-        <div class="score-item">
-          <div class="score-label">Racha</div>
-          <div class="score-value" id="streakScore">0</div>
-        </div>
+        <div class="score-item"><div class="score-label">Correctas</div><div class="score-value success" id="correctScore">0</div></div>
+        <div class="score-item"><div class="score-label">Incorrectas</div><div class="score-value danger" id="incorrectScore">0</div></div>
+        <div class="score-item"><div class="score-label">Racha</div><div class="score-value" id="streakScore">0</div></div>
       </div>
-
       <div class="play-controls">
-        <button class="btn" onclick="playSound()" id="playBtn">
-          🔊 Reproducir
-        </button>
-        <button class="btn btn-warning" onclick="nextQuestion()">
-          🔄 Siguiente
-        </button>
-        <button class="btn btn-danger" onclick="resetScore()">
-          ↺ Reiniciar Puntuación
-        </button>
+        <button class="btn" onclick="playSound()">🔊 Reproducir</button>
+        <button class="btn btn-warning" onclick="nextQuestion()">🔄 Siguiente</button>
+        <button class="btn btn-danger"  onclick="resetScore()">↺ Reiniciar</button>
       </div>
-
       <div id="optionsContainer" class="options-grid"></div>
-
       <div id="feedback" class="feedback"></div>
-      </div>
-    </div>
-
-    <!-- FOOTER PROFESIONAL -->
-    <footer style="text-align: center; padding: 40px 20px; margin-top: 60px; 
-                   background: var(--card); border-radius: 20px; 
-                   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
-      <h3 style="color: var(--primary); margin-bottom: 20px; font-size: 1.8em;">
-        🎓 Proyecto de Investigación Académica
-      </h3>
-      
-      <div style="max-width: 800px; margin: 0 auto;">
-        <p style="margin-bottom: 12px; font-size: 1.1em;">
-          <strong style="color: var(--primary);">Desarrollado por:</strong> 
-          <span style="color: var(--success);">Prof. Andrés Chávez</span>
-        </p>
-        
-        <p style="margin-bottom: 12px; font-size: 1.1em;">
-          <strong style="color: var(--primary);">Institución:</strong> 
-          Universidad del Quindío
-        </p>
-        
-        <p style="margin-bottom: 12px; font-size: 1.1em;">
-          <strong style="color: var(--primary);">Ubicación:</strong> 
-          Armenia, Quindío, Colombia 🇨🇴
-        </p>
-        
-        <p style="margin-bottom: 12px; font-size: 1.1em;">
-          <strong style="color: var(--primary);">Año:</strong> 2025
-        </p>
-        
-        <div style="margin: 30px 0; padding: 20px; 
-                    background: rgba(108, 99, 255, 0.1); 
-                    border-radius: 15px; border-left: 4px solid var(--primary);">
-          <p style="color: var(--text); font-size: 1.05em; line-height: 1.8;">
-            <strong>📚 Descripción del Proyecto:</strong><br>
-            Herramienta digital interactiva para el desarrollo del oído musical 
-            y entrenamiento auditivo. Proyecto de innovación pedagógica que 
-            integra tecnología web y educación musical para estudiantes 
-            universitarios y público general interesado en mejorar sus 
-            habilidades auditivas musicales.
-          </p>
-        </div>
-        
-        <div style="margin: 25px 0;">
-          <p style="color: var(--text-muted); font-size: 1em; line-height: 1.6;">
-            <strong>🎯 Áreas de aplicación:</strong><br>
-            Intervalos • Acordes • Inversiones • Séptimas • Progresiones • Escalas
-          </p>
-        </div>
-        
-        <div style="margin-top: 30px; padding-top: 20px; 
-                    border-top: 2px solid rgba(108, 99, 255, 0.3);">
-          <p style="margin-bottom: 15px; font-size: 1em;">
-            <strong style="color: var(--primary);">📧 Contacto:</strong> 
-            <a href="mailto:archavez@uniquindio.edu.co" 
-               style="color: var(--success); text-decoration: none;">
-              archavez@uniquindio.edu.co
-            </a>
-          </p>
-          
-          <p style="color: var(--text-muted); font-size: 0.95em; margin-top: 20px;">
-            © 2025 Universidad del Quindío - Todos los derechos reservados<br>
-            Herramienta educativa de acceso libre para fines académicos
-          </p>
-        </div>
-        
-        <div style="margin-top: 25px;">
-          <p style="font-size: 0.9em; color: var(--text-muted);">
-            <strong>Versión:</strong> 1.0 | 
-            <strong>Última actualización:</strong> Noviembre 2025
-          </p>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <!-- CHAT DE IA -->
-  <div class="chat-button" onclick="toggleChat()" id="chatButton">
-    💬
-  </div>
-
-  <div class="chat-container" id="chatContainer">
-    <div class="chat-header">
-      <h3>🎵 Asistente Musical IA</h3>
-      <button class="chat-close" onclick="toggleChat()">×</button>
-    </div>
-    
-    <div class="chat-suggestions">
-      <div class="suggestion-chip" onclick="askQuestion('¿Qué es un intervalo de tercera mayor?')">
-        Tercera mayor
-      </div>
-      <div class="suggestion-chip" onclick="askQuestion('Explica las inversiones de acordes')">
-        Inversiones
-      </div>
-      <div class="suggestion-chip" onclick="askQuestion('¿Cómo reconocer un acorde menor?')">
-        Acorde menor
-      </div>
-      <div class="suggestion-chip" onclick="askQuestion('¿Qué es una progresión armónica?')">
-        Progresiones
-      </div>
-    </div>
-    
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-message assistant">
-        ¡Hola! Soy tu asistente de teoría musical. Puedo ayudarte con:
-        <br><br>
-        • Intervalos y sus características<br>
-        • Acordes (tríadas y séptimas)<br>
-        • Inversiones de acordes<br>
-        • Progresiones armónicas<br>
-        • Escalas y modos<br>
-        • Conceptos de solfeo y armonía<br>
-        <br>
-        ¿En qué puedo ayudarte?
-      </div>
-    </div>
-    
-    <div class="chat-input-area">
-      <textarea 
-        class="chat-input" 
-        id="chatInput" 
-        placeholder="Pregunta sobre teoría musical..."
-        rows="1"
-        onkeypress="handleChatKeyPress(event)"
-      ></textarea>
-      <button class="chat-send" onclick="sendMessage()" id="sendButton">
-        ➤
-      </button>
     </div>
   </div>
 
-  <script>
-    // ==================== CONFIGURACIÓN ====================
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    let audioReady = false;
-    let currentMode = 'intervalos';
-    let viewMode = 'study'; // 'study' o 'test'
-    let currentQuestion = null;
-    let answered = false;
-    let chatHistory = [];
-    
-    const scores = {
-      correct: 0,
-      incorrect: 0,
-      streak: 0
-    };
+  <footer style="text-align:center;padding:40px 20px;margin-top:60px;background:var(--card);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+    <h3 style="color:var(--primary);margin-bottom:20px;font-size:1.7em;">🎓 Proyecto de Investigación Académica</h3>
+    <div style="max-width:780px;margin:0 auto;">
+      <p style="margin-bottom:10px;"><strong style="color:var(--primary);">Desarrollado por:</strong> <span style="color:var(--success);">Prof. Andrés Chávez</span></p>
+      <p style="margin-bottom:10px;"><strong style="color:var(--primary);">Institución:</strong> Universidad del Quindío</p>
+      <p style="margin-bottom:10px;"><strong style="color:var(--primary);">Ubicación:</strong> Armenia, Quindío, Colombia 🇨🇴</p>
+      <p style="margin-bottom:10px;"><strong style="color:var(--primary);">Año:</strong> 2025</p>
+      <div style="margin:25px 0;padding:18px;background:rgba(108,99,255,0.1);border-radius:12px;border-left:4px solid var(--primary);">
+        <p style="line-height:1.8;"><strong>📚 Descripción:</strong><br>Herramienta digital interactiva para el desarrollo del oído musical y entrenamiento auditivo. Proyecto de innovación pedagógica que integra tecnología web y educación musical para estudiantes universitarios y público general.</p>
+      </div>
+      <p style="color:var(--text-muted);margin-bottom:18px;"><strong>🎯 Áreas:</strong> Intervalos • Tríadas • Inversiones • Séptimas • Progresiones • Escalas</p>
+      <p><strong style="color:var(--primary);">📧 Contacto:</strong> <a href="mailto:archavez@uniquindio.edu.co" style="color:var(--success);text-decoration:none;">archavez@uniquindio.edu.co</a></p>
+      <p style="color:var(--text-muted);font-size:0.9em;margin-top:18px;">© 2025 Universidad del Quindío — Herramienta educativa de acceso libre</p>
+      <p style="font-size:0.85em;color:var(--text-muted);margin-top:12px;"><strong>Versión:</strong> 3.0 | <strong>Actualización:</strong> 2025</p>
+    </div>
+  </footer>
+</div>
 
-    // Configuración de intervalos
-    const intervalSettings = {
-      ascending: true,
-      descending: false
-    };
+<!-- CHAT -->
+<button class="chat-button" onclick="toggleChat()" title="Asistente Musical">💬</button>
+<div class="chat-container" id="chatContainer">
+  <div class="chat-header">
+    <h3>🎵 Asistente de Teoría Musical</h3>
+    <button class="chat-close" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-suggestions">
+    <div class="suggestion-chip" onclick="askQuestion('¿Qué es una tercera mayor?')">Tercera mayor</div>
+    <div class="suggestion-chip" onclick="askQuestion('Explica las inversiones de acordes')">Inversiones</div>
+    <div class="suggestion-chip" onclick="askQuestion('¿Qué es el acorde dominante 7?')">Dominante 7</div>
+    <div class="suggestion-chip" onclick="askQuestion('¿Qué es la progresión ii-V-I?')">ii-V-I</div>
+    <div class="suggestion-chip" onclick="askQuestion('Escala menor armónica')">Menor armónica</div>
+    <div class="suggestion-chip" onclick="askQuestion('Consejos para estudiar')">Consejos</div>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-message assistant">
+      ¡Hola! Soy tu asistente de teoría musical. Puedo explicarte:<br><br>
+      🎵 <strong>Intervalos</strong> — distancias entre notas<br>
+      🎹 <strong>Acordes</strong> — tríadas, séptimas e inversiones<br>
+      🎼 <strong>Progresiones</strong> — secuencias armónicas<br>
+      🎶 <strong>Escalas</strong> — mayor, menor y modos<br><br>
+      ¿Sobre qué quieres aprender?
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <textarea class="chat-input" id="chatInput" placeholder="Pregunta sobre teoría musical..." rows="1" onkeypress="handleChatKeyPress(event)"></textarea>
+    <button class="chat-send" onclick="sendMessage()" id="sendButton">➤</button>
+  </div>
+</div>
 
-    // Progreso de tríadas (sistema de desbloqueo)
-    const triadasProgress = {
-      correctAnswers: 0,
-      unlockedChords: ['Mayor', 'Menor', 'Aumentado', 'Disminuido']
-    };
+<script>
+// ==================== CONFIG ====================
+const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+let audioReady = false, currentMode = 'intervalos', viewMode = 'study';
+let currentQuestion = null, answered = false;
+const scores = { correct: 0, incorrect: 0, streak: 0 };
 
-    // Notas musicales
-    const noteNames = ['Do', 'Do♯', 'Re', 'Re♯', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'La♯', 'Si'];
-    
-    // Información detallada de escalas
-    const scaleDetails = {
-      'Mayor': {
-        pattern: ['T', 'T', 'st', 'T', 'T', 'T', 'st'],
-        notes: ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si', 'Do']
-      },
-      'Menor Natural': {
-        pattern: ['T', 'st', 'T', 'T', 'st', 'T', 'T'],
-        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa', 'Sol', 'La']
-      },
-      'Menor Armónica': {
-        pattern: ['T', 'st', 'T', 'T', 'st', 'T+st', 'st'],
-        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa', 'Sol♯', 'La']
-      },
-      'Menor Melódica': {
-        pattern: ['T', 'st', 'T', 'T', 'T', 'T', 'st'],
-        notes: ['La', 'Si', 'Do', 'Re', 'Mi', 'Fa♯', 'Sol♯', 'La']
-      },
-      'Pentatónica Mayor': {
-        pattern: ['T', 'T', 'T+st', 'T', 'T+st'],
-        notes: ['Do', 'Re', 'Mi', 'Sol', 'La', 'Do']
-      },
-      'Pentatónica Menor': {
-        pattern: ['T+st', 'T', 'T', 'T+st', 'T'],
-        notes: ['La', 'Do', 'Re', 'Mi', 'Sol', 'La']
-      },
-      'Blues': {
-        pattern: ['T+st', 'T', 'st', 'st', 'T+st', 'T'],
-        notes: ['La', 'Do', 'Re', 'Re♯', 'Mi', 'Sol', 'La']
-      },
-      'Dórica': {
-        pattern: ['T', 'st', 'T', 'T', 'T', 'st', 'T'],
-        notes: ['Re', 'Mi', 'Fa', 'Sol', 'La', 'Si', 'Do', 'Re']
-      }
-    };
+// ==================== DATOS ====================
+const scaleDetails = {
+  'Mayor':             { pattern:['T','T','st','T','T','T','st'],     notes:['Do','Re','Mi','Fa','Sol','La','Si','Do'] },
+  'Menor Natural':     { pattern:['T','st','T','T','st','T','T'],     notes:['La','Si','Do','Re','Mi','Fa','Sol','La'] },
+  'Menor Armónica':    { pattern:['T','st','T','T','st','T+st','st'], notes:['La','Si','Do','Re','Mi','Fa','Sol♯','La'] },
+  'Menor Melódica':    { pattern:['T','st','T','T','T','T','st'],     notes:['La','Si','Do','Re','Mi','Fa♯','Sol♯','La'] },
+  'Pentatónica Mayor': { pattern:['T','T','T+st','T','T+st'],         notes:['Do','Re','Mi','Sol','La','Do'] },
+  'Pentatónica Menor': { pattern:['T+st','T','T','T+st','T'],         notes:['La','Do','Re','Mi','Sol','La'] },
+  'Blues':             { pattern:['T+st','T','st','st','T+st','T'],   notes:['La','Do','Re','Re♯','Mi','Sol','La'] },
+  'Dórica':            { pattern:['T','st','T','T','T','st','T'],     notes:['Re','Mi','Fa','Sol','La','Si','Do','Re'] }
+};
 
-    // ==================== DATOS MUSICALES ====================
-    const musicData = {
-      intervalos: [
-        { name: 'Segunda menor (m2)', semitones: 1 },
-        { name: 'Segunda mayor (M2)', semitones: 2 },
-        { name: 'Tercera menor (m3)', semitones: 3 },
-        { name: 'Tercera mayor (M3)', semitones: 4 },
-        { name: 'Cuarta justa (P4)', semitones: 5 },
-        { name: 'Tritono (TT)', semitones: 6 },
-        { name: 'Quinta justa (P5)', semitones: 7 },
-        { name: 'Sexta menor (m6)', semitones: 8 },
-        { name: 'Sexta mayor (M6)', semitones: 9 },
-        { name: 'Séptima menor (m7)', semitones: 10 },
-        { name: 'Séptima mayor (M7)', semitones: 11 },
-        { name: 'Octava (P8)', semitones: 12 }
-      ],
-      triadas: [
-        { name: 'Mayor', intervals: [0, 4, 7], unlockAt: 0 },
-        { name: 'Menor', intervals: [0, 3, 7], unlockAt: 0 },
-        { name: 'Aumentado', intervals: [0, 4, 8], unlockAt: 0 },
-        { name: 'Disminuido', intervals: [0, 3, 6], unlockAt: 0 },
-        { name: 'Suspendido 2', intervals: [0, 2, 7], unlockAt: 10 },
-        { name: 'Suspendido 4', intervals: [0, 5, 7], unlockAt: 15 },
-        { name: 'Quinta (Power chord)', intervals: [0, 7, 12], unlockAt: 20 }
-      ],
-      inversiones: [
-        { name: 'Mayor - Fundamental', intervals: [0, 4, 7], type: 'Mayor' },
-        { name: 'Mayor - 1ª Inversión', intervals: [0, 3, 8], type: 'Mayor' },
-        { name: 'Mayor - 2ª Inversión', intervals: [0, 5, 9], type: 'Mayor' },
-        { name: 'Menor - Fundamental', intervals: [0, 3, 7], type: 'Menor' },
-        { name: 'Menor - 1ª Inversión', intervals: [0, 4, 9], type: 'Menor' },
-        { name: 'Menor - 2ª Inversión', intervals: [0, 5, 8], type: 'Menor' }
-      ],
-      septimas: [
-        { name: 'Mayor 7', intervals: [0, 4, 7, 11] },
-        { name: 'Menor 7', intervals: [0, 3, 7, 10] },
-        { name: 'Dominante 7', intervals: [0, 4, 7, 10] },
-        { name: 'Menor 7♭5', intervals: [0, 3, 6, 10] },
-        { name: 'Mayor 7♯5', intervals: [0, 4, 8, 11] },
-        { name: 'Disminuido 7', intervals: [0, 3, 6, 9] }
-      ],
-      progresiones: [
-        { name: 'I - IV - V - I', chords: [[0,4,7], [5,9,12], [7,11,14], [0,4,7]] },
-        { name: 'I - V - vi - IV', chords: [[0,4,7], [7,11,14], [9,12,16], [5,9,12]] },
-        { name: 'ii - V - I', chords: [[2,5,9], [7,11,14], [0,4,7]] },
-        { name: 'I - vi - IV - V', chords: [[0,4,7], [9,12,16], [5,9,12], [7,11,14]] },
-        { name: 'vi - IV - I - V', chords: [[9,12,16], [5,9,12], [0,4,7], [7,11,14]] }
-      ],
-      escalas: [
-        { name: 'Mayor', intervals: [0,2,4,5,7,9,11,12] },
-        { name: 'Menor Natural', intervals: [0,2,3,5,7,8,10,12] },
-        { name: 'Menor Armónica', intervals: [0,2,3,5,7,8,11,12] },
-        { name: 'Menor Melódica', intervals: [0,2,3,5,7,9,11,12] },
-        { name: 'Pentatónica Mayor', intervals: [0,2,4,7,9,12] },
-        { name: 'Pentatónica Menor', intervals: [0,3,5,7,10,12] },
-        { name: 'Blues', intervals: [0,3,5,6,7,10,12] },
-        { name: 'Dórica', intervals: [0,2,3,5,7,9,10,12] }
-      ]
-    };
+const musicData = {
+  intervalos: [
+    { name:'Segunda menor (m2)', semitones:1 },  { name:'Segunda mayor (M2)', semitones:2 },
+    { name:'Tercera menor (m3)', semitones:3 },  { name:'Tercera mayor (M3)', semitones:4 },
+    { name:'Cuarta justa (P4)',  semitones:5 },  { name:'Tritono (TT)',        semitones:6 },
+    { name:'Quinta justa (P5)', semitones:7 },   { name:'Sexta menor (m6)',    semitones:8 },
+    { name:'Sexta mayor (M6)',  semitones:9 },   { name:'Séptima menor (m7)', semitones:10 },
+    { name:'Séptima mayor (M7)',semitones:11 },  { name:'Octava (P8)',         semitones:12 }
+  ],
+  triadas: [
+    { name:'Mayor',      intervals:[0,4,7] }, { name:'Menor',      intervals:[0,3,7] },
+    { name:'Aumentado',  intervals:[0,4,8] }, { name:'Disminuido', intervals:[0,3,6] },
+    { name:'Sus2',       intervals:[0,2,7] }, { name:'Sus4',       intervals:[0,5,7] }
+  ],
+  inversiones: [
+    { name:'Mayor — Fundamental',   intervals:[0,4,7] }, { name:'Mayor — 1ª Inversión', intervals:[0,3,8] },
+    { name:'Mayor — 2ª Inversión',  intervals:[0,5,9] }, { name:'Menor — Fundamental',  intervals:[0,3,7] },
+    { name:'Menor — 1ª Inversión',  intervals:[0,4,9] }, { name:'Menor — 2ª Inversión', intervals:[0,5,8] }
+  ],
+  septimas: [
+    { name:'Mayor 7',      intervals:[0,4,7,11] }, { name:'Menor 7',      intervals:[0,3,7,10] },
+    { name:'Dominante 7',  intervals:[0,4,7,10] }, { name:'Menor 7b5',    intervals:[0,3,6,10] },
+    { name:'Mayor 7#5',    intervals:[0,4,8,11] }, { name:'Disminuido 7', intervals:[0,3,6,9]  }
+  ],
+  progresiones: [
+    { name:'I - IV - V - I (Mayor)',    chords:[[0,4,7],[5,9,12],[7,11,14],[0,4,7]] },
+    { name:'I - V - vi - IV (Mayor)',   chords:[[0,4,7],[7,11,14],[9,12,16],[5,9,12]] },
+    { name:'ii - V - I (Mayor)',        chords:[[2,5,9],[7,11,14],[0,4,7]] },
+    { name:'I - vi - IV - V (Mayor)',   chords:[[0,4,7],[9,12,16],[5,9,12],[7,11,14]] },
+    { name:'I - IV - I (Mayor)',        chords:[[0,4,7],[5,9,12],[0,4,7]] },
+    { name:'I - V - I (Mayor)',         chords:[[0,4,7],[7,11,14],[0,4,7]] },
+    { name:'i - iv - v - i (Menor)',    chords:[[0,3,7],[5,8,12],[7,10,14],[0,3,7]] },
+    { name:'i - VI - III - VII (Menor)',chords:[[0,3,7],[8,12,15],[3,7,10],[10,14,17]] }
+  ],
+  escalas: [
+    { name:'Mayor',             intervals:[0,2,4,5,7,9,11,12] }, { name:'Menor Natural',    intervals:[0,2,3,5,7,8,10,12] },
+    { name:'Menor Armónica',    intervals:[0,2,3,5,7,8,11,12] }, { name:'Menor Melódica',   intervals:[0,2,3,5,7,9,11,12] },
+    { name:'Pentatónica Mayor', intervals:[0,2,4,7,9,12] },      { name:'Pentatónica Menor',intervals:[0,3,5,7,10,12] },
+    { name:'Blues',             intervals:[0,3,5,6,7,10,12] },   { name:'Dórica',           intervals:[0,2,3,5,7,9,10,12] }
+  ]
+};
 
-    // ==================== INICIALIZACIÓN ====================
-    async function initAudio() {
-      await Tone.start();
-      audioReady = true;
-      document.getElementById('startOverlay').style.display = 'none';
-      setViewMode('study'); // Empezar en modo estudio
-      updateView();
+const customSettings = {
+  intervalos: {
+    selectedIntervals: musicData.intervalos.map(i => i.name),
+    melodic:true, harmonic:false, ascending:true, descending:false,
+    registerLow:false, registerMid:true, registerHigh:false
+  },
+  triadas:     { selected: musicData.triadas.map(x => x.name) },
+  inversiones: { selected: musicData.inversiones.map(x => x.name) },
+  septimas:    { selected: musicData.septimas.map(x => x.name) },
+  progresiones:{ selected: musicData.progresiones.map(x => x.name) },
+  escalas:     { selected: musicData.escalas.map(x => x.name) }
+};
+
+// ==================== INIT ====================
+async function initAudio() {
+  await Tone.start();
+  audioReady = true;
+  document.getElementById('startOverlay').style.display = 'none';
+  setViewMode('study');
+}
+
+// ==================== SCROLL ====================
+function scrollToExerciseArea() {
+  document.getElementById('exerciseArea').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ==================== VISTA ====================
+function setViewMode(mode) {
+  viewMode = mode;
+  document.getElementById('studyModeBtn').className = mode === 'study' ? 'btn btn-success' : 'btn';
+  document.getElementById('testModeBtn').className  = mode === 'test'  ? 'btn btn-success' : 'btn';
+  updateView();
+  if (audioReady) scrollToExerciseArea();
+}
+
+function updateView() {
+  const s = document.getElementById('studyArea');
+  const t = document.getElementById('testArea');
+  if (viewMode === 'study') {
+    s.style.display = 'block'; t.style.display = 'none';
+    renderStudyMode();
+  } else {
+    s.style.display = 'none'; t.style.display = 'block';
+    updateSettingsPanel();
+    nextQuestion();
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+  updateView();
+  scrollToExerciseArea();
+}
+
+// ==================== MODO ESTUDIO ====================
+function renderStudyMode() {
+  const container = document.getElementById('studyContent');
+  container.innerHTML = '';
+  (musicData[currentMode] || []).forEach(item => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card-hover);padding:22px;border-radius:12px;border:2px solid rgba(108,99,255,0.3);cursor:pointer;transition:all 0.3s;text-align:center;';
+    card.onmouseover = () => { card.style.transform='scale(1.02)'; card.style.borderColor='var(--primary)'; card.style.boxShadow='0 8px 20px rgba(108,99,255,0.3)'; };
+    card.onmouseout  = () => { card.style.transform='scale(1)';    card.style.borderColor='rgba(108,99,255,0.3)'; card.style.boxShadow='none'; };
+
+    let html = `<div style="font-size:1.1em;font-weight:bold;color:var(--primary);margin-bottom:8px;">${item.name}</div>
+                <div style="font-size:1.9em;margin:10px 0;">🔊</div>`;
+
+    if (currentMode === 'intervalos') {
+      html += `<div style="color:var(--text-muted);font-size:0.85em;">${item.semitones} semitonos</div>`;
     }
 
-    // ==================== CHAT DE IA ====================
-    function toggleChat() {
-      const chatContainer = document.getElementById('chatContainer');
-      chatContainer.classList.toggle('open');
+    if (currentMode === 'escalas' && scaleDetails[item.name]) {
+      const d = scaleDetails[item.name];
+      const sep = p => {
+        if (p==='T')    return '<span class="scale-interval int-t">→T→</span>';
+        if (p==='st')   return '<span class="scale-interval int-st">→½→</span>';
+        if (p==='T+st') return '<span class="scale-interval int-ts">→T½→</span>';
+        return '';
+      };
+      html += `<div class="scale-visualization">
+        <div class="scale-diagram">
+          ${d.notes.map((n,i) => `<span class="scale-note">${n}</span>${i < d.pattern.length ? sep(d.pattern[i]) : ''}`).join('')}
+        </div>
+        <small style="color:var(--text-muted);">T=Tono &nbsp; ½=Semitono &nbsp; T½=Tono+Semitono</small>
+      </div>`;
     }
 
-    function handleChatKeyPress(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-      }
+    card.innerHTML = html;
+    card.onclick = () => playStudyItem(item);
+    container.appendChild(card);
+  });
+}
+
+function playStudyItem(item) {
+  if (!audioReady) return;
+  const now = Tone.now();
+  if (currentMode === 'intervalos') {
+    synth.triggerAttackRelease(getFreq(0), '0.5', now);
+    synth.triggerAttackRelease(getFreq(item.semitones), '0.5', now + 0.6);
+    synth.triggerAttackRelease(getFreq(item.semitones), '0.5', now + 1.5);
+    synth.triggerAttackRelease(getFreq(0), '0.5', now + 2.1);
+  } else if (['triadas','inversiones','septimas'].includes(currentMode)) {
+    item.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f, '1.5', now));
+    item.intervals.map(i => getFreq(i)).forEach((f,i) => synth.triggerAttackRelease(f, '0.4', now + 2 + i * 0.3));
+  } else if (currentMode === 'progresiones') {
+    item.chords.forEach((ch,i) => ch.map(s => getFreq(s)).forEach(f => synth.triggerAttackRelease(f,'0.8',now+i*1)));
+  } else if (currentMode === 'escalas') {
+    item.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
+    [...item.intervals].reverse().forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+item.intervals.length*0.25+0.3+i*0.25));
+  }
+}
+
+// ==================== PANEL CONFIG ====================
+function updateSettingsPanel() {
+  const panel = document.getElementById('settingsContent');
+
+  if (currentMode === 'intervalos') {
+    panel.innerHTML = `
+      <div class="settings-section">
+        <h4>📋 Intervalos a practicar:</h4>
+        <div class="toggle-group">
+          ${musicData.intervalos.map(x => `<button class="toggle-btn ${customSettings.intervalos.selectedIntervals.includes(x.name)?'active':''}" onclick="toggleIntervalSel('${x.name}')">${x.name.replace(' (','\n(')}</button>`).join('')}
+        </div>
+        <p class="selection-info">✓ ${customSettings.intervalos.selectedIntervals.length} / ${musicData.intervalos.length} seleccionados</p>
+      </div>
+      <div class="settings-section">
+        <h4>🎵 Tipo:</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${customSettings.intervalos.melodic?'active':''}"  onclick="toggleIntType('melodic')">Melódico (sucesivo)</button>
+          <button class="toggle-btn ${customSettings.intervalos.harmonic?'active':''}" onclick="toggleIntType('harmonic')">Armónico (simultáneo)</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>↕️ Dirección (melódico):</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${customSettings.intervalos.ascending?'active':''}"  onclick="toggleIntDir('ascending')">↑ Ascendente</button>
+          <button class="toggle-btn ${customSettings.intervalos.descending?'active':''}" onclick="toggleIntDir('descending')">↓ Descendente</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>🎹 Registro:</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${customSettings.intervalos.registerLow?'active':''}"  onclick="toggleReg('registerLow')">Grave (C3)</button>
+          <button class="toggle-btn ${customSettings.intervalos.registerMid?'active':''}"  onclick="toggleReg('registerMid')">Medio (C4)</button>
+          <button class="toggle-btn ${customSettings.intervalos.registerHigh?'active':''}" onclick="toggleReg('registerHigh')">Agudo (C5)</button>
+        </div>
+      </div>`;
+  } else {
+    const labels = { triadas:'Tríadas', inversiones:'Inversiones', septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas' };
+    const arr = musicData[currentMode];
+    const sel = customSettings[currentMode].selected;
+    panel.innerHTML = `
+      <div class="settings-section">
+        <h4>📋 ${labels[currentMode]} a practicar:</h4>
+        <div class="toggle-group">
+          ${arr.map(x => `<button class="toggle-btn ${sel.includes(x.name)?'active':''}" onclick="toggleSel('${currentMode}','${x.name.replace(/'/g,"\\'")}')"> ${x.name}</button>`).join('')}
+        </div>
+        <p class="selection-info">✓ ${sel.length} / ${arr.length} seleccionados</p>
+      </div>`;
+  }
+}
+
+// ==================== TOGGLES ====================
+function toggleIntervalSel(name) {
+  const arr = customSettings.intervalos.selectedIntervals;
+  const i = arr.indexOf(name);
+  if (i > -1) { if (arr.length > 1) arr.splice(i,1); } else arr.push(name);
+  updateSettingsPanel();
+}
+function toggleIntType(t) {
+  customSettings.intervalos[t] = !customSettings.intervalos[t];
+  if (!customSettings.intervalos.melodic && !customSettings.intervalos.harmonic) customSettings.intervalos[t] = true;
+  updateSettingsPanel();
+}
+function toggleIntDir(d) {
+  customSettings.intervalos[d] = !customSettings.intervalos[d];
+  if (!customSettings.intervalos.ascending && !customSettings.intervalos.descending) customSettings.intervalos[d] = true;
+  updateSettingsPanel();
+}
+function toggleReg(r) {
+  customSettings.intervalos[r] = !customSettings.intervalos[r];
+  if (!customSettings.intervalos.registerLow && !customSettings.intervalos.registerMid && !customSettings.intervalos.registerHigh) customSettings.intervalos[r] = true;
+  updateSettingsPanel();
+}
+function toggleSel(cat, name) {
+  const arr = customSettings[cat].selected;
+  const i = arr.indexOf(name);
+  if (i > -1) { if (arr.length > 1) arr.splice(i,1); } else arr.push(name);
+  updateSettingsPanel();
+}
+
+// ==================== SONIDO ====================
+function getFreq(semitones, octave = 4) {
+  return 261.63 * Math.pow(2, octave - 4) * Math.pow(2, semitones / 12);
+}
+function getRandomRegister() {
+  const r = [];
+  if (customSettings.intervalos.registerLow)  r.push(3);
+  if (customSettings.intervalos.registerMid)  r.push(4);
+  if (customSettings.intervalos.registerHigh) r.push(5);
+  return r[Math.floor(Math.random() * r.length)];
+}
+
+async function playSound() {
+  if (!audioReady || !currentQuestion) return;
+  const now = Tone.now();
+  if (currentMode === 'intervalos') {
+    const oct = currentQuestion.register || 4;
+    if (currentQuestion.type === 'harmonic') {
+      synth.triggerAttackRelease(getFreq(0, oct), '1.5', now);
+      synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '1.5', now);
+    } else if (currentQuestion.direction === 'descending') {
+      synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.5', now);
+      synth.triggerAttackRelease(getFreq(0, oct), '0.5', now + 0.6);
+    } else {
+      synth.triggerAttackRelease(getFreq(0, oct), '0.5', now);
+      synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.5', now + 0.6);
     }
+  } else if (['triadas','inversiones','septimas'].includes(currentMode)) {
+    currentQuestion.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f,'1.5',now));
+  } else if (currentMode === 'progresiones') {
+    currentQuestion.chords.forEach((ch,i) => ch.map(s=>getFreq(s)).forEach(f=>synth.triggerAttackRelease(f,'0.8',now+i*1)));
+  } else if (currentMode === 'escalas') {
+    currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
+  }
+}
 
-    function askQuestion(question) {
-      document.getElementById('chatInput').value = question;
-      sendMessage();
+// ==================== PREGUNTAS ====================
+function nextQuestion() {
+  let options = [], correctIndex = 0;
+
+  if (currentMode === 'intervalos') {
+    options = musicData.intervalos.filter(x => customSettings.intervalos.selectedIntervals.includes(x.name));
+    if (!options.length) { alert('Selecciona al menos un intervalo'); return; }
+    correctIndex = Math.floor(Math.random() * options.length);
+    currentQuestion = { ...options[correctIndex] };
+    const types = [];
+    if (customSettings.intervalos.melodic)  types.push('melodic');
+    if (customSettings.intervalos.harmonic) types.push('harmonic');
+    currentQuestion.type = types[Math.floor(Math.random() * types.length)];
+    if (currentQuestion.type === 'melodic') {
+      const dirs = [];
+      if (customSettings.intervalos.ascending)  dirs.push('ascending');
+      if (customSettings.intervalos.descending) dirs.push('descending');
+      currentQuestion.direction = dirs[Math.floor(Math.random() * dirs.length)];
     }
+    currentQuestion.register = getRandomRegister();
+  } else {
+    options = musicData[currentMode].filter(x => customSettings[currentMode].selected.includes(x.name));
+    if (!options.length) { alert('Selecciona al menos una opción'); return; }
+    correctIndex = Math.floor(Math.random() * options.length);
+    currentQuestion = options[correctIndex];
+  }
 
-    async function sendMessage() {
-      const input = document.getElementById('chatInput');
-      const message = input.value.trim();
-      
-      if (!message) return;
-      
-      // Limpiar input
-      input.value = '';
-      
-      // Agregar mensaje del usuario
-      addMessageToChat('user', message);
-      
-      // Deshabilitar botón de envío
-      const sendButton = document.getElementById('sendButton');
-      sendButton.disabled = true;
-      
-      // Mostrar mensaje de carga
-      const loadingId = addMessageToChat('loading', '🎼 Pensando...');
-      
-      // Respuestas predefinidas del asistente de teoría musical
-      const response = getMusicTheoryResponse(message);
-      
-      // Simular un pequeño delay para que se sienta más natural
-      setTimeout(() => {
-        removeMessageFromChat(loadingId);
-        addMessageToChat('assistant', response);
-        chatHistory.push({ user: message, assistant: response });
-        sendButton.disabled = false;
-      }, 800);
-    }
+  answered = false;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  renderOptions(options, correctIndex);
+  setTimeout(() => playSound(), 300);
+}
 
-    function getMusicTheoryResponse(question) {
-      const q = question.toLowerCase();
-      
-      // Intervalos
-      if (q.includes('tercera mayor') || q.includes('3ra mayor') || q.includes('3m')) {
-        return '🎵 <strong>Tercera Mayor</strong><br><br>Es un intervalo de <strong>4 semitonos</strong> (2 tonos).<br><br><strong>Características:</strong><br>• Sonido brillante y alegre<br>• Base del acorde mayor<br>• Ejemplo: Do-Mi, Sol-Si<br><br><strong>En la app:</strong> Encuéntralo en la sección de Intervalos. Su sonido es el inicio de "Oh When the Saints". 🎺';
-      }
-      
-      if (q.includes('tercera menor') || q.includes('3ra menor')) {
-        return '🎵 <strong>Tercera Menor</strong><br><br>Es un intervalo de <strong>3 semitonos</strong> (1 tono + ½).<br><br><strong>Características:</strong><br>• Sonido oscuro y melancólico<br>• Base del acorde menor<br>• Ejemplo: Do-Mib, La-Do<br><br><strong>En la app:</strong> Lo encontrarás en Intervalos. Aparece en "Greensleeves". 🎼';
-      }
-      
-      if (q.includes('quinta justa') || q.includes('5ta justa')) {
-        return '🎵 <strong>Quinta Justa</strong><br><br>Es un intervalo de <strong>7 semitonos</strong> (3 tonos + ½).<br><br><strong>Características:</strong><br>• El más consonante después de la octava<br>• Base de todos los acordes<br>• Sonido estable y fuerte<br>• Ejemplo: Do-Sol, Re-La<br><br><strong>Referencia:</strong> Inicio de "Star Wars". ⭐';
-      }
-      
-      if (q.includes('tritono') || q.includes('cuarta aumentada')) {
-        return '🎵 <strong>Tritono</strong><br><br>Es un intervalo de <strong>6 semitonos</strong> (3 tonos exactos).<br><br><strong>Características:</strong><br>• El más disonante<br>• Llamado "Diabolus in Musica" en la Edad Media<br>• Divide la octava en dos partes iguales<br>• Ejemplo: Do-Fa#, Si-Fa<br><br><strong>Lo escuchas en:</strong> Los Simpsons, Black Sabbath 🎸';
-      }
-      
-      // Acordes
-      if (q.includes('acorde mayor') || q.includes('triada mayor')) {
-        return '🎹 <strong>Acorde Mayor</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J<br>Intervalos: 0, 4, 7 semitonos<br><br><strong>Características:</strong><br>• Sonido alegre y brillante<br>• Estable y consonante<br>• Ejemplo: Do mayor = Do-Mi-Sol<br><br><strong>En la app:</strong> Practica en "Tríadas". Es uno de los 4 acordes básicos. 🎵';
-      }
-      
-      if (q.includes('acorde menor') || q.includes('triada menor')) {
-        return '🎹 <strong>Acorde Menor</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5J<br>Intervalos: 0, 3, 7 semitonos<br><br><strong>Características:</strong><br>• Sonido triste y melancólico<br>• Más oscuro que el mayor<br>• Ejemplo: La menor = La-Do-Mi<br><br><strong>Diferencia con mayor:</strong> Solo cambia la tercera (de 4 a 3 semitonos). 🎼';
-      }
-      
-      if (q.includes('aumentado')) {
-        return '🎹 <strong>Acorde Aumentado</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5A<br>Intervalos: 0, 4, 8 semitonos<br><br><strong>Características:</strong><br>• Sonido tenso e inestable<br>• Simétrico (divide octava en 3 partes iguales)<br>• Usado para crear tensión<br>• Ejemplo: Do+ = Do-Mi-Sol#<br><br><strong>En la app:</strong> Disponible en "Tríadas". ✨';
-      }
-      
-      if (q.includes('disminuido')) {
-        return '🎹 <strong>Acorde Disminuido</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5d<br>Intervalos: 0, 3, 6 semitonos<br><br><strong>Características:</strong><br>• Muy tenso y disonante<br>• Necesita resolver<br>• Usado en transiciones<br>• Ejemplo: Si° = Si-Re-Fa<br><br><strong>Tip:</strong> Dos terceras menores apiladas. 🎵';
-      }
-      
-      // Inversiones
-      if (q.includes('inversion') || q.includes('inversión')) {
-        return '🔄 <strong>Inversiones de Acordes</strong><br><br><strong>Fundamental:</strong> Notas en orden 1-3-5<br>Ejemplo: Do-Mi-Sol<br><br><strong>1ª Inversión:</strong> La 3ª es el bajo<br>Ejemplo: Mi-Sol-Do<br><br><strong>2ª Inversión:</strong> La 5ª es el bajo<br>Ejemplo: Sol-Do-Mi<br><br><strong>En la app:</strong> Sección "Inversiones" tiene ejercicios específicos de Mayor y Menor. 🎹';
-      }
-      
-      // Séptimas
-      if (q.includes('mayor 7') || q.includes('maj7')) {
-        return '7️⃣ <strong>Acorde Mayor 7</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J - 7M<br>Intervalos: 0, 4, 7, 11 semitonos<br><br><strong>Características:</strong><br>• Sonido sofisticado, jazz<br>• Muy consonante<br>• Ejemplo: Cmaj7 = Do-Mi-Sol-Si<br><br><strong>Uso:</strong> Jazz, bossa nova, baladas. 🎷';
-      }
-      
-      if (q.includes('dominante 7') || q.includes('acorde 7') || (q.includes('septima') && q.includes('dominante'))) {
-        return '7️⃣ <strong>Acorde Dominante 7</strong><br><br><strong>Estructura:</strong> 1 - 3M - 5J - 7m<br>Intervalos: 0, 4, 7, 10 semitonos<br><br><strong>Características:</strong><br>• Tenso, quiere resolver<br>• Fundamental en blues y jazz<br>• Ejemplo: C7 = Do-Mi-Sol-Sib<br><br><strong>Función:</strong> Resolver a la tónica (V7→I). 🎸';
-      }
-      
-      if (q.includes('menor 7') || q.includes('m7')) {
-        return '7️⃣ <strong>Acorde Menor 7</strong><br><br><strong>Estructura:</strong> 1 - 3m - 5J - 7m<br>Intervalos: 0, 3, 7, 10 semitonos<br><br><strong>Características:</strong><br>• Sonido suave y melancólico<br>• Muy usado en jazz y R&B<br>• Ejemplo: Dm7 = Re-Fa-La-Do<br><br><strong>Uso común:</strong> Función de ii en ii-V-I. 🎹';
-      }
-      
-      // Progresiones
-      if (q.includes('progresion') || q.includes('progresión')) {
-        return '🎼 <strong>Progresiones Armónicas</strong><br><br>Son secuencias de acordes que crean movimiento musical.<br><br><strong>Ejemplos en la app:</strong><br><br>• <strong>I-IV-V-I:</strong> Clásica, rock básico<br>• <strong>I-V-vi-IV:</strong> Pop moderno ("Let It Be")<br>• <strong>ii-V-I:</strong> Jazz estándar<br><br><strong>En números romanos:</strong><br>I = tónica, ii = supertónica, V = dominante, etc. 🎵';
-      }
-      
-      // Escalas
-      if (q.includes('escala mayor')) {
-        return '🎶 <strong>Escala Mayor</strong><br><br><strong>Patrón:</strong> T - T - st - T - T - T - st<br><br><strong>Ejemplo Do Mayor:</strong><br>Do-Re-Mi-Fa-Sol-La-Si-Do<br><br><strong>Características:</strong><br>• Sonido alegre y brillante<br>• Base de la música occidental<br>• 7 notas + octava<br><br><strong>En la app:</strong> Modo Estudio muestra los intervalos visualmente. 🎵';
-      }
-      
-      if (q.includes('escala menor') || q.includes('menor natural')) {
-        return '🎶 <strong>Escala Menor Natural</strong><br><br><strong>Patrón:</strong> T - st - T - T - st - T - T<br><br><strong>Ejemplo La menor:</strong><br>La-Si-Do-Re-Mi-Fa-Sol-La<br><br><strong>Características:</strong><br>• Sonido triste y oscuro<br>• Relativa menor de Do Mayor<br>• Mismas notas, diferente centro tonal<br><br><strong>Relación:</strong> Comienza en el 6º grado de su mayor relativa. 🎼';
-      }
-      
-      if (q.includes('armonica') || q.includes('armónica')) {
-        return '🎶 <strong>Escala Menor Armónica</strong><br><br><strong>Patrón:</strong> T - st - T - T - st - T+st - st<br><br><strong>Ejemplo:</strong><br>La-Si-Do-Re-Mi-Fa-Sol#-La<br><br><strong>Diferencia con natural:</strong><br>La 7ª está elevada medio tono (Sol# en vez de Sol).<br><br><strong>Sonido:</strong> Exótico, usado en música clásica, flamenca y metal. 🎸';
-      }
-      
-      if (q.includes('pentatonica') || q.includes('pentatónica')) {
-        return '🎶 <strong>Escalas Pentatónicas</strong><br><br><strong>5 notas (sin st):</strong><br><br><strong>Mayor:</strong> 1-2-3-5-6<br>Do-Re-Mi-Sol-La<br><br><strong>Menor:</strong> 1-b3-4-5-b7<br>La-Do-Re-Mi-Sol<br><br><strong>Características:</strong><br>• Sin disonancias<br>• Muy usadas en rock, blues, folk<br>• Fáciles de improvisar<br><br><strong>Ejemplos:</strong> Solos de guitarra, música asiática. 🎸';
-      }
-      
-      // Preguntas generales
-      if (q.includes('intervalo')) {
-        return '🎵 <strong>¿Qué es un Intervalo?</strong><br><br>Es la distancia entre dos notas musicales.<br><br><strong>Se miden en:</strong><br>• Semitonos (la mínima distancia)<br>• Tonos (2 semitonos)<br><br><strong>Tipos en la app:</strong><br>• Melódicos: notas sucesivas<br>• Armónicos: notas simultáneas<br><br><strong>12 intervalos:</strong> Desde 2ª menor hasta octava. 🎼';
-      }
-      
-      if (q.includes('tono') && q.includes('semitono')) {
-        return '🎵 <strong>Tonos y Semitonos</strong><br><br><strong>Semitono (st):</strong><br>• La distancia más pequeña<br>• Ejemplo: Do→Do# o Mi→Fa<br><br><strong>Tono (T):</strong><br>• 2 semitonos<br>• Ejemplo: Do→Re o Mi→Fa#<br><br><strong>En el piano:</strong><br>• Semitono = tecla siguiente<br>• Tono = saltar una tecla<br><br>Son la base para construir escalas y acordes. 🎹';
-      }
-      
-      if (q.includes('como') && (q.includes('estudi') || q.includes('practi') || q.includes('mejor'))) {
-        return '📚 <strong>Consejos para Estudiar</strong><br><br><strong>1. Modo Estudio:</strong><br>• Familiarízate con cada sonido<br>• Escucha varias veces<br><br><strong>2. Modo Prueba:</strong><br>• Empieza con pocos elementos<br>• Aumenta dificultad gradualmente<br><br><strong>3. Práctica diaria:</strong><br>• 15-20 min es suficiente<br>• Constancia > Cantidad<br><br><strong>4. Visualiza + Escucha</strong><br>• Usa las escalas visuales<br>• Canta los intervalos<br><br>¡La repetición es clave! 🎯';
-      }
-      
-      // Respuesta por defecto
-      return '🎵 <strong>Pregunta sobre teoría musical</strong><br><br>Puedo ayudarte con:<br><br>• <strong>Intervalos:</strong> "¿Qué es una tercera mayor?"<br>• <strong>Acordes:</strong> "Explica el acorde aumentado"<br>• <strong>Inversiones:</strong> "¿Qué es la primera inversión?"<br>• <strong>Séptimas:</strong> "Diferencia entre Maj7 y 7"<br>• <strong>Progresiones:</strong> "¿Qué es I-IV-V?"<br>• <strong>Escalas:</strong> "Explica la escala menor armónica"<br><br>Haz tu pregunta sobre teoría musical. 🎼';
-    }
+function renderOptions(options, correctIndex) {
+  const c = document.getElementById('optionsContainer');
+  c.innerHTML = '';
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt.name;
+    btn.onclick = () => checkAnswer(i, correctIndex, btn);
+    c.appendChild(btn);
+  });
+}
 
-    function addMessageToChat(type, content) {
-      const messagesContainer = document.getElementById('chatMessages');
-      const messageDiv = document.createElement('div');
-      const messageId = 'msg-' + Date.now();
-      
-      messageDiv.className = `chat-message ${type}`;
-      messageDiv.id = messageId;
-      messageDiv.innerHTML = content.replace(/\n/g, '<br>');
-      
-      messagesContainer.appendChild(messageDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      
-      return messageId;
-    }
+// ==================== RESPUESTA ====================
+function checkAnswer(selected, correct, btn) {
+  if (answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (selected === correct) {
+    btn.classList.add('correct');
+    fb.textContent = '¡Correcto! ✓'; fb.className = 'feedback correct';
+    scores.correct++; scores.streak++;
+  } else {
+    btn.classList.add('incorrect');
+    btns[correct].classList.add('correct');
+    fb.textContent = `Incorrecto. Era: ${btns[correct].textContent}`; fb.className = 'feedback incorrect';
+    scores.incorrect++; scores.streak = 0;
+  }
+  updateScoreboard();
+  setTimeout(() => nextQuestion(), 2500);
+}
 
-    function removeMessageFromChat(messageId) {
-      const message = document.getElementById(messageId);
-      if (message) {
-        message.remove();
-      }
-    }
+function updateScoreboard() {
+  document.getElementById('correctScore').textContent   = scores.correct;
+  document.getElementById('incorrectScore').textContent = scores.incorrect;
+  document.getElementById('streakScore').textContent    = scores.streak;
+}
 
-    // ==================== CAMBIO DE VISTA ====================
-    function scrollToExerciseArea() {
-      document.getElementById('exerciseArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+function resetScore() {
+  scores.correct = scores.incorrect = scores.streak = 0;
+  updateScoreboard(); nextQuestion();
+}
 
-    function setViewMode(mode) {
-      viewMode = mode;
+// ==================== CHAT ====================
+function toggleChat() { document.getElementById('chatContainer').classList.toggle('open'); }
+function handleChatKeyPress(e) { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function askQuestion(q) { document.getElementById('chatInput').value = q; sendMessage(); }
 
-      // Actualizar botones
-      document.getElementById('studyModeBtn').className = mode === 'study' ? 'btn btn-success' : 'btn';
-      document.getElementById('testModeBtn').className = mode === 'test' ? 'btn btn-success' : 'btn';
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMsg('user', msg);
+  const btn = document.getElementById('sendButton');
+  btn.disabled = true;
+  const lid = addMsg('loading','🎼 Pensando...');
+  setTimeout(() => { removeMsg(lid); addMsg('assistant', getResponse(msg)); btn.disabled = false; }, 550);
+}
 
-      updateView();
-      scrollToExerciseArea();
-    }
+function addMsg(type, content) {
+  const c = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  const id = 'msg' + Date.now() + Math.random();
+  d.className = `chat-message ${type}`; d.id = id;
+  d.innerHTML = content.replace(/\n/g,'<br>');
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  return id;
+}
+function removeMsg(id) { const el = document.getElementById(id); if(el) el.remove(); }
 
-    function updateView() {
-      const studyArea = document.getElementById('studyArea');
-      const testArea = document.getElementById('testArea');
-      
-      if (viewMode === 'study') {
-        studyArea.style.display = 'block';
-        testArea.style.display = 'none';
-        renderStudyMode();
-      } else {
-        studyArea.style.display = 'none';
-        testArea.style.display = 'block';
-        updateSettingsPanel();
-        nextQuestion();
-      }
-    }
+// ==================== RESPUESTAS CHAT ====================
+function getResponse(question) {
+  const n = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const q = n(question);
+  const has = (...w) => w.some(x => q.includes(n(x)));
 
-    // ==================== MODO ESTUDIO ====================
-    function renderStudyMode() {
-      const container = document.getElementById('studyContent');
-      container.innerHTML = '';
-      
-      let items = [];
-      
-      if (currentMode === 'intervalos') {
-        items = musicData.intervalos.map(item => ({
-          ...item,
-          description: `${item.name} - ${item.semitones} semitonos`
-        }));
-      } else if (currentMode === 'triadas') {
-        items = musicData.triadas.map(item => ({
-          ...item,
-          description: item.name
-        }));
-      } else if (currentMode === 'inversiones') {
-        items = musicData.inversiones.map(item => ({
-          ...item,
-          description: item.name
-        }));
-      } else if (currentMode === 'septimas') {
-        items = musicData.septimas.map(item => ({
-          ...item,
-          description: item.name
-        }));
-      } else if (currentMode === 'progresiones') {
-        items = musicData.progresiones.map(item => ({
-          ...item,
-          description: item.name
-        }));
-      } else if (currentMode === 'escalas') {
-        items = musicData.escalas.map(item => ({
-          ...item,
-          description: `${item.name} - ${item.desc || ''}`
-        }));
-      }
-      
-      items.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.style.background = 'var(--card-hover)';
-        card.style.padding = '25px';
-        card.style.borderRadius = '12px';
-        card.style.border = '2px solid rgba(108, 99, 255, 0.3)';
-        card.style.cursor = 'pointer';
-        card.style.transition = 'all 0.3s';
-        
-        card.onmouseover = () => {
-          card.style.transform = 'scale(1.02)';
-          card.style.borderColor = 'var(--primary)';
-          card.style.boxShadow = '0 8px 20px rgba(108, 99, 255, 0.3)';
-        };
-        
-        card.onmouseout = () => {
-          card.style.transform = 'scale(1)';
-          card.style.borderColor = 'rgba(108, 99, 255, 0.3)';
-          card.style.boxShadow = 'none';
-        };
-        
-        let cardContent = `
-          <div style="font-size: 1.2em; margin-bottom: 8px; font-weight: bold; color: var(--primary);">
-            ${item.description || item.name}
-          </div>
-          <div style="font-size: 2em; margin: 15px 0;">🔊</div>
-        `;
-        
-        // Agregar visualización especial para escalas
-        if (currentMode === 'escalas' && scaleDetails[item.name]) {
-          const details = scaleDetails[item.name];
-          
-          cardContent += `
-            <div class="scale-visualization">
-              <div class="scale-diagram">
-                ${details.notes.map((note, i) => {
-                  let intervalText = '';
-                  if (i < details.pattern.length) {
-                    const pattern = details.pattern[i];
-                    if (pattern === 'T') {
-                      intervalText = '<span class="scale-interval interval-whole">→ Tono →</span>';
-                    } else if (pattern === 'st') {
-                      intervalText = '<span class="scale-interval interval-half">→ ½ →</span>';
-                    } else if (pattern === 'T+st') {
-                      intervalText = '<span class="scale-interval interval-whole">→ Tono+½ →</span>';
-                    }
-                  }
-                  return `
-                    <div class="scale-note">${note}</div>
-                    ${intervalText}
-                  `;
-                }).join('')}
-              </div>
-              <div style="margin-top: 15px; padding: 10px; background: rgba(108, 99, 255, 0.1); border-radius: 8px;">
-                <small style="color: #666;">
-                  <span class="interval-whole">T = Tono completo (2 semitonos)</span> • 
-                  <span class="interval-half">½ = Semitono (1 semitono)</span>
-                </small>
-              </div>
-            </div>
-          `;
-        }
-        
-        card.innerHTML = cardContent;
-        card.onclick = () => playStudyItem(item);
-        container.appendChild(card);
-      });
-    }
+  // Intervalos específicos
+  if (has('segunda menor','m2','2da menor'))
+    return '🎵 <strong>Segunda Menor (m2)</strong><br><br>Distancia: <strong>1 semitono</strong><br><br>• Sonido muy tenso, casi rozante<br>• Ejemplo: Do→Do♯, Mi→Fa<br>• Referencia: "Tiburón" (Jaws) 🦈<br><br>En la app: actívala en Intervalos → Configuración.';
 
-    function playStudyItem(item) {
-      if (!audioReady) return;
-      
-      const now = Tone.now();
-      
-      if (currentMode === 'intervalos') {
-        // Tocar ascendente y descendente
-        synth.triggerAttackRelease(getFrequency(0), '0.5', now);
-        synth.triggerAttackRelease(getFrequency(item.semitones), '0.5', now + 0.6);
-        
-        // Descendente después de una pausa
-        synth.triggerAttackRelease(getFrequency(item.semitones), '0.5', now + 1.5);
-        synth.triggerAttackRelease(getFrequency(0), '0.5', now + 2.1);
-        
-      } else if (currentMode === 'triadas' || currentMode === 'inversiones' || currentMode === 'septimas') {
-        // Primero armónico
-        const notes = item.intervals.map(i => getFrequency(i));
-        notes.forEach(freq => {
-          synth.triggerAttackRelease(freq, '1.5', now);
-        });
-        
-        // Luego melódico (arpegio)
-        notes.forEach((freq, i) => {
-          synth.triggerAttackRelease(freq, '0.4', now + 2 + i * 0.3);
-        });
-        
-      } else if (currentMode === 'progresiones') {
-        item.chords.forEach((chord, i) => {
-          const notes = chord.map(semi => getFrequency(semi));
-          notes.forEach(freq => {
-            synth.triggerAttackRelease(freq, '0.8', now + i * 1);
-          });
-        });
-        
-      } else if (currentMode === 'escalas') {
-        // Ascendente
-        item.intervals.forEach((semi, i) => {
-          synth.triggerAttackRelease(getFrequency(semi), '0.3', now + i * 0.25);
-        });
-        
-        // Descendente
-        const reversed = [...item.intervals].reverse();
-        reversed.forEach((semi, i) => {
-          synth.triggerAttackRelease(getFrequency(semi), '0.3', now + item.intervals.length * 0.25 + 0.3 + i * 0.25);
-        });
-      }
-    }
+  if (has('segunda mayor','2da mayor'))
+    return '🎵 <strong>Segunda Mayor (M2)</strong><br><br>Distancia: <strong>2 semitonos</strong> (1 tono)<br><br>• Paso natural de escala, sonido suave<br>• Ejemplo: Do→Re, Sol→La<br>• Referencia: primeras notas de "Cumpleaños Feliz" 🎂';
 
-    // ==================== PANEL DE CONFIGURACIÓN ====================
-    function updateSettingsPanel() {
-      const panel = document.getElementById('settingsContent');
-      
-      if (currentMode === 'intervalos') {
-        panel.innerHTML = `
-          <div>
-            <strong>Dirección del intervalo:</strong>
-            <div class="toggle-group">
-              <button class="toggle-btn ${intervalSettings.ascending ? 'active' : ''}" 
-                onclick="toggleIntervalSetting('ascending')">
-                ↑ Ascendente
-              </button>
-              <button class="toggle-btn ${intervalSettings.descending ? 'active' : ''}" 
-                onclick="toggleIntervalSetting('descending')">
-                ↓ Descendente
-              </button>
-            </div>
-          </div>
-        `;
-      } else if (currentMode === 'triadas') {
-        const progress = triadasProgress.correctAnswers;
-        const nextUnlock = musicData.triadas.find(c => c.unlockAt > progress);
-        const progressPercent = nextUnlock ? (progress / nextUnlock.unlockAt * 100) : 100;
-        
-        panel.innerHTML = `
-          <div class="progress-info">
-            <strong>🎯 Progreso de Desbloqueo</strong>
-            <p>Respuestas correctas: ${progress}</p>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progressPercent}%"></div>
-            </div>
-            ${nextUnlock ? 
-              `<p>Próximo acorde: <strong>${nextUnlock.name}</strong> (${nextUnlock.unlockAt} correctas)</p>` :
-              `<p class="unlock-message">✨ ¡Todos los acordes desbloqueados!</p>`
-            }
-            <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-muted);">
-              Desbloqueados: ${triadasProgress.unlockedChords.join(', ')}
-            </p>
-          </div>
-        `;
-      } else {
-        panel.innerHTML = '<p>Selecciona tu respuesta después de escuchar el sonido.</p>';
-      }
-    }
+  if (has('tercera menor','m3','3ra menor','3ª menor'))
+    return '🎵 <strong>Tercera Menor (m3)</strong><br><br>Distancia: <strong>3 semitonos</strong><br><br>• Sonido oscuro y melancólico<br>• Base de todos los acordes menores<br>• Ejemplo: La→Do, Re→Fa<br>• Referencia: "Greensleeves", "Smoke on the Water" 🎸';
 
-    function toggleIntervalSetting(setting) {
-      intervalSettings[setting] = !intervalSettings[setting];
-      
-      // Al menos uno debe estar activo
-      if (!intervalSettings.ascending && !intervalSettings.descending) {
-        intervalSettings[setting] = true;
-      }
-      
-      updateSettingsPanel();
-      nextQuestion();
-    }
+  if (has('tercera mayor','m3','3ra mayor','3ª mayor'))
+    return '🎵 <strong>Tercera Mayor (M3)</strong><br><br>Distancia: <strong>4 semitonos</strong><br><br>• Sonido brillante y alegre<br>• Base de todos los acordes mayores<br>• Ejemplo: Do→Mi, Sol→Si<br>• Referencia: "Oh When the Saints" 🎺';
 
-    // ==================== FUNCIONES DE SONIDO ====================
-    function getFrequency(semitones) {
-      const baseFreq = 261.63; // C4
-      return baseFreq * Math.pow(2, semitones / 12);
-    }
+  if (has('cuarta justa','p4','4ta justa'))
+    return '🎵 <strong>Cuarta Justa (P4)</strong><br><br>Distancia: <strong>5 semitonos</strong><br><br>• Sonido estable y abierto<br>• Ejemplo: Do→Fa<br>• Referencia: "Here Comes the Bride" 💒';
 
-    async function playSound() {
-      if (!audioReady || !currentQuestion) return;
-      
-      const now = Tone.now();
-      
-      if (currentMode === 'intervalos') {
-        const isDescending = currentQuestion.direction === 'descending';
-        if (isDescending) {
-          synth.triggerAttackRelease(getFrequency(currentQuestion.semitones), '0.5', now);
-          synth.triggerAttackRelease(getFrequency(0), '0.5', now + 0.6);
-        } else {
-          synth.triggerAttackRelease(getFrequency(0), '0.5', now);
-          synth.triggerAttackRelease(getFrequency(currentQuestion.semitones), '0.5', now + 0.6);
-        }
-      } 
-      else if (currentMode === 'triadas' || currentMode === 'inversiones' || currentMode === 'septimas') {
-        const notes = currentQuestion.intervals.map(i => getFrequency(i));
-        notes.forEach(freq => {
-          synth.triggerAttackRelease(freq, '1.5', now);
-        });
-      }
-      else if (currentMode === 'progresiones') {
-        currentQuestion.chords.forEach((chord, i) => {
-          const notes = chord.map(semi => getFrequency(semi));
-          notes.forEach(freq => {
-            synth.triggerAttackRelease(freq, '0.8', now + i * 1);
-          });
-        });
-      }
-      else if (currentMode === 'escalas') {
-        currentQuestion.intervals.forEach((semi, i) => {
-          synth.triggerAttackRelease(getFrequency(semi), '0.3', now + i * 0.25);
-        });
-      }
-    }
+  if (has('tritono','triton','diabolus','cuarta aumentada'))
+    return '🎵 <strong>Tritono (TT)</strong><br><br>Distancia: <strong>6 semitonos</strong> — exactamente la mitad de la octava<br><br>• El más disonante de todos<br>• "Diabolus in Musica" en la Edad Media<br>• Ejemplo: Do→Fa♯<br>• Referencia: Los Simpsons 🎵, Black Sabbath 🎸';
 
-    // ==================== MANEJO DE MODOS ====================
-    function setMode(mode) {
-      currentMode = mode;
-      document.querySelectorAll('.mode-card').forEach(card => {
-        card.classList.remove('active');
-      });
-      document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
-      updateView();
-      scrollToExerciseArea();
-    }
+  if (has('quinta justa','p5','5ta justa'))
+    return '🎵 <strong>Quinta Justa (P5)</strong><br><br>Distancia: <strong>7 semitonos</strong><br><br>• Muy consonante, base de todos los acordes<br>• Ejemplo: Do→Sol<br>• Referencia: "Star Wars" ⭐';
 
-    // ==================== GENERACIÓN DE PREGUNTAS ====================
-    function nextQuestion() {
-      let options = [];
-      let correctIndex = 0;
+  if (has('sexta menor','m6','6ta menor'))
+    return '🎵 <strong>Sexta Menor (m6)</strong><br><br>Distancia: <strong>8 semitonos</strong><br><br>• Sonido expresivo y melancólico<br>• Ejemplo: Mi→Do';
 
-      if (currentMode === 'intervalos') {
-        // Generar pregunta de intervalo
-        options = musicData.intervalos;
-        correctIndex = Math.floor(Math.random() * options.length);
-        currentQuestion = {...options[correctIndex]};
-        
-        // Determinar dirección
-        const directions = [];
-        if (intervalSettings.ascending) directions.push('ascending');
-        if (intervalSettings.descending) directions.push('descending');
-        currentQuestion.direction = directions[Math.floor(Math.random() * directions.length)];
-        
-      } else if (currentMode === 'triadas') {
-        // Solo mostrar acordes desbloqueados
-        options = musicData.triadas.filter(chord => 
-          triadasProgress.unlockedChords.includes(chord.name)
-        );
-        correctIndex = Math.floor(Math.random() * options.length);
-        currentQuestion = options[correctIndex];
-        
-      } else {
-        options = musicData[currentMode];
-        correctIndex = Math.floor(Math.random() * options.length);
-        currentQuestion = options[correctIndex];
-      }
-      
-      answered = false;
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('feedback').className = 'feedback';
-      
-      renderOptions(options, correctIndex);
-      setTimeout(() => playSound(), 300);
-    }
+  if (has('sexta mayor','6ta mayor'))
+    return '🎵 <strong>Sexta Mayor (M6)</strong><br><br>Distancia: <strong>9 semitonos</strong><br><br>• Sonido luminoso y alegre<br>• Ejemplo: Do→La<br>• Referencia: "My Bonnie" 🎶';
 
-    function renderOptions(options, correctIndex) {
-      const container = document.getElementById('optionsContainer');
-      container.innerHTML = '';
-      
-      // Si es modo tríadas, mostrar todos los acordes (bloqueados y desbloqueados)
-      if (currentMode === 'triadas') {
-        musicData.triadas.forEach((option, index) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          
-          const isUnlocked = triadasProgress.unlockedChords.includes(option.name);
-          const isInCurrentOptions = options.some(o => o.name === option.name);
-          
-          if (!isUnlocked) {
-            btn.classList.add('locked');
-            btn.disabled = true;
-            btn.textContent = `${option.name} (${option.unlockAt} correctas)`;
-          } else {
-            btn.textContent = option.name;
-            if (isInCurrentOptions && option.name === currentQuestion.name) {
-              btn.onclick = () => checkAnswer(index, index, btn);
-            } else if (isInCurrentOptions) {
-              const actualIndex = options.findIndex(o => o.name === option.name);
-              btn.onclick = () => checkAnswer(actualIndex, options.findIndex(o => o.name === currentQuestion.name), btn);
-            }
-          }
-          
-          container.appendChild(btn);
-        });
-      } else {
-        options.forEach((option, index) => {
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.textContent = option.name;
-          btn.onclick = () => checkAnswer(index, correctIndex, btn);
-          container.appendChild(btn);
-        });
-      }
-    }
+  if (has('septima menor','m7','7ma menor') && !has('acorde'))
+    return '🎵 <strong>Séptima Menor (m7)</strong><br><br>Distancia: <strong>10 semitonos</strong><br><br>• Sonido tenso, quiere resolver<br>• Clave en el acorde dominante 7<br>• Ejemplo: Sol→Fa';
 
-    // ==================== VERIFICACIÓN DE RESPUESTA ====================
-    function checkAnswer(selectedIndex, correctIndex, btn) {
-      if (answered) return;
-      answered = true;
-      
-      const buttons = document.querySelectorAll('.option-btn:not(.locked)');
-      buttons.forEach(b => b.disabled = true);
-      
-      const feedback = document.getElementById('feedback');
-      
-      if (selectedIndex === correctIndex) {
-        btn.classList.add('correct');
-        feedback.textContent = '¡Correcto! ✓';
-        feedback.className = 'feedback correct';
-        scores.correct++;
-        scores.streak++;
-        
-        // Sistema de desbloqueo para tríadas
-        if (currentMode === 'triadas') {
-          triadasProgress.correctAnswers++;
-          
-          // Verificar si se desbloquea un nuevo acorde
-          musicData.triadas.forEach(chord => {
-            if (chord.unlockAt === triadasProgress.correctAnswers && 
-                !triadasProgress.unlockedChords.includes(chord.name)) {
-              triadasProgress.unlockedChords.push(chord.name);
-              feedback.textContent += ` 🎉 ¡Nuevo acorde desbloqueado: ${chord.name}!`;
-            }
-          });
-          
-          updateSettingsPanel();
-        }
-        
-      } else {
-        btn.classList.add('incorrect');
-        const allButtons = Array.from(document.querySelectorAll('.option-btn'));
-        
-        if (currentMode === 'triadas') {
-          // Buscar el botón correcto por nombre
-          const correctBtn = allButtons.find(b => 
-            b.textContent === currentQuestion.name
-          );
-          if (correctBtn) correctBtn.classList.add('correct');
-        } else {
-          allButtons[correctIndex].classList.add('correct');
-        }
-        
-        feedback.textContent = `Incorrecto. Era: ${currentQuestion.name}`;
-        feedback.className = 'feedback incorrect';
-        scores.incorrect++;
-        scores.streak = 0;
-      }
-      
-      updateScoreboard();
-      
-      // Auto-avanzar después de 2.5 segundos
-      setTimeout(() => nextQuestion(), 2500);
-    }
+  if (has('septima mayor','7ma mayor') && !has('acorde'))
+    return '🎵 <strong>Séptima Mayor (M7)</strong><br><br>Distancia: <strong>11 semitonos</strong><br><br>• Sonido sofisticado, casi chocante<br>• Ejemplo: Do→Si<br>• Referencia: "Take On Me" 🎸';
 
-    // ==================== PUNTUACIÓN ====================
-    function updateScoreboard() {
-      document.getElementById('correctScore').textContent = scores.correct;
-      document.getElementById('incorrectScore').textContent = scores.incorrect;
-      document.getElementById('streakScore').textContent = scores.streak;
-    }
+  if (has('octava','p8','8va'))
+    return '🎵 <strong>Octava (P8)</strong><br><br>Distancia: <strong>12 semitonos</strong><br><br>• Misma nota, diferente altura. Máxima consonancia.<br>• Referencia: primer salto de "Somewhere Over the Rainbow" 🌈';
 
-    function resetScore() {
-      scores.correct = 0;
-      scores.incorrect = 0;
-      scores.streak = 0;
-      
-      // Reiniciar progreso de tríadas
-      if (currentMode === 'triadas') {
-        triadasProgress.correctAnswers = 0;
-        triadasProgress.unlockedChords = ['Mayor', 'Menor', 'Aumentado', 'Disminuido'];
-        updateSettingsPanel();
-      }
-      
-      updateScoreboard();
-      nextQuestion();
-    }
-  </script>
+  // Acordes / Tríadas
+  if (has('triada mayor','tríada mayor','acorde mayor') && !has('7','septima'))
+    return '🎹 <strong>Tríada Mayor</strong><br><br>Estructura: 1 — 3M — 5J &nbsp;|&nbsp; intervalos: 0, 4, 7<br><br>• Sonido brillante y estable<br>• Ejemplo: Do mayor = Do-Mi-Sol';
+
+  if (has('triada menor','tríada menor','acorde menor') && !has('7','septima'))
+    return '🎹 <strong>Tríada Menor</strong><br><br>Estructura: 1 — 3m — 5J &nbsp;|&nbsp; intervalos: 0, 3, 7<br><br>• Sonido oscuro y melancólico<br>• Ejemplo: La menor = La-Do-Mi<br>• Solo cambia la tercera (4→3 semitonos respecto al mayor)';
+
+  if (has('aumentado'))
+    return '🎹 <strong>Acorde Aumentado</strong><br><br>Estructura: 1 — 3M — 5A &nbsp;|&nbsp; intervalos: 0, 4, 8<br><br>• Tenso e inestable, simétrico<br>• Ejemplo: Do+ = Do-Mi-Sol♯<br>• Divide la octava en 3 terceras mayores iguales';
+
+  if (has('disminuido') && !has('7'))
+    return '🎹 <strong>Acorde Disminuido</strong><br><br>Estructura: 1 — 3m — 5d &nbsp;|&nbsp; intervalos: 0, 3, 6<br><br>• Muy tenso, necesita resolver<br>• Ejemplo: Si° = Si-Re-Fa<br>• Dos terceras menores apiladas';
+
+  if (has('sus2','suspendido 2'))
+    return '🎹 <strong>Sus2</strong><br><br>Estructura: 1 — 2M — 5J &nbsp;|&nbsp; intervalos: 0, 2, 7<br><br>• Sin tercera: sonido abierto, ni mayor ni menor<br>• Ejemplo: DoSus2 = Do-Re-Sol';
+
+  if (has('sus4','suspendido 4'))
+    return '🎹 <strong>Sus4</strong><br><br>Estructura: 1 — 4J — 5J &nbsp;|&nbsp; intervalos: 0, 5, 7<br><br>• Tensión que espera resolver a mayor o menor<br>• Ejemplo: DoSus4 = Do-Fa-Sol';
+
+  // Séptimas
+  if (has('mayor 7','maj7') || (has('mayor') && has('septima') && !has('dominante')))
+    return '7️⃣ <strong>Acorde Mayor 7 (Maj7)</strong><br><br>Estructura: 1 — 3M — 5J — 7M &nbsp;|&nbsp; 0, 4, 7, 11<br><br>• Sonido sofisticado, jazz, bossa nova<br>• Ejemplo: Cmaj7 = Do-Mi-Sol-Si<br>• Muy consonante 🎷';
+
+  if (has('menor 7','m7') && !has('b5','bemol'))
+    return '7️⃣ <strong>Acorde Menor 7 (m7)</strong><br><br>Estructura: 1 — 3m — 5J — 7m &nbsp;|&nbsp; 0, 3, 7, 10<br><br>• Suave y melancólico<br>• Ejemplo: Dm7 = Re-Fa-La-Do<br>• Grado ii en la progresión ii-V-I 🎹';
+
+  if (has('dominante 7','dominant','v7') || (has('dominante') && has('7','septima')))
+    return '7️⃣ <strong>Acorde Dominante 7</strong><br><br>Estructura: 1 — 3M — 5J — 7m &nbsp;|&nbsp; 0, 4, 7, 10<br><br>• Máxima tensión → resuelve a la tónica (V7→I)<br>• Base del blues y el jazz<br>• Ejemplo: G7 = Sol-Si-Re-Fa 🎸';
+
+  if (has('menor 7b5','semidisminuido','semi disminuido','m7b5'))
+    return '7️⃣ <strong>Menor 7b5 (semidisminuido)</strong><br><br>Estructura: 1 — 3m — 5d — 7m &nbsp;|&nbsp; 0, 3, 6, 10<br><br>• Oscuro y tenso<br>• Función: grado ii° en progresiones menores (ii°-V-i) 🎹';
+
+  if (has('disminuido 7','dim7'))
+    return '7️⃣ <strong>Disminuido 7</strong><br><br>Estructura: 1 — 3m — 5d — 7dim &nbsp;|&nbsp; 0, 3, 6, 9<br><br>• Máxima tensión, totalmente simétrico<br>• 4 terceras menores apiladas<br>• Muy dramático, usado en cine y música clásica 🎬';
+
+  // Inversiones
+  if (has('inversion','inversión'))
+    return '🔄 <strong>Inversiones de Acordes</strong><br><br><strong>Fundamental:</strong> raíz en el bajo → Do-Mi-Sol (más estable)<br><strong>1ª Inversión:</strong> 3ª en el bajo → Mi-Sol-Do (más ligero)<br><strong>2ª Inversión:</strong> 5ª en el bajo → Sol-Do-Mi (menos estable, acorde de paso)<br><br>Las inversiones cambian el color del acorde sin cambiar sus notas.';
+
+  // Progresiones
+  if (has('i iv v','1 4 5','I-IV-V'))
+    return '🎼 <strong>I-IV-V</strong><br><br>La progresión más usada en la historia.<br><br>En Do: <strong>Do — Fa — Sol</strong><br>• I = reposo, IV = movimiento, V = tensión<br>• Base del blues, rock, country, cumbia 🎸';
+
+  if (has('i v vi iv','pop','cuatro acordes'))
+    return '🎼 <strong>I-V-vi-IV</strong><br><br>La progresión del pop moderno.<br><br>En Do: <strong>Do — Sol — Lam — Fa</strong><br>• "Let It Be", "Someone Like You", "No Woman No Cry"<br>• Miles de canciones la usan 🎵';
+
+  if (has('ii v i','2 5 1','dos cinco uno'))
+    return '🎼 <strong>ii-V-I</strong><br><br>La progresión fundamental del jazz.<br><br>En Do: <strong>Rem7 — Sol7 — DoMaj7</strong><br>• ii prepara, V tensiona, I resuelve<br>• Aparece en casi todos los estándares de jazz 🎷';
+
+  if (has('progresion','progresión') && !has('ii','iv','vi'))
+    return '🎼 <strong>Progresiones Armónicas</strong><br><br>Secuencias de acordes que crean movimiento musical.<br><br>• <strong>I-IV-V:</strong> blues, rock<br>• <strong>I-V-vi-IV:</strong> pop moderno<br>• <strong>ii-V-I:</strong> jazz<br>• <strong>I-vi-IV-V:</strong> baladas<br><br>Los números romanos indican el grado de la escala.';
+
+  // Escalas
+  if (has('escala mayor') && !has('menor','penta'))
+    return '🎶 <strong>Escala Mayor</strong><br><br>Patrón: T-T-st-T-T-T-st<br><br>En Do: Do-Re-Mi-Fa-Sol-La-Si-Do<br>• Sonido alegre y brillante<br>• Base de la música occidental 🎵';
+
+  if (has('menor natural') || (has('escala menor') && !has('armon','melod','penta')))
+    return '🎶 <strong>Escala Menor Natural</strong><br><br>Patrón: T-st-T-T-st-T-T<br><br>En La: La-Si-Do-Re-Mi-Fa-Sol-La<br>• Oscura y melancólica<br>• Mismas notas que Do Mayor pero desde La 🎼';
+
+  if (has('menor armon','armónica','armonica'))
+    return '🎶 <strong>Menor Armónica</strong><br><br>Patrón: T-st-T-T-st-T½-st<br><br>En La: La-Si-Do-Re-Mi-Fa-Sol♯-La<br>• 7ª elevada ½ tono → tensión más fuerte hacia la tónica<br>• Sonido exótico, oriental<br>• Muy usada en clásica, flamenca y metal 🎸';
+
+  if (has('menor melod','melódica','melodica'))
+    return '🎶 <strong>Menor Melódica</strong><br><br>Patrón ascendente: T-st-T-T-T-T-st<br><br>En La: La-Si-Do-Re-Mi-Fa♯-Sol♯-La<br>• 6ª y 7ª elevadas al subir<br>• En jazz siempre se usa la forma ascendente 🎹';
+
+  if (has('pentatonica','pentatónica'))
+    return '🎶 <strong>Pentatónicas</strong><br><br>Solo 5 notas, sin semitonos conflictivos:<br><br><strong>Mayor:</strong> Do-Re-Mi-Sol-La<br><strong>Menor:</strong> La-Do-Re-Mi-Sol<br><br>• Cualquier nota suena bien sobre cualquier acorde<br>• Base de rock, blues, folk y música asiática 🎸';
+
+  if (has('blues'))
+    return '🎶 <strong>Escala Blues</strong><br><br>Pentatónica menor + nota blue (♭5):<br><br>En La: La-Do-Re-Re♯-Mi-Sol-La<br>• El Re♯ crea el sonido "azul" característico<br>• Base del blues, jazz, rock y funk 🎷';
+
+  if (has('dorica','dórica','dorico'))
+    return '🎶 <strong>Modo Dórico</strong><br><br>Patrón: T-st-T-T-T-st-T<br><br>En Re: Re-Mi-Fa-Sol-La-Si-Do-Re<br>• Como menor natural pero con 6ª mayor<br>• Oscuro pero con brillo<br>• "So What" (Miles Davis) 🎷';
+
+  // Conceptos
+  if (has('grado','tonica','dominante','subdominante') && !has('7','acorde'))
+    return '🎼 <strong>Grados de la Escala</strong><br><br>I — Tónica (reposo)<br>II — Supertónica<br>III — Mediante (define mayor/menor)<br>IV — Subdominante<br>V — Dominante (tensión máxima)<br>VI — Superdominante / relativo<br>VII — Sensible (atracción a I)<br><br>Mayúsculas = acordes mayores, minúsculas = menores.';
+
+  if (has('cadencia'))
+    return '🎼 <strong>Cadencias</strong><br><br><strong>Auténtica perfecta:</strong> V→I (la más conclusiva)<br><strong>Plagal:</strong> IV→I ("Amén")<br><strong>Rota / Evadida:</strong> V→vi (sorpresa)<br><strong>Semicadencia:</strong> termina en V (tensión sin resolver)';
+
+  if (has('modo','modos') && !has('estudio','prueba','escala'))
+    return '🎶 <strong>Modos de la Escala Mayor</strong><br><br>I Jónico = Mayor<br>II Dórico (Re)<br>III Frigio (Mi)<br>IV Lidio (Fa) — 4ª aumentada<br>V Mixolidio (Sol) — 7ª menor 🎸<br>VI Aeoliano = Menor Natural<br>VII Locrio — el más disonante<br><br>Todos usan las mismas notas de Do Mayor.';
+
+  if (has('consejo','tip','estudiar','practicar','mejorar'))
+    return '📚 <strong>Consejos para Entrenar el Oído</strong><br><br>1. <strong>Empieza con poco:</strong> 2-3 intervalos/acordes en configuración, luego agrega más.<br>2. <strong>Modo Estudio primero:</strong> escucha varias veces antes de hacer el examen.<br>3. <strong>Constancia:</strong> 15-20 min diarios > 2 horas una vez por semana.<br>4. <strong>Asocia canciones:</strong> cada intervalo tiene una referencia musical.<br>5. <strong>Canta lo que escuchas:</strong> entonar acelera mucho el aprendizaje. 🎯';
+
+  if (has('armonico','armónico') && has('intervalo','intervalos'))
+    return '🎵 <strong>Intervalo Armónico</strong><br><br>Las dos notas suenan <strong>al mismo tiempo</strong> (simultáneamente).<br><br>Contraste con el intervalo melódico, donde las notas suenan una después de la otra.<br><br>En la app puedes activar el modo armónico en Intervalos → Configuración → Tipo → "Armónico (simultáneo)".';
+
+  if (has('melodico','melódico') && has('intervalo','intervalos'))
+    return '🎵 <strong>Intervalo Melódico</strong><br><br>Las dos notas suenan <strong>una después de la otra</strong>.<br><br>Puede ser ascendente (grave→agudo) o descendente (agudo→grave).<br><br>En la app: Intervalos → Configuración → Tipo → "Melódico (sucesivo)" + elige la dirección.';
+
+  // Fallback
+  return '🎵 No encontré respuesta exacta. Puedo ayudarte con:<br><br>• <strong>Intervalos:</strong> "¿Qué es una quinta justa?"<br>• <strong>Tríadas:</strong> "Explica el acorde aumentado"<br>• <strong>Inversiones:</strong> "¿Qué es la primera inversión?"<br>• <strong>Séptimas:</strong> "¿Qué es el dominante 7?"<br>• <strong>Progresiones:</strong> "Explica el ii-V-I"<br>• <strong>Escalas:</strong> "Escala menor armónica"<br>• <strong>Consejos:</strong> "¿Cómo mejorar el oído?"<br><br>Intenta ser más específico 🎼';
+}
+</script>
 </body>
 </html>
-
-
