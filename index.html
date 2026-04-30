@@ -273,7 +273,11 @@ const scaleDetails = {
   'Pentatónica Mayor': { pattern:['T','T','T+st','T','T+st'],         notes:['Do','Re','Mi','Sol','La','Do'] },
   'Pentatónica Menor': { pattern:['T+st','T','T','T+st','T'],         notes:['La','Do','Re','Mi','Sol','La'] },
   'Blues':             { pattern:['T+st','T','st','st','T+st','T'],   notes:['La','Do','Re','Re♯','Mi','Sol','La'] },
-  'Dórica':            { pattern:['T','st','T','T','T','st','T'],     notes:['Re','Mi','Fa','Sol','La','Si','Do','Re'] }
+  'Dórica':            { pattern:['T','st','T','T','T','st','T'],     notes:['Re','Mi','Fa','Sol','La','Si','Do','Re'] },
+  'Frigio':            { pattern:['st','T','T','T','st','T','T'],     notes:['Mi','Fa','Sol','La','Si','Do','Re','Mi'] },
+  'Lidio':             { pattern:['T','T','T','st','T','T','st'],     notes:['Fa','Sol','La','Si','Do','Re','Mi','Fa'] },
+  'Mixolidio':         { pattern:['T','T','st','T','T','st','T'],     notes:['Sol','La','Si','Do','Re','Mi','Fa','Sol'] },
+  'Locrio':            { pattern:['st','T','T','st','T','T','T'],     notes:['Si','Do','Re','Mi','Fa','Sol','La','Si'] }
 };
 
 const musicData = {
@@ -291,9 +295,11 @@ const musicData = {
     { name:'Sus2',       intervals:[0,2,7] }, { name:'Sus4',       intervals:[0,5,7] }
   ],
   inversiones: [
-    { name:'Mayor — Fundamental',   intervals:[0,4,7] }, { name:'Mayor — 1ª Inversión', intervals:[0,3,8] },
-    { name:'Mayor — 2ª Inversión',  intervals:[0,5,9] }, { name:'Menor — Fundamental',  intervals:[0,3,7] },
-    { name:'Menor — 1ª Inversión',  intervals:[0,4,9] }, { name:'Menor — 2ª Inversión', intervals:[0,5,8] }
+    { name:'Mayor — Fundamental',      intervals:[0,4,7] }, { name:'Mayor — 1ª Inversión',      intervals:[0,3,8] },
+    { name:'Mayor — 2ª Inversión',     intervals:[0,5,9] }, { name:'Menor — Fundamental',       intervals:[0,3,7] },
+    { name:'Menor — 1ª Inversión',     intervals:[0,4,9] }, { name:'Menor — 2ª Inversión',      intervals:[0,5,8] },
+    { name:'Disminuido — Fundamental', intervals:[0,3,6] }, { name:'Disminuido — 1ª Inversión', intervals:[0,3,9] },
+    { name:'Disminuido — 2ª Inversión',intervals:[0,6,9] }
   ],
   septimas: [
     { name:'Mayor 7',      intervals:[0,4,7,11] }, { name:'Menor 7',      intervals:[0,3,7,10] },
@@ -314,7 +320,9 @@ const musicData = {
     { name:'Mayor',             intervals:[0,2,4,5,7,9,11,12] }, { name:'Menor Natural',    intervals:[0,2,3,5,7,8,10,12] },
     { name:'Menor Armónica',    intervals:[0,2,3,5,7,8,11,12] }, { name:'Menor Melódica',   intervals:[0,2,3,5,7,9,11,12] },
     { name:'Pentatónica Mayor', intervals:[0,2,4,7,9,12] },      { name:'Pentatónica Menor',intervals:[0,3,5,7,10,12] },
-    { name:'Blues',             intervals:[0,3,5,6,7,10,12] },   { name:'Dórica',           intervals:[0,2,3,5,7,9,10,12] }
+    { name:'Blues',             intervals:[0,3,5,6,7,10,12] },   { name:'Dórica',           intervals:[0,2,3,5,7,9,10,12] },
+    { name:'Frigio',            intervals:[0,1,3,5,7,8,10,12] }, { name:'Lidio',             intervals:[0,2,4,6,7,9,11,12] },
+    { name:'Mixolidio',         intervals:[0,2,4,5,7,9,10,12] }, { name:'Locrio',            intervals:[0,1,3,5,6,8,10,12] }
   ]
 };
 
@@ -326,7 +334,7 @@ const customSettings = {
   },
   triadas:     { selected: musicData.triadas.map(x => x.name) },
   inversiones: { selected: musicData.inversiones.map(x => x.name) },
-  septimas:    { selected: musicData.septimas.map(x => x.name) },
+  septimas:    { selected: musicData.septimas.map(x => x.name), harmonic:true, arpeggio:false },
   progresiones:{ selected: musicData.progresiones.map(x => x.name) },
   escalas:     { selected: musicData.escalas.map(x => x.name) }
 };
@@ -471,6 +479,18 @@ function updateSettingsPanel() {
     const labels = { triadas:'Tríadas', inversiones:'Inversiones', septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas' };
     const arr = musicData[currentMode];
     const sel = customSettings[currentMode].selected;
+    let extraSections = '';
+    if (currentMode === 'septimas') {
+      const s = customSettings.septimas;
+      extraSections = `
+      <div class="settings-section">
+        <h4>🎵 Modo de reproducción:</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${s.harmonic?'active':''}" onclick="toggleSeptimaMode('harmonic')">Armónico (simultáneo)</button>
+          <button class="toggle-btn ${s.arpeggio?'active':''}" onclick="toggleSeptimaMode('arpeggio')">Arpegio (sucesivo)</button>
+        </div>
+      </div>`;
+    }
     panel.innerHTML = `
       <div class="settings-section">
         <h4>📋 ${labels[currentMode]} a practicar:</h4>
@@ -478,7 +498,7 @@ function updateSettingsPanel() {
           ${arr.map(x => `<button class="toggle-btn ${sel.includes(x.name)?'active':''}" onclick="toggleSel('${currentMode}','${x.name.replace(/'/g,"\\'")}')"> ${x.name}</button>`).join('')}
         </div>
         <p class="selection-info">✓ ${sel.length} / ${arr.length} seleccionados</p>
-      </div>`;
+      </div>${extraSections}`;
   }
 }
 
@@ -487,28 +507,33 @@ function toggleIntervalSel(name) {
   const arr = customSettings.intervalos.selectedIntervals;
   const i = arr.indexOf(name);
   if (i > -1) { if (arr.length > 1) arr.splice(i,1); } else arr.push(name);
-  updateSettingsPanel();
+  updateSettingsPanel(); nextQuestion(false);
 }
 function toggleIntType(t) {
   customSettings.intervalos[t] = !customSettings.intervalos[t];
   if (!customSettings.intervalos.melodic && !customSettings.intervalos.harmonic) customSettings.intervalos[t] = true;
-  updateSettingsPanel();
+  updateSettingsPanel(); nextQuestion(false);
 }
 function toggleIntDir(d) {
   customSettings.intervalos[d] = !customSettings.intervalos[d];
   if (!customSettings.intervalos.ascending && !customSettings.intervalos.descending) customSettings.intervalos[d] = true;
-  updateSettingsPanel();
+  updateSettingsPanel(); nextQuestion(false);
 }
 function toggleReg(r) {
   customSettings.intervalos[r] = !customSettings.intervalos[r];
   if (!customSettings.intervalos.registerLow && !customSettings.intervalos.registerMid && !customSettings.intervalos.registerHigh) customSettings.intervalos[r] = true;
-  updateSettingsPanel();
+  updateSettingsPanel(); nextQuestion(false);
 }
 function toggleSel(cat, name) {
   const arr = customSettings[cat].selected;
   const i = arr.indexOf(name);
   if (i > -1) { if (arr.length > 1) arr.splice(i,1); } else arr.push(name);
-  updateSettingsPanel();
+  updateSettingsPanel(); nextQuestion(false);
+}
+function toggleSeptimaMode(mode) {
+  customSettings.septimas[mode] = !customSettings.septimas[mode];
+  if (!customSettings.septimas.harmonic && !customSettings.septimas.arpeggio) customSettings.septimas[mode] = true;
+  updateSettingsPanel(); nextQuestion(false);
 }
 
 // ==================== SONIDO ====================
@@ -538,12 +563,27 @@ async function playSound() {
       synth.triggerAttackRelease(getFreq(0, oct), '0.5', now);
       synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.5', now + 0.6);
     }
-  } else if (['triadas','inversiones','septimas'].includes(currentMode)) {
+  } else if (currentMode === 'triadas') {
     currentQuestion.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f,'1.5',now));
+  } else if (currentMode === 'inversiones') {
+    const reg = currentQuestion.register || 4;
+    currentQuestion.intervals.map(i => getFreq(i, reg)).forEach(f => synth.triggerAttackRelease(f,'1.5',now));
+  } else if (currentMode === 'septimas') {
+    const s = customSettings.septimas;
+    const modes = [];
+    if (s.harmonic) modes.push('harmonic');
+    if (s.arpeggio) modes.push('arpeggio');
+    const chosen = modes[Math.floor(Math.random() * modes.length)];
+    if (chosen === 'arpeggio') {
+      currentQuestion.intervals.forEach((semis,i) => synth.triggerAttackRelease(getFreq(semis),'0.5',now+i*0.35));
+    } else {
+      currentQuestion.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f,'1.5',now));
+    }
   } else if (currentMode === 'progresiones') {
     currentQuestion.chords.forEach((ch,i) => ch.map(s=>getFreq(s)).forEach(f=>synth.triggerAttackRelease(f,'0.8',now+i*1)));
   } else if (currentMode === 'escalas') {
-    currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
+    const ko = currentQuestion.keyOffset || 0;
+    currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s+ko),'0.3',now+i*0.25));
   }
 }
 
@@ -571,7 +611,13 @@ function nextQuestion(autoPlay = true) {
     options = musicData[currentMode].filter(x => customSettings[currentMode].selected.includes(x.name));
     if (!options.length) { alert('Selecciona al menos una opción'); return; }
     correctIndex = Math.floor(Math.random() * options.length);
-    currentQuestion = options[correctIndex];
+    currentQuestion = { ...options[correctIndex] };
+    if (currentMode === 'escalas') {
+      currentQuestion.keyOffset = Math.floor(Math.random() * 12);
+    }
+    if (currentMode === 'inversiones') {
+      currentQuestion.register = [3,4,5][Math.floor(Math.random() * 3)];
+    }
   }
 
   answered = false;
