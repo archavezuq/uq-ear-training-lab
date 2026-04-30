@@ -66,8 +66,29 @@
     .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
     .feedback { text-align: center; font-size: 1.4em; font-weight: bold; margin: 20px 0; padding: 20px; border-radius: 10px; min-height: 65px; display: flex; align-items: center; justify-content: center; }
-    .feedback.correct  { background: rgba(6,214,160,0.2);  color: var(--success); }
-    .feedback.incorrect{ background: rgba(239,71,111,0.2); color: var(--danger); }
+    .feedback.correct    { background: rgba(6,214,160,0.2);  color: var(--success); }
+    .feedback.incorrect  { background: rgba(239,71,111,0.2); color: var(--danger); }
+    .feedback.approximation{ background: rgba(251,191,36,0.15); color: var(--warning); }
+
+    /* Progress panel */
+    .progress-panel { background: var(--card); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+    .progress-category { margin-bottom: 28px; }
+    .progress-category h4 { color: var(--primary); margin-bottom: 14px; font-size: 1.1em; border-bottom: 1px solid rgba(108,99,255,0.2); padding-bottom: 8px; }
+    .progress-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .progress-item-name { min-width: 200px; font-size: 0.9em; color: var(--text); }
+    .progress-bar-track { flex: 1; min-width: 100px; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 5px; transition: width 0.4s; }
+    .progress-bar-fill.good   { background: var(--success); }
+    .progress-bar-fill.medium { background: var(--warning); }
+    .progress-bar-fill.bad    { background: var(--danger); }
+    .progress-stat { font-size: 0.82em; color: var(--text-muted); min-width: 55px; text-align: right; }
+    .progress-confusion { font-size: 0.78em; padding: 2px 8px; border-radius: 10px; margin-left: 4px; }
+    .progress-confusion.inverse { background: rgba(251,191,36,0.2); color: var(--warning); }
+    .progress-confusion.error   { background: rgba(239,71,111,0.2); color: var(--danger); }
+    .suggestion-card { background: rgba(108,99,255,0.1); border-left: 4px solid var(--primary); border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; font-size: 0.92em; line-height: 1.6; }
+    .suggestion-card.warning { border-color: var(--warning); background: rgba(251,191,36,0.08); }
+    .suggestion-card.danger  { border-color: var(--danger);  background: rgba(239,71,111,0.08); }
+    .no-data { text-align: center; color: var(--text-muted); padding: 40px; font-size: 0.95em; }
 
     /* Study mode */
     .scale-visualization { background: rgba(255,255,255,0.04); padding: 18px; border-radius: 10px; margin-top: 12px; }
@@ -142,8 +163,9 @@
   </header>
 
   <div style="display:flex;justify-content:center;gap:15px;margin-bottom:22px;flex-wrap:wrap;">
-    <button class="btn btn-success" onclick="setViewMode('study')" id="studyModeBtn">📚 Modo Estudio</button>
-    <button class="btn"            onclick="setViewMode('test')"  id="testModeBtn">✏️ Modo Prueba</button>
+    <button class="btn btn-success" onclick="setViewMode('study')"    id="studyModeBtn">📚 Modo Estudio</button>
+    <button class="btn"             onclick="setViewMode('test')"     id="testModeBtn">✏️ Modo Prueba</button>
+    <button class="btn btn-warning" onclick="setViewMode('progress')" id="progressModeBtn" style="color:#000;">📊 Mi Progreso</button>
   </div>
 
   <div class="mode-selector">
@@ -192,6 +214,12 @@
       <div id="studyContent" class="options-grid"></div>
     </div>
 
+    <!-- PROGRESO -->
+    <div id="progressArea" style="display:none;">
+      <h2 style="text-align:center;margin-bottom:25px;color:var(--primary);">📊 Mi Progreso</h2>
+      <div id="progressContent"></div>
+    </div>
+
     <!-- MODO PRUEBA -->
     <div id="testArea" style="display:none;">
       <div id="settingsPanel" class="settings-panel">
@@ -222,7 +250,7 @@
       <div style="margin:25px 0;padding:18px;background:rgba(108,99,255,0.1);border-radius:12px;border-left:4px solid var(--primary);">
         <p style="line-height:1.8;"><strong>📚 Descripción:</strong><br>Herramienta digital interactiva para el desarrollo del oído musical y entrenamiento auditivo. Proyecto de innovación pedagógica que integra tecnología web y educación musical para estudiantes universitarios y público general.</p>
       </div>
-      <p style="color:var(--text-muted);margin-bottom:18px;"><strong>🎯 Áreas:</strong> Intervalos • Tríadas • Inversiones • Séptimas • Progresiones • Escalas</p>
+      <p style="color:var(--text-muted);margin-bottom:18px;"><strong>🎯 Áreas:</strong> Intervalos • Tríadas • Inversiones • Séptimas • Progresiones • Escalas • Notas</p>
       <p><strong style="color:var(--primary);">📧 Contacto:</strong> <a href="mailto:archavez@uniquindio.edu.co" style="color:var(--success);text-decoration:none;">archavez@uniquindio.edu.co</a></p>
       <p style="color:var(--text-muted);font-size:0.9em;margin-top:18px;">© 2025 Andrés R. Chávez Becerra — Herramienta educativa de acceso libre</p>
       <p style="font-size:0.85em;color:var(--text-muted);margin-top:12px;"><strong>Versión:</strong> 3.0 | <strong>Actualización:</strong> 2025</p>
@@ -267,6 +295,7 @@ const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 let audioReady = false, currentMode = 'intervalos', viewMode = 'study';
 let currentQuestion = null, answered = false;
 const scores = { correct: 0, incorrect: 0, streak: 0 };
+let progress = {};
 
 // ==================== DATOS ====================
 const scaleDetails = {
@@ -282,6 +311,15 @@ const scaleDetails = {
   'Lidio':             { pattern:['T','T','T','st','T','T','st'],     notes:['Fa','Sol','La','Si','Do','Re','Mi','Fa'] },
   'Mixolidio':         { pattern:['T','T','st','T','T','st','T'],     notes:['Sol','La','Si','Do','Re','Mi','Fa','Sol'] },
   'Locrio':            { pattern:['st','T','T','st','T','T','T'],     notes:['Si','Do','Re','Mi','Fa','Sol','La','Si'] }
+};
+
+const intervalInverses = {
+  'Segunda menor (m2)':  'Séptima mayor (M7)',  'Séptima mayor (M7)':  'Segunda menor (m2)',
+  'Segunda mayor (M2)':  'Séptima menor (m7)',  'Séptima menor (m7)':  'Segunda mayor (M2)',
+  'Tercera menor (m3)':  'Sexta mayor (M6)',    'Sexta mayor (M6)':    'Tercera menor (m3)',
+  'Tercera mayor (M3)':  'Sexta menor (m6)',    'Sexta menor (m6)':    'Tercera mayor (M3)',
+  'Cuarta justa (P4)':   'Quinta justa (P5)',   'Quinta justa (P5)':   'Cuarta justa (P4)',
+  'Tritono (TT)':        'Tritono (TT)'
 };
 
 const musicData = {
@@ -360,6 +398,7 @@ const customSettings = {
 async function initAudio() {
   await Tone.start();
   audioReady = true;
+  loadProgress();
   document.getElementById('startOverlay').style.display = 'none';
   setViewMode('study');
 }
@@ -372,8 +411,9 @@ function scrollToExerciseArea() {
 // ==================== VISTA ====================
 function setViewMode(mode) {
   viewMode = mode;
-  document.getElementById('studyModeBtn').className = mode === 'study' ? 'btn btn-success' : 'btn';
-  document.getElementById('testModeBtn').className  = mode === 'test'  ? 'btn btn-success' : 'btn';
+  document.getElementById('studyModeBtn').className    = mode === 'study'    ? 'btn btn-success' : 'btn';
+  document.getElementById('testModeBtn').className     = mode === 'test'     ? 'btn btn-success' : 'btn';
+  document.getElementById('progressModeBtn').className = mode === 'progress' ? 'btn btn-warning'  : 'btn btn-warning';
   updateView();
   if (audioReady) scrollToExerciseArea();
 }
@@ -381,11 +421,16 @@ function setViewMode(mode) {
 function updateView() {
   const s = document.getElementById('studyArea');
   const t = document.getElementById('testArea');
+  const p = document.getElementById('progressArea');
+  s.style.display = 'none'; t.style.display = 'none'; p.style.display = 'none';
   if (viewMode === 'study') {
-    s.style.display = 'block'; t.style.display = 'none';
+    s.style.display = 'block';
     renderStudyMode();
+  } else if (viewMode === 'progress') {
+    p.style.display = 'block';
+    renderProgressPanel();
   } else {
-    s.style.display = 'none'; t.style.display = 'block';
+    t.style.display = 'block';
     updateSettingsPanel();
     nextQuestion(false);
   }
@@ -727,18 +772,29 @@ function checkAnswer(selected, correct, btn) {
   const btns = document.querySelectorAll('.option-btn');
   btns.forEach(b => b.disabled = true);
   const fb = document.getElementById('feedback');
+  const correctName  = btns[correct].textContent.trim();
+  const selectedName = btn.textContent.trim();
   if (selected === correct) {
     btn.classList.add('correct');
     fb.textContent = '¡Correcto! ✓'; fb.className = 'feedback correct';
     scores.correct++; scores.streak++;
+    recordAnswer(currentMode, correctName, correctName, true);
   } else {
     btn.classList.add('incorrect');
     btns[correct].classList.add('correct');
-    fb.textContent = `Incorrecto. Era: ${btns[correct].textContent}`; fb.className = 'feedback incorrect';
     scores.incorrect++; scores.streak = 0;
+    recordAnswer(currentMode, correctName, selectedName, false);
+    const errType = getErrorType(currentMode, correctName, selectedName);
+    if (errType === 'inverse') {
+      fb.innerHTML = `⚠️ Aproximación — <strong>${selectedName}</strong> es el inverso de <strong>${correctName}</strong>`;
+      fb.className = 'feedback approximation';
+    } else {
+      fb.textContent = `Incorrecto. Era: ${correctName}`;
+      fb.className = 'feedback incorrect';
+    }
   }
   updateScoreboard();
-  setTimeout(() => nextQuestion(), 2500);
+  setTimeout(() => nextQuestion(), 2800);
 }
 
 function updateScoreboard() {
@@ -750,6 +806,88 @@ function updateScoreboard() {
 function resetScore() {
   scores.correct = scores.incorrect = scores.streak = 0;
   updateScoreboard(); nextQuestion(false);
+}
+
+// ==================== PROGRESO ====================
+function loadProgress() {
+  try { progress = JSON.parse(localStorage.getItem('audikus_progress') || '{}'); }
+  catch(e) { progress = {}; }
+}
+function saveProgress() {
+  localStorage.setItem('audikus_progress', JSON.stringify(progress));
+}
+function recordAnswer(mode, correctName, selectedName, isCorrect) {
+  if (!progress[mode]) progress[mode] = {};
+  if (!progress[mode][correctName]) progress[mode][correctName] = { correct:0, total:0, confusions:{} };
+  const item = progress[mode][correctName];
+  item.total++;
+  if (isCorrect) { item.correct++; }
+  else {
+    item.confusions[selectedName] = (item.confusions[selectedName] || 0) + 1;
+  }
+  saveProgress();
+}
+function getErrorType(mode, correctName, selectedName) {
+  if (mode === 'intervalos' && intervalInverses[correctName] === selectedName) return 'inverse';
+  return 'error';
+}
+function renderProgressPanel() {
+  const container = document.getElementById('progressContent');
+  const catLabels = { intervalos:'Intervalos', triadas:'Tríadas', inversiones:'Inversiones',
+                      septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas', notas:'Notas' };
+  const cats = Object.keys(catLabels);
+  const hasAny = cats.some(c => progress[c] && Object.keys(progress[c]).length > 0);
+  if (!hasAny) {
+    container.innerHTML = `<div class="no-data">🎵 Aún no hay datos. Practica en <strong>Modo Prueba</strong> para ver tu progreso aquí.</div>`;
+    return;
+  }
+  const suggestions = [];
+  let html = '';
+  cats.forEach(cat => {
+    const catData = progress[cat];
+    if (!catData || !Object.keys(catData).length) return;
+    const items = Object.entries(catData).filter(([,d]) => d.total > 0)
+      .sort((a,b) => (a[1].correct/a[1].total) - (b[1].correct/b[1].total));
+    html += `<div class="progress-category"><h4>${catLabels[cat]}</h4>`;
+    items.forEach(([name, data]) => {
+      const pct = Math.round((data.correct / data.total) * 100);
+      const fillClass = pct >= 80 ? 'good' : pct >= 55 ? 'medium' : 'bad';
+      const topConfusions = Object.entries(data.confusions)
+        .sort((a,b) => b[1]-a[1]).slice(0,2);
+      let confusionHtml = '';
+      topConfusions.forEach(([cName, cCount]) => {
+        const type = getErrorType(cat, name, cName);
+        const label = type === 'inverse' ? `≈ inverso: ${cName} (${cCount}×)` : `✗ ${cName} (${cCount}×)`;
+        confusionHtml += `<span class="progress-confusion ${type === 'inverse' ? 'inverse' : 'error'}">${label}</span>`;
+        if (cCount >= 3) {
+          if (type === 'inverse') suggestions.push({ type:'warning', text:`En <strong>${catLabels[cat]}</strong> confundes <strong>${name}</strong> con su inverso <strong>${cName}</strong> (${cCount} veces). Son complementarios — practica en modo armónico para diferenciarlos.` });
+          else suggestions.push({ type:'danger',  text:`En <strong>${catLabels[cat]}</strong> confundes frecuentemente <strong>${name}</strong> con <strong>${cName}</strong> (${cCount} veces). Enfoca tus próximas sesiones en este ítem.` });
+        }
+      });
+      html += `<div class="progress-item">
+        <span class="progress-item-name">${name}</span>
+        <div class="progress-bar-track"><div class="progress-bar-fill ${fillClass}" style="width:${pct}%"></div></div>
+        <span class="progress-stat">${pct}% (${data.correct}/${data.total})</span>
+        ${confusionHtml}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  let sugHtml = '';
+  if (suggestions.length) {
+    sugHtml = `<div class="progress-panel"><h3 style="color:var(--primary);margin-bottom:16px;">💡 Sugerencias</h3>`;
+    suggestions.slice(0,5).forEach(s => sugHtml += `<div class="suggestion-card ${s.type}">${s.text}</div>`);
+    sugHtml += `</div>`;
+  }
+  container.innerHTML = sugHtml + `<div class="progress-panel">${html}</div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-danger" onclick="resetProgress()">🗑️ Borrar todo el progreso</button>
+    </div>`;
+}
+function resetProgress() {
+  if (confirm('¿Seguro que quieres borrar todo tu historial de progreso?')) {
+    progress = {}; saveProgress(); renderProgressPanel();
+  }
 }
 
 // ==================== CHAT ====================
