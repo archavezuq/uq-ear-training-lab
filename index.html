@@ -201,7 +201,7 @@
     </div>
     <div class="mode-card" onclick="setMode('notas')"      data-mode="notas">
       <div class="mode-icon">🎯</div>
-      <div class="mode-title">Notas</div>
+      <div class="mode-title">Nota Absoluta</div>
       <p style="font-size:0.85em;color:var(--text-muted)">Diatónico y Cromático</p>
     </div>
   </div>
@@ -250,7 +250,7 @@
       <div style="margin:25px 0;padding:18px;background:rgba(108,99,255,0.1);border-radius:12px;border-left:4px solid var(--primary);">
         <p style="line-height:1.8;"><strong>📚 Descripción:</strong><br>Herramienta digital interactiva para el desarrollo del oído musical y entrenamiento auditivo. Proyecto de innovación pedagógica que integra tecnología web y educación musical para estudiantes universitarios y público general.</p>
       </div>
-      <p style="color:var(--text-muted);margin-bottom:18px;"><strong>🎯 Áreas:</strong> Intervalos • Tríadas • Inversiones • Séptimas • Progresiones • Escalas • Notas</p>
+      <p style="color:var(--text-muted);margin-bottom:18px;"><strong>🎯 Áreas:</strong> Intervalos • Tríadas • Inversiones • Séptimas • Progresiones • Escalas • Nota Absoluta</p>
       <p><strong style="color:var(--primary);">📧 Contacto:</strong> <a href="mailto:archavez@uniquindio.edu.co" style="color:var(--success);text-decoration:none;">archavez@uniquindio.edu.co</a></p>
       <p style="color:var(--text-muted);font-size:0.9em;margin-top:18px;">© 2025 Andrés R. Chávez Becerra — Herramienta educativa de acceso libre</p>
       <p style="font-size:0.85em;color:var(--text-muted);margin-top:12px;"><strong>Versión:</strong> 3.0 | <strong>Actualización:</strong> 2025</p>
@@ -556,7 +556,7 @@ function updateSettingsPanel() {
         </div>
       </div>
       <div class="settings-section">
-        <h4>📋 Notas a practicar:</h4>
+        <h4>📋 Notas a identificar:</h4>
         <div class="toggle-group">
           ${pool.map(n => `<button class="toggle-btn ${sn.selected.includes(n.name)?'active':''}" onclick="toggleSel('notas','${n.name}')">${n.name}</button>`).join('')}
         </div>
@@ -834,7 +834,7 @@ function getErrorType(mode, correctName, selectedName) {
 function renderProgressPanel() {
   const container = document.getElementById('progressContent');
   const catLabels = { intervalos:'Intervalos', triadas:'Tríadas', inversiones:'Inversiones',
-                      septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas', notas:'Notas' };
+                      septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas', notas:'Nota Absoluta' };
   const cats = Object.keys(catLabels);
   const hasAny = cats.some(c => progress[c] && Object.keys(progress[c]).length > 0);
   if (!hasAny) {
