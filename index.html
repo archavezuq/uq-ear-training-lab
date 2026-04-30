@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrenamiento Auditivo - Mtro. Andrés Chávez</title>
+  <title>Audikus - Mtro. Andrés Chávez</title>
   <script src="https://cdn.jsdelivr.net/npm/tone@14/build/Tone.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg: #0f0f1e; --card: #1a1a2e; --card-hover: #232340;
       --primary: #6c63ff; --success: #06d6a0; --danger: #ef476f;
-      --warning: #ffd166; --text: #e0e0e0; --text-muted: #a0a0a0;
+      --warning: #fbbf24; --text: #e0e0e0; --text-muted: #a0a0a0;
     }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
     .container { max-width: 1200px; margin: 0 auto; }
@@ -129,14 +129,14 @@
 <body>
 
 <div id="startOverlay" class="start-overlay">
-  <h2>🎵 Entrenamiento Auditivo Musical</h2>
+  <h2>🎵 Audikus</h2>
   <p>Haz clic para activar el sonido y comenzar</p>
   <button class="btn btn-success" onclick="initAudio()">▶ INICIAR</button>
 </div>
 
 <div class="container">
   <header>
-    <h1>🎼 Entrenamiento Auditivo Musical</h1>
+    <h1>🎼 Audikus</h1>
     <p class="subtitle">por Mtro. Andrés Chávez • 2025</p>
     <div class="mobile-indicator">⬇️ Desliza hacia abajo para comenzar</div>
   </header>
@@ -176,6 +176,11 @@
       <div class="mode-icon">🎶</div>
       <div class="mode-title">Escalas</div>
       <p style="font-size:0.85em;color:var(--text-muted)">Mayor, Menor y Modos</p>
+    </div>
+    <div class="mode-card" onclick="setMode('notas')"      data-mode="notas">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-title">Notas</div>
+      <p style="font-size:0.85em;color:var(--text-muted)">Diatónico y Cromático</p>
     </div>
   </div>
 
@@ -315,6 +320,14 @@ const musicData = {
     { name:'i - iv - v - i (Menor)',    chords:[[0,3,7],[5,8,12],[7,10,14],[0,3,7]] },
     { name:'i - VI - III - VII (Menor)',chords:[[0,3,7],[8,12,15],[3,7,10],[10,14,17]] }
   ],
+  notas: [
+    { name:'Do',     semitones:0  }, { name:'Do♯',    semitones:1  },
+    { name:'Re',     semitones:2  }, { name:'Re♯',    semitones:3  },
+    { name:'Mi',     semitones:4  }, { name:'Fa',     semitones:5  },
+    { name:'Fa♯',    semitones:6  }, { name:'Sol',    semitones:7  },
+    { name:'Sol♯',   semitones:8  }, { name:'La',     semitones:9  },
+    { name:'La♯',    semitones:10 }, { name:'Si',     semitones:11 }
+  ],
   escalas: [
     { name:'Mayor',             intervals:[0,2,4,5,7,9,11,12] }, { name:'Menor Natural',    intervals:[0,2,3,5,7,8,10,12] },
     { name:'Menor Armónica',    intervals:[0,2,3,5,7,8,11,12] }, { name:'Menor Melódica',   intervals:[0,2,3,5,7,9,11,12] },
@@ -335,7 +348,12 @@ const customSettings = {
   inversiones: { selected: musicData.inversiones.map(x => x.name) },
   septimas:    { selected: musicData.septimas.map(x => x.name), harmonic:true, arpeggio:false },
   progresiones:{ selected: musicData.progresiones.map(x => x.name) },
-  escalas:     { selected: musicData.escalas.map(x => x.name) }
+  escalas:     { selected: musicData.escalas.map(x => x.name) },
+  notas:       {
+    selected: musicData.notas.filter(n => [0,2,4,5,7,9,11].includes(n.semitones)).map(n => n.name),
+    mode: 'diatonica',
+    registerLow:false, registerMid:true, registerHigh:false
+  }
 };
 
 // ==================== INIT ====================
@@ -436,6 +454,10 @@ function playStudyItem(item) {
   } else if (currentMode === 'escalas') {
     item.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
     [...item.intervals].reverse().forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+item.intervals.length*0.25+0.3+i*0.25));
+  } else if (currentMode === 'notas') {
+    synth.triggerAttackRelease(getFreq(0), '0.5', now);
+    synth.triggerAttackRelease(getFreq(item.semitones), '0.6', now + 0.8);
+    synth.triggerAttackRelease(getFreq(0), '0.5', now + 1.8);
   }
 }
 
@@ -473,6 +495,38 @@ function updateSettingsPanel() {
           <button class="toggle-btn ${customSettings.intervalos.registerMid?'active':''}"  onclick="toggleReg('registerMid')">Medio (C4)</button>
           <button class="toggle-btn ${customSettings.intervalos.registerHigh?'active':''}" onclick="toggleReg('registerHigh')">Agudo (C5)</button>
         </div>
+      </div>`;
+  } else if (currentMode === 'notas') {
+    const sn = customSettings.notas;
+    const diatonicas = [0,2,4,5,7,9,11];
+    const pool = sn.mode === 'diatonica'
+      ? musicData.notas.filter(n => diatonicas.includes(n.semitones))
+      : musicData.notas;
+    panel.innerHTML = `
+      <div class="settings-section">
+        <h4>🎵 Modo:</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${sn.mode==='diatonica'?'active':''}" onclick="toggleNotaMode('diatonica')">Diatónico (7 notas)</button>
+          <button class="toggle-btn ${sn.mode==='cromatica'?'active':''}" onclick="toggleNotaMode('cromatica')">Cromático (12 notas)</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>📋 Notas a practicar:</h4>
+        <div class="toggle-group">
+          ${pool.map(n => `<button class="toggle-btn ${sn.selected.includes(n.name)?'active':''}" onclick="toggleSel('notas','${n.name}')">${n.name}</button>`).join('')}
+        </div>
+        <p class="selection-info">✓ ${sn.selected.length} / ${pool.length} seleccionadas</p>
+      </div>
+      <div class="settings-section">
+        <h4>🎹 Registro:</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${sn.registerLow?'active':''}"  onclick="toggleNotaReg('registerLow')">Grave (C3)</button>
+          <button class="toggle-btn ${sn.registerMid?'active':''}"  onclick="toggleNotaReg('registerMid')">Medio (C4)</button>
+          <button class="toggle-btn ${sn.registerHigh?'active':''}" onclick="toggleNotaReg('registerHigh')">Agudo (C5)</button>
+        </div>
+      </div>
+      <div class="settings-section" style="background:rgba(108,99,255,0.08);border-radius:10px;padding:12px;">
+        <p style="margin:0;font-size:0.9em;color:var(--text-muted);">🔔 Cada ejercicio reproduce primero <strong>Do</strong> como nota de referencia, luego la nota a identificar.</p>
       </div>`;
   } else {
     const labels = { triadas:'Tríadas', inversiones:'Inversiones', septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas' };
@@ -534,6 +588,20 @@ function toggleSeptimaMode(mode) {
   if (!customSettings.septimas.harmonic && !customSettings.septimas.arpeggio) customSettings.septimas[mode] = true;
   updateSettingsPanel(); nextQuestion(false);
 }
+function toggleNotaMode(mode) {
+  customSettings.notas.mode = mode;
+  const diatonicas = [0,2,4,5,7,9,11];
+  const pool = mode === 'diatonica'
+    ? musicData.notas.filter(n => diatonicas.includes(n.semitones))
+    : musicData.notas;
+  customSettings.notas.selected = pool.map(n => n.name);
+  updateSettingsPanel(); nextQuestion(false);
+}
+function toggleNotaReg(r) {
+  customSettings.notas[r] = !customSettings.notas[r];
+  if (!customSettings.notas.registerLow && !customSettings.notas.registerMid && !customSettings.notas.registerHigh) customSettings.notas[r] = true;
+  updateSettingsPanel(); nextQuestion(false);
+}
 
 // ==================== SONIDO ====================
 function getFreq(semitones, octave = 4) {
@@ -583,6 +651,10 @@ async function playSound() {
   } else if (currentMode === 'escalas') {
     const ko = currentQuestion.keyOffset || 0;
     currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s+ko),'0.3',now+i*0.25));
+  } else if (currentMode === 'notas') {
+    const oct = currentQuestion.register || 4;
+    synth.triggerAttackRelease(getFreq(0, oct), '0.5', now);
+    synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.6', now + 0.8);
   }
 }
 
@@ -606,6 +678,16 @@ function nextQuestion(autoPlay = true) {
       currentQuestion.direction = dirs[Math.floor(Math.random() * dirs.length)];
     }
     currentQuestion.register = getRandomRegister();
+  } else if (currentMode === 'notas') {
+    const sn = customSettings.notas;
+    const regs = [];
+    if (sn.registerLow)  regs.push(3);
+    if (sn.registerMid)  regs.push(4);
+    if (sn.registerHigh) regs.push(5);
+    options = musicData.notas.filter(n => sn.selected.includes(n.name));
+    if (!options.length) { alert('Selecciona al menos una nota'); return; }
+    correctIndex = Math.floor(Math.random() * options.length);
+    currentQuestion = { ...options[correctIndex], register: regs[Math.floor(Math.random() * regs.length)] };
   } else {
     options = musicData[currentMode].filter(x => customSettings[currentMode].selected.includes(x.name));
     if (!options.length) { alert('Selecciona al menos una opción'); return; }
