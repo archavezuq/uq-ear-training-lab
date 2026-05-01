@@ -390,7 +390,8 @@ const customSettings = {
   notas:       {
     selected: musicData.notas.filter(n => [0,2,4,5,7,9,11].includes(n.semitones)).map(n => n.name),
     mode: 'diatonica',
-    registerLow:false, registerMid:true, registerHigh:false
+    registerLow:false, registerMid:true, registerHigh:false,
+    playReference: true
   }
 };
 
@@ -500,9 +501,13 @@ function playStudyItem(item) {
     item.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
     [...item.intervals].reverse().forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+item.intervals.length*0.25+0.3+i*0.25));
   } else if (currentMode === 'notas') {
-    synth.triggerAttackRelease(getFreq(0), '0.5', now);
-    synth.triggerAttackRelease(getFreq(item.semitones), '0.6', now + 0.8);
-    synth.triggerAttackRelease(getFreq(0), '0.5', now + 1.8);
+    if (customSettings.notas.playReference) {
+      synth.triggerAttackRelease(getFreq(0), '0.5', now);
+      synth.triggerAttackRelease(getFreq(item.semitones), '0.6', now + 0.8);
+      synth.triggerAttackRelease(getFreq(0), '0.5', now + 1.8);
+    } else {
+      synth.triggerAttackRelease(getFreq(item.semitones), '0.6', now);
+    }
   }
 }
 
@@ -570,8 +575,17 @@ function updateSettingsPanel() {
           <button class="toggle-btn ${sn.registerHigh?'active':''}" onclick="toggleNotaReg('registerHigh')">Agudo (C5)</button>
         </div>
       </div>
-      <div class="settings-section" style="background:rgba(108,99,255,0.08);border-radius:10px;padding:12px;">
-        <p style="margin:0;font-size:0.9em;color:var(--text-muted);">🔔 Cada ejercicio reproduce primero <strong>Do</strong> como nota de referencia, luego la nota a identificar.</p>
+      <div class="settings-section">
+        <h4>🔔 Nota de referencia (Do):</h4>
+        <div class="toggle-group">
+          <button class="toggle-btn ${sn.playReference?'active':''}" onclick="toggleNotaRef(true)">Activada</button>
+          <button class="toggle-btn ${!sn.playReference?'active':''}" onclick="toggleNotaRef(false)">Desactivada</button>
+        </div>
+        <p style="margin:8px 0 0;font-size:0.85em;color:var(--text-muted);">
+          ${sn.playReference
+            ? '🔔 Se reproducirá <strong>Do</strong> antes de cada nota para orientarte.'
+            : '🔕 Sin referencia — modo avanzado para oído absoluto real.'}
+        </p>
       </div>`;
   } else {
     const labels = { triadas:'Tríadas', inversiones:'Inversiones', septimas:'Séptimas', progresiones:'Progresiones', escalas:'Escalas' };
@@ -647,6 +661,10 @@ function toggleNotaReg(r) {
   if (!customSettings.notas.registerLow && !customSettings.notas.registerMid && !customSettings.notas.registerHigh) customSettings.notas[r] = true;
   updateSettingsPanel(); nextQuestion(false);
 }
+function toggleNotaRef(val) {
+  customSettings.notas.playReference = val;
+  updateSettingsPanel(); nextQuestion(false);
+}
 
 // ==================== SONIDO ====================
 function getFreq(semitones, octave = 4) {
@@ -698,8 +716,12 @@ async function playSound() {
     currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s+ko),'0.3',now+i*0.25));
   } else if (currentMode === 'notas') {
     const oct = currentQuestion.register || 4;
-    synth.triggerAttackRelease(getFreq(0, oct), '0.5', now);
-    synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.6', now + 0.8);
+    if (customSettings.notas.playReference) {
+      synth.triggerAttackRelease(getFreq(0, oct), '0.5', now);
+      synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.6', now + 0.8);
+    } else {
+      synth.triggerAttackRelease(getFreq(currentQuestion.semitones, oct), '0.6', now);
+    }
   }
 }
 
@@ -756,6 +778,14 @@ function nextQuestion(autoPlay = true) {
 function renderOptions(options, correctIndex) {
   const c = document.getElementById('optionsContainer');
   c.innerHTML = '';
+  if (currentMode === 'notas') {
+    const refEl = document.createElement('p');
+    refEl.style.cssText = 'text-align:center;margin:0 0 16px;font-size:0.92em;color:var(--text-muted);';
+    refEl.innerHTML = customSettings.notas.playReference
+      ? '🔔 Escucharás primero <strong style="color:var(--warning)">Do</strong> como referencia, luego la nota a identificar'
+      : '🔕 Sin referencia — identifica la nota directamente';
+    c.appendChild(refEl);
+  }
   options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
