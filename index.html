@@ -679,6 +679,7 @@ function getRandomRegister() {
 
 async function playSound() {
   if (!audioReady || !currentQuestion) return;
+  synth.releaseAll();
   const now = Tone.now();
   if (currentMode === 'intervalos') {
     const oct = currentQuestion.register || 4;
