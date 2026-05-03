@@ -168,7 +168,6 @@
   <div style="display:flex;justify-content:center;gap:15px;margin-bottom:22px;flex-wrap:wrap;">
     <button class="btn btn-success" onclick="setViewMode('study')"    id="studyModeBtn">📚 Modo Estudio</button>
     <button class="btn"             onclick="setViewMode('test')"     id="testModeBtn">✏️ Modo Prueba</button>
-    <button class="btn btn-warning" onclick="setViewMode('progress')" id="progressModeBtn" style="color:#000;">📊 Mi Progreso</button>
     <button class="btn" onclick="setLang(currentLang==='es'?'en':'es')" id="langBtn" style="font-weight:bold;letter-spacing:1px;">EN</button>
   </div>
 
@@ -635,7 +634,7 @@ function updateStaticText() {
   // View buttons
   document.getElementById('studyModeBtn').textContent   = L.btnStudy;
   document.getElementById('testModeBtn').textContent    = L.btnTest;
-  document.getElementById('progressModeBtn').textContent = L.btnProgress;
+  const pmb = document.getElementById('progressModeBtn'); if (pmb) pmb.textContent = L.btnProgress;
   document.getElementById('langBtn').textContent        = currentLang === 'es' ? 'EN' : 'ES';
   // Static area titles
   document.querySelector('#studyArea h2').textContent   = L.studyTitle;
