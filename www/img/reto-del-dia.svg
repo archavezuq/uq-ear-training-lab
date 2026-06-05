@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Audikus — Reto del día</title>
+  
+  <path d="M32 6 L52 14 L52 32 Q 52 46, 32 58 Q 12 46, 12 32 L 12 14 Z" fill="#f5b54a" fill-opacity="0.12" stroke="#f5b54a" stroke-width="2.4"></path>
+  
+  <path d="M32 11 L47 17 L47 32 Q 47 43, 32 53 Q 17 43, 17 32 L 17 17 Z" stroke="#f5b54a" stroke-width="1.2" stroke-opacity="0.4"></path>
+  
+  <g transform="translate(32 32)">
+    <ellipse cx="-5" cy="8" rx="6" ry="4.5" fill="#8b7cff" stroke="#8b7cff" stroke-width="2" transform="rotate(-18 -5 8)"></ellipse>
+    <path d="M0 6 L0 -12" stroke="#8b7cff" stroke-width="2.6"></path>
+    <path d="M0 -12 Q 10 -8, 6 2" stroke="#8b7cff" stroke-width="2.6" fill="none"></path>
+  </g>
+</svg>

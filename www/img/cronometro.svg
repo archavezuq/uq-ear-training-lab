@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#8b7cff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <title>Audikus — Cronómetro</title>
+  
+  <path d="M13 3 L19 3"></path>
+  <path d="M14 5 L18 5"></path>
+  
+  <circle cx="16" cy="18" r="11"></circle>
+  
+  <path d="M16 18 L16 11"></path>
+  <path d="M16 18 L21 21"></path>
+  
+  <path d="M16 8 L16 9.5" opacity="0.5"></path>
+  
+  <circle cx="16" cy="18" r="1.2" fill="#8b7cff" stroke="none"></circle>
+</svg>
