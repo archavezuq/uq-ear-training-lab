@@ -270,28 +270,38 @@
     .int-ts { color: var(--danger);  font-weight: bold; }
 
     /* ── Chat ─────────────────────────────────────────────────── */
-    .chat-button { position: absolute; bottom: calc(var(--nav-total) + 12px); right: 14px; width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), #9c5cff); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 14px rgba(108,99,255,0.5); z-index: 70; font-size: 1.5em; border: none; color: white; transition: transform 0.2s; }
-    .chat-button:active { transform: scale(0.93); }
-    .chat-container { position: absolute; bottom: calc(var(--nav-total) + 68px); left: 10px; right: 10px; height: 360px; background: var(--card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 75; overflow: hidden; border: 1px solid rgba(108,99,255,0.3); }
+    .chat-button { position: absolute; bottom: calc(var(--nav-total) + 12px); right: 14px; width: 52px; height: 52px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 18px rgba(108,99,255,0.45); z-index: 70; border: 1.5px solid rgba(255,255,255,0.3); color: #fff; transition: transform 0.2s; overflow: hidden; padding: 0; }
+    .chat-button:active { transform: scale(0.91); }
+    .chat-button img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .chat-button-emoji { font-size: 1.6em; line-height: 1; }
+    .chat-container { position: absolute; bottom: calc(var(--nav-total) + 72px); left: 10px; right: 10px; height: min(360px, calc(100dvh - var(--nav-total) - 90px)); background: var(--card); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 75; overflow: hidden; border: 1px solid rgba(108,99,255,0.3); }
     .chat-container.open { display: flex; }
-    .chat-header { background: linear-gradient(135deg, var(--primary), #9c5cff); padding: 14px 16px; color: white; display: flex; justify-content: space-between; align-items: center; }
-    .chat-header h3 { margin: 0; font-size: 13px; }
-    .chat-close { background: none; border: none; color: white; font-size: 1.4em; cursor: pointer; line-height: 1; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .chat-message { max-width: 85%; padding: 9px 12px; border-radius: 12px; line-height: 1.5; font-size: 11px; animation: slideIn 0.25s; }
+    .chat-header { background: linear-gradient(135deg, #5a4fe0, #9c5cff); padding: 10px 14px; color: white; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-shrink: 0; }
+    .chat-header-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .sinko-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.3em; }
+    .sinko-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    #sinkoMoment { position: fixed; bottom: calc(var(--nav-total) + 20px); left: 50%; transform: translateX(-50%) translateY(130%); z-index: 300; opacity: 0; transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1), opacity 0.38s; pointer-events: none; background: none; }
+    #sinkoMoment.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #sinkoMoment img { width: 148px; display: block; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35)); }
+    .chat-header-text { min-width: 0; }
+    .chat-header-text h3 { margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-header-text p  { margin: 0; font-size: 10px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-close { background: none; border: none; color: white; font-size: 1.4em; cursor: pointer; line-height: 1; flex-shrink: 0; padding: 4px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+    .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; line-height: 1.5; font-size: 11.5px; animation: slideIn 0.25s; }
     .chat-message.user      { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
     .chat-message.assistant { background: rgba(108,99,255,0.12); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(108,99,255,0.2); }
     .chat-message.loading   { background: rgba(108,99,255,0.08); color: var(--text-muted); align-self: flex-start; }
-    .chat-suggestions { padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid rgba(108,99,255,0.2); }
-    .suggestion-chip { background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.3); padding: 4px 9px; border-radius: 20px; font-size: 10px; cursor: pointer; transition: all 0.2s; color: var(--text); }
-    .suggestion-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
-    .chat-input-area { padding: 10px; border-top: 1px solid rgba(108,99,255,0.3); display: flex; gap: 7px; }
-    .chat-input { flex: 1; background: var(--card-hover); border: 1.5px solid rgba(108,99,255,0.3); border-radius: 10px; padding: 9px; color: var(--text); font-size: 11px; resize: none; font-family: inherit; }
+    .chat-suggestions { padding: 7px 12px; display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid rgba(108,99,255,0.2); flex-shrink: 0; }
+    .suggestion-chip { background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.3); padding: 4px 9px; border-radius: 20px; font-size: 10.5px; cursor: pointer; color: var(--text); -webkit-tap-highlight-color: transparent; }
+    .suggestion-chip:active { background: var(--primary); color: white; border-color: var(--primary); }
+    .chat-input-area { padding: 9px 10px; border-top: 1px solid rgba(108,99,255,0.3); display: flex; gap: 7px; flex-shrink: 0; }
+    .chat-input { flex: 1; background: var(--card-hover); border: 1.5px solid rgba(108,99,255,0.3); border-radius: 10px; padding: 9px 11px; color: var(--text); font-size: 12px; resize: none; font-family: inherit; }
     .chat-input:focus { outline: none; border-color: var(--primary); }
-    .chat-send { background: var(--primary); border: none; border-radius: 10px; padding: 9px 14px; color: white; cursor: pointer; font-size: 1em; transition: opacity 0.2s; }
+    .chat-send { background: var(--primary); border: none; border-radius: 10px; padding: 9px 14px; color: white; cursor: pointer; font-size: 1em; flex-shrink: 0; }
     .chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
-    .chat-feedback-btn { margin-top: 9px; background: rgba(108,99,255,0.13); border: 1px solid rgba(108,99,255,0.35); border-radius: 8px; padding: 8px 12px; color: var(--primary); font-size: 10.5px; cursor: pointer; width: 100%; text-align: left; transition: background 0.2s; font-family: inherit; line-height: 1.4; }
-    .chat-feedback-btn:hover { background: rgba(108,99,255,0.22); }
+    .chat-feedback-btn { margin-top: 9px; background: rgba(108,99,255,0.13); border: 1px solid rgba(108,99,255,0.35); border-radius: 8px; padding: 8px 12px; color: var(--primary); font-size: 10.5px; cursor: pointer; width: 100%; text-align: left; font-family: inherit; line-height: 1.4; }
+    .chat-context-tag { display: inline-block; background: rgba(255,255,255,0.18); border-radius: 20px; padding: 2px 8px; font-size: 9.5px; font-weight: 600; margin-left: 4px; }
 
     /* ── Snackbar ─────────────────────────────────────────────── */
     .snackbar { position: absolute; bottom: calc(var(--nav-total) + 10px); left: 14px; right: 14px; background: #1e1e3a; color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 11px 16px; font-size: 12px; font-weight: 500; z-index: 80; opacity: 0; transform: translateY(6px); transition: all 0.3s cubic-bezier(0.2,0,0,1); pointer-events: none; }
@@ -736,10 +746,19 @@
   </div><!-- /exercise-overlay -->
 
   <!-- CHAT -->
-  <button class="chat-button" onclick="toggleChat()" title="Asistente Musical">💬</button>
+  <button class="chat-button" onclick="toggleChat()" title="SinKo — Teoría Musical">
+    <img src="img/sinko-escuchando.png" style="width:100%;height:100%;object-fit:cover;object-position:center 28%;border-radius:50%;" alt="SinKo">
+  </button>
+  <div id="sinkoMoment"><img src="" alt="SinKo"></div>
   <div class="chat-container" id="chatContainer">
     <div class="chat-header">
-      <h3 id="chatTitle">🎵 Asistente de Teoría Musical</h3>
+      <div class="chat-header-left">
+        <div class="sinko-avatar" id="sinkoAvatar"><img src="img/sinko-escuchando.png" alt="SinKo" style="object-position:center 28%;"></div>
+        <div class="chat-header-text">
+          <h3 id="chatTitle">SinKo</h3>
+          <p id="chatSubtitle">Teoría Musical</p>
+        </div>
+      </div>
       <button class="chat-close" onclick="toggleChat()">×</button>
     </div>
     <div class="chat-suggestions" id="chatChips"></div>
@@ -853,7 +872,7 @@ const ui = {
     overlaySubtitle:'Presiona para activar el sonido y comenzar',
     overlayBtn:'▶ INICIAR',
     btnStudy:'📚 Aprender', btnTest:'✏️ Practicar', btnProgress:'📊 Mi Progreso',
-    navLearn:'Aprender', navPractice:'Practicar', navProgress:'Progreso', navSettings:'Ajustes',
+    navLearn:'Aprender', navPractice:'Practicar', navRacha:'Racha', navCamino:'Camino', navProgress:'Progreso', navSettings:'Ajustes',
     practiceTitle:'Practicar', practiceSub:'Selecciona un modo arriba y presiona Comenzar',
     settingsScreen:'Ajustes', segStudy:'Aprender', segTest:'Practicar',
     studyTitle:'📚 Aprender — Explora y Aprende',
@@ -913,7 +932,7 @@ const ui = {
     analysisRec:(cat)=>`🎯 <strong>Recomendación:</strong> Dedica tu próxima sesión a <strong>${cat}</strong> — es el área con mayor margen de mejora.`,
     analysisConf:(cat,a,b,n)=>`🔄 <strong>Confusión frecuente:</strong> En ${cat} confundes <strong>${a}</strong> con <strong>${b}</strong> (${n} veces).`,
     analysisBased:(n)=>`Basado en ${n} respuestas registradas.`,
-    cats:{intervalos:'Intervalos',triadas:'Tríadas',inversiones:'Inversiones',septimas:'Acordes con Séptima',progresiones:'Progresiones',escalas:'Escalas',notas:'Nota Absoluta',alturas:'Alturas',entonacion:'Entonación'},
+    cats:{intervalos:'Intervalos',triadas:'Tríadas',inversiones:'Inversiones',septimas:'Acordes con Séptima',progresiones:'Progresiones',escalas:'Escalas',notas:'Nota Absoluta',alturas:'Alturas',entonacion:'Entonación',entonAcordes:'Entonación Acordes',entonEscalas:'Entonación Escalas'},
     sAlturas:{
       octTitle:'🎹 Registro de referencia:',
       ansHigh:'Agudo ↑', ansLow:'Grave ↓',
@@ -934,25 +953,26 @@ const ui = {
       micError:'No se pudo acceder al micrófono. Verifica los permisos.'
     },
     footerDev:'Desarrollado por:', footerContact:'📧 Contacto:',
-    chatTitle:'🎵 Asistente de Teoría Musical',
+    chatTitle:'SinKo',
+    chatSubtitle:'Teoría Musical',
     chatPlaceholder:'Pregunta sobre teoría musical...',
-    chatWelcome:'¡Hola! Soy tu asistente de <strong>teoría musical</strong>. Puedo ayudarte con los temas de la app:<br><br>🎵 <strong>Intervalos</strong> — distancias entre notas<br>🎹 <strong>Acordes</strong> — tríadas, séptimas e inversiones<br>🎼 <strong>Progresiones</strong> — secuencias armónicas<br>🎶 <strong>Escalas</strong> — mayor, menor y modos<br>💡 <strong>Estrategias</strong> — cómo estudiar y entrenar el oído<br><br><em>Nota: solo respondo temas musicales de la app.</em><br><br>¿Sobre qué quieres aprender?',
+    chatWelcome:'¡Hola! Soy <strong>SinKo</strong>, la mascota de Audikus. Estoy aquí para ayudarte con las preguntas que tengas sobre teoría musical.<br><br>¿Tienes dudas sobre los términos que ves en la app? Escríbelas aquí, puedo responderlas.',
     chatChips:[
-      {text:'Tercera mayor',   q:'¿Qué es una tercera mayor?'},
-      {text:'Inversiones',     q:'Explica las inversiones de acordes'},
-      {text:'Dominante 7',     q:'¿Qué es el acorde dominante 7?'},
-      {text:'ii-V-I',          q:'¿Qué es la progresión ii-V-I?'},
-      {text:'Menor armónica',  q:'Escala menor armónica'},
-      {text:'Consejos',        q:'Consejos para estudiar'}
+      {text:'Tercera mayor',      q:'¿Qué es una tercera mayor?'},
+      {text:'Función tonal',      q:'¿Qué es función tonal?'},
+      {text:'Dominante 7',        q:'¿Qué es el acorde dominante 7?'},
+      {text:'Conducción de voces',q:'¿Qué es conducción de voces?'},
+      {text:'Enharmonía',         q:'¿Qué es enharmonía?'},
+      {text:'Modulación',         q:'¿Qué es modulación?'}
     ],
-    chatOffTopic:'⚠️ Solo puedo responder preguntas sobre <strong>teoría musical</strong> y los temas de la app: intervalos, acordes, escalas, progresiones y estrategias de estudio. ¿Tienes alguna pregunta musical?'
+    chatOffTopic:'⚠️ Solo respondo preguntas de <strong>teoría musical</strong> relacionadas con los temas de la app: intervalos, acordes, escalas, progresiones, modulación y estrategias de estudio. ¿Tienes alguna pregunta musical?'
   },
   en: {
     appTitle:'Audikus — Ear Training',
     overlaySubtitle:'Tap to activate sound and start',
     overlayBtn:'▶ START',
     btnStudy:'📚 Learn', btnTest:'✏️ Practice', btnProgress:'📊 My Progress',
-    navLearn:'Learn', navPractice:'Practice', navProgress:'Progress', navSettings:'Settings',
+    navLearn:'Learn', navPractice:'Practice', navRacha:'Streak', navCamino:'Path', navProgress:'Progress', navSettings:'Settings',
     practiceTitle:'Practice', practiceSub:'Select a mode above and press Start',
     settingsScreen:'Settings', segStudy:'Learn', segTest:'Practice',
     studyTitle:'📚 Learn — Explore and Listen',
@@ -1012,7 +1032,7 @@ const ui = {
     analysisRec:(cat)=>`🎯 <strong>Recommendation:</strong> Dedicate your next session to <strong>${cat}</strong> — it's the area with the most room for improvement.`,
     analysisConf:(cat,a,b,n)=>`🔄 <strong>Frequent confusion:</strong> In ${cat} you confuse <strong>${a}</strong> with <strong>${b}</strong> (${n} times).`,
     analysisBased:(n)=>`Based on ${n} recorded answers.`,
-    cats:{intervalos:'Intervals',triadas:'Triads',inversiones:'Inversions',septimas:'Seventh Chords',progresiones:'Progressions',escalas:'Scales',notas:'Absolute Pitch',alturas:'Pitch Height',entonacion:'Intonation'},
+    cats:{intervalos:'Intervals',triadas:'Triads',inversiones:'Inversions',septimas:'Seventh Chords',progresiones:'Progressions',escalas:'Scales',notas:'Absolute Pitch',alturas:'Pitch Height',entonacion:'Intonation',entonAcordes:'Chord Intonation',entonEscalas:'Scale Intonation'},
     sAlturas:{
       octTitle:'🎹 Reference register:',
       ansHigh:'High ↑', ansLow:'Low ↓',
@@ -1033,18 +1053,19 @@ const ui = {
       micError:'Could not access microphone. Check permissions.'
     },
     footerDev:'Developed by:', footerContact:'📧 Contact:',
-    chatTitle:'🎵 Music Theory Assistant',
+    chatTitle:'SinKo',
+    chatSubtitle:'Music Theory',
     chatPlaceholder:'Ask about music theory...',
-    chatWelcome:'Hi! I\'m your <strong>music theory</strong> assistant. I can help you with the app\'s topics:<br><br>🎵 <strong>Intervals</strong> — distances between notes<br>🎹 <strong>Chords</strong> — triads, sevenths and inversions<br>🎼 <strong>Progressions</strong> — harmonic sequences<br>🎶 <strong>Scales</strong> — major, minor and modes<br>💡 <strong>Strategies</strong> — how to study and train your ear<br><br><em>Note: I only answer music topics covered in the app.</em><br><br>What would you like to learn about?',
+    chatWelcome:'Hi! I\'m <strong>SinKo</strong>, Audikus\'s mascot. I\'m here to help you with any music theory questions you have.<br><br>Do you have questions about the terms you see in the app? Write them here, I can answer them.',
     chatChips:[
-      {text:'Major third',     q:'What is a major third?'},
-      {text:'Inversions',      q:'Explain chord inversions'},
-      {text:'Dominant 7th',    q:'What is the dominant 7th chord?'},
-      {text:'ii-V-I',          q:'What is the ii-V-I progression?'},
-      {text:'Harmonic minor',  q:'Harmonic minor scale'},
-      {text:'Tips',            q:'Tips for ear training'}
+      {text:'Major third',      q:'What is a major third?'},
+      {text:'Tonal function',   q:'What is tonal function?'},
+      {text:'Dominant 7th',     q:'What is the dominant 7th chord?'},
+      {text:'Voice leading',    q:'What is voice leading?'},
+      {text:'Enharmonics',      q:'What is enharmonics?'},
+      {text:'Modulation',       q:'What is modulation?'}
     ],
-    chatOffTopic:'⚠️ I can only answer questions about <strong>music theory</strong> and the app\'s topics: intervals, chords, scales, progressions and study strategies. Do you have a music question?'
+    chatOffTopic:'⚠️ I only answer <strong>music theory</strong> questions related to the app\'s topics: intervals, chords, scales, progressions, modulation and study strategies. Do you have a music question?'
   }
 };
 function tx(key) { return (ui[currentLang]||ui.es)[key] || ui.es[key] || key; }
@@ -1436,6 +1457,7 @@ async function initAudio() {
   renderModeCards();
   renderModeChips();
   renderRetoDia();
+  checkLastStudy();
   switchNavTab('learn');
   // Carga el piano Salamander en segundo plano (samples reales)
   _sampler = new Tone.Sampler({
@@ -1508,9 +1530,9 @@ function updateStaticText() {
   if (pc1) pc1.innerHTML = '<img src="img/siguiente.svg" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"> ' + L.btnNext.replace(/^[^\s]+\s/,'');
   if (pc2) pc2.innerHTML = '↺ '  + L.btnReset.replace(/^[^\s]+\s/,'');
   // Nav labels
-  ['navLabelLearn','navLabelPractice','navLabelProgress','navLabelSettings'].forEach((id,i) => {
+  ['navLabelLearn','navLabelPractice','navLabelRacha','navLabelCamino','navLabelProgress','navLabelSettings'].forEach((id,i) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = [L.navLearn, L.navPractice, L.navProgress, L.navSettings][i];
+    if (el) el.textContent = [L.navLearn, L.navPractice, L.navRacha, L.navCamino, L.navProgress, L.navSettings][i];
   });
   // Practice screen title/sub
   const ptEl = document.getElementById('practiceTitle');
@@ -1528,14 +1550,9 @@ function updateStaticText() {
   // Footer — static, no update needed
   // Chat
   const ct = document.getElementById('chatTitle'); if (ct) ct.textContent = L.chatTitle;
+  const cst = document.getElementById('chatSubtitle'); if (cst) cst.textContent = L.chatSubtitle;
   const ci = document.getElementById('chatInput'); if (ci) ci.placeholder = L.chatPlaceholder;
-  const cw = document.getElementById('chatWelcome'); if (cw) cw.innerHTML = L.chatWelcome;
-  const chipsEl = document.getElementById('chatChips');
-  if (chipsEl && L.chatChips) {
-    chipsEl.innerHTML = L.chatChips.map(c =>
-      `<div class="suggestion-chip" onclick="askQuestion('${c.q.replace(/'/g,"&#39;")}')">${c.text}</div>`
-    ).join('');
-  }
+  _renderChatDefault();
 }
 
 // ==================== SCROLL ====================
@@ -1592,8 +1609,8 @@ function closeSheet() {
 function renderModeCards() {
   const L = ui[currentLang];
   const CARD_IMGS = {
-    intervalos:'img/intervalos.png', triadas:'img/triadas-icon.svg',
-    inversiones:'img/inversiones-icon.svg', septimas:'img/septimas-icon.svg',
+    intervalos:'img/intervalos.png', triadas:'img/triadas.png',
+    inversiones:'img/inversiones.png', septimas:'img/septimas.png',
     progresiones:'img/progresiones.png', escalas:'img/escalas.png',
     notas:'img/nota_absoluta.png', alturas:'', entonacion:'',
     entonAcordes:'img/entonacion-acordes.svg', entonEscalas:'img/entonacion-escalas.svg'
@@ -1692,6 +1709,7 @@ function setMode(mode) {
   openExerciseOverlay();
   updateView();
   scrollToExerciseArea();
+  showSinko('studying');
 }
 
 // ==================== MODO ESTUDIO ====================
@@ -2093,11 +2111,56 @@ function getFreq(semitones, octave = 4) {
 }
 function midiFreq(midi) { return tuningA * Math.pow(2, (midi - 69) / 12); }
 function setTuning(hz) { tuningA = hz; try { localStorage.setItem("audikus_tuning", hz); } catch(e) {} const txt = "A="+hz+"Hz"; ['tuningBtn','tuningBtn2'].forEach(id => { const b = document.getElementById(id); if(b) b.textContent = txt; }); }
+
+let _sinkoTimer = null;
+const _SINKO_STREAK_IMGS = ['correct','streak','celebrate'];
+let _sinkoStreakIdx = 0;
+function showSinkoStreak() {
+  if (scores.streak > 0 && scores.streak % 5 === 0) {
+    showSinko(_SINKO_STREAK_IMGS[_sinkoStreakIdx % _SINKO_STREAK_IMGS.length]);
+    _sinkoStreakIdx++;
+  }
+}
+function showSinko(type) {
+  const imgs = { correct:'img/sinko-bien.png', celebrate:'img/sinko-celebra.png', wrong:'img/sinko-animo.png', noStudy:'img/sinko-regresa.png', streak:'img/sinko-feliz.png', studying:'img/sinko-estudiando.png' };
+  const src = imgs[type]; if (!src) return;
+  const el = document.getElementById('sinkoMoment'); if (!el) return;
+  const img = el.querySelector('img'); if (img) img.src = src;
+  if (_sinkoTimer) clearTimeout(_sinkoTimer);
+  el.classList.add('visible');
+  _sinkoTimer = setTimeout(() => el.classList.remove('visible'), 3200);
+}
+function checkLastStudy() {
+  try {
+    const last = localStorage.getItem('audikus_last_study');
+    if (last && (Date.now() - parseInt(last)) > 2 * 24 * 60 * 60 * 1000) {
+      setTimeout(() => showSinko('noStudy'), 1500);
+    }
+  } catch(e) {}
+}
+
 function midiNoteName(midi) {
   const ns = currentLang === 'es'
     ? ['Do','Do♯','Re','Re♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si']
     : ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
   return ns[((midi % 12) + 12) % 12] + (Math.floor(midi / 12) - 1);
+}
+function midiNoteNameInContext(midi) {
+  const pitchClass = ((midi % 12) + 12) % 12;
+  if ((currentMode === 'entonAcordes' || currentMode === 'entonEscalas')
+      && currentQuestion && currentQuestion.noteNames && currentQuestion.midiSequence) {
+    const seqMap = new Map();
+    currentQuestion.midiSequence.forEach((m, i) => {
+      const pc = ((m % 12) + 12) % 12;
+      if (!seqMap.has(pc) && currentQuestion.noteNames[i]) seqMap.set(pc, currentQuestion.noteNames[i]);
+    });
+    if (seqMap.has(pitchClass)) {
+      const octave = Math.floor(midi / 12) - 1;
+      const localized = localizeNoteName(seqMap.get(pitchClass)).replace('#','♯').replace('b','♭');
+      return localized + octave;
+    }
+  }
+  return midiNoteName(midi);
 }
 // ── Motor de ortografía musical ───────────────────────────────
 // Raíces preferidas por semitono (12 semis)
@@ -2407,6 +2470,8 @@ function checkAnswer(selected, correct, btn) {
     recordAnswer(currentMode, correctName, correctName, true);
     playFeedback('correct', scores.streak);
     vibrateDevice([40]);
+    showSinkoStreak();
+    try { localStorage.setItem('audikus_last_study', Date.now().toString()); } catch(e) {}
   } else {
     btn.classList.add('incorrect');
     btns[correct].classList.add('correct');
@@ -2414,6 +2479,7 @@ function checkAnswer(selected, correct, btn) {
     recordAnswer(currentMode, correctName, selectedName, false);
     playFeedback('wrong');
     vibrateDevice([80, 40, 80]);
+    showSinko('wrong');
     const errType = getErrorType(currentMode, correctName, selectedName);
     if (errType === 'inverse') {
       fb.innerHTML = `${tx('feedbackApprox')} — <strong>${dn(selectedName)}</strong> ${tx('feedbackApproxIs')} <strong>${dn(correctName)}</strong>`;
@@ -2492,7 +2558,7 @@ async function toggleSinging() {
   if (micStream) { stopSinging(); return; }
   var se = ui[currentLang].sEntonacion;
   var MicPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Mic;
-  if (!MicPlugin) { alert(currentLang === 'es' ? 'Plugin de microfono no disponible' : 'Mic plugin not available'); return; }
+  if (!MicPlugin) { alert(se.micError); return; }
   try {
     await MicPlugin.start();
     micStream = true;
@@ -2526,7 +2592,7 @@ async function toggleSinging() {
       var sorted = pitchHistory.slice().sort(function(a,b){return a-b;});
       var smoothMidi = sorted[Math.floor(sorted.length / 2)];
       var cents = Math.round((smoothMidi - targetMidi) * 100);
-      d.textContent = midiNoteName(Math.round(smoothMidi));
+      d.textContent = midiNoteNameInContext(Math.round(smoothMidi));
       d.style.cssText = 'font-size:1.5em;font-weight:700;';
       if (Math.abs(cents) <= tol) {
         d.style.color = 'var(--success)';
@@ -2540,6 +2606,8 @@ async function toggleSinging() {
           document.getElementById('feedback').textContent = tx('feedbackCorrect');
           document.getElementById('feedback').className = 'feedback correct';
           answered = true;
+          showSinkoStreak();
+          try { localStorage.setItem('audikus_last_study', Date.now().toString()); } catch(e) {}
           setTimeout(function(){ nextQuestion(); }, 2000);
         }
       } else {
@@ -2552,7 +2620,7 @@ async function toggleSinging() {
       }
     }, 100);
   } catch(e) {
-    alert('Error: ' + (e.message || e));
+    alert(se.micError);
     micStream = null;
   }
 }
@@ -2634,11 +2702,23 @@ function playEntonSeqRef() {
   synth.triggerAttackRelease(midiFreq(currentQuestion.refMidi), '0.8');
 }
 
+function playEntonSeqFull() {
+  if (!audioReady || !currentQuestion) return;
+  synth.releaseAll();
+  studyTimers.forEach(t => clearTimeout(t)); studyTimers = [];
+  const sq = currentQuestion.midiSequence;
+  sq.forEach((midi, i) => {
+    studyTimers.push(setTimeout(() => {
+      if (audioReady) synth.triggerAttackRelease(midiFreq(midi), i < sq.length - 1 ? '0.40' : '0.7');
+    }, i * 420));
+  });
+}
+
 async function toggleSingingSeq() {
   if (micStream) { stopSinging(); return; }
   const se = ui[currentLang].sEntonacion;
   const MicPlugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Mic;
-  if (!MicPlugin) { alert(currentLang==='es'?'Plugin de micrófono no disponible':'Mic plugin not available'); return; }
+  if (!MicPlugin) { alert(se.micError); return; }
   try {
     await MicPlugin.start();
     micStream = true;
@@ -2674,7 +2754,7 @@ async function toggleSingingSeq() {
       const sorted = pitchHistory.slice().sort((a,b)=>a-b);
       const smoothMidi = sorted[Math.floor(sorted.length / 2)];
       const cents = Math.round((smoothMidi - targetMidi) * 100);
-      d.textContent = midiNoteName(Math.round(smoothMidi));
+      d.textContent = midiNoteNameInContext(Math.round(smoothMidi));
       d.style.cssText = 'font-size:1.5em;font-weight:700;';
       if (Math.abs(cents) <= tol) {
         d.style.color = 'var(--success)';
@@ -2688,10 +2768,28 @@ async function toggleSingingSeq() {
             scores.correct++; scores.streak++;
             recordAnswer(currentMode, currentQuestion.name, currentQuestion.name, true);
             updateScoreboard();
-            document.getElementById('feedback').textContent = tx('feedbackCorrect');
-            document.getElementById('feedback').className = 'feedback correct';
             answered = true;
-            setTimeout(() => nextQuestion(), 2000);
+            const _isAcorde = currentMode === 'entonAcordes';
+            const _qName = dn(currentQuestion.name);
+            const _prompt = currentLang === 'es'
+              ? `¿Quieres escuchar ${_isAcorde ? 'el acorde' : 'la escala'} <strong>${_qName}</strong> que realizaste?`
+              : `Would you like to hear the ${_isAcorde ? 'chord' : 'scale'} <strong>${_qName}</strong> you just sang?`;
+            const _cont = currentLang === 'es' ? 'Continuar →' : 'Continue →';
+            const _listen = currentLang === 'es' ? '🔊 Escuchar' : '🔊 Listen';
+            const _btnBase = 'border:none;border-radius:24px;padding:11px 22px;font-size:0.92em;font-weight:700;cursor:pointer;transition:opacity 0.2s;';
+            const _cont2 = document.getElementById('optionsContainer');
+            showSinkoStreak();
+            try { localStorage.setItem('audikus_last_study', Date.now().toString()); } catch(e) {}
+            if (_cont2) _cont2.innerHTML = `
+              <div style="text-align:center;padding:20px 12px 8px;">
+                <div style="font-size:2em;margin-bottom:6px;">✅</div>
+                <div style="font-size:1em;font-weight:700;color:var(--success);margin-bottom:14px;">${tx('feedbackCorrect')}</div>
+                <div style="font-size:0.9em;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">${_prompt}</div>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                  <button onclick="playEntonSeqFull()" style="${_btnBase}background:var(--primary);color:#fff;">${_listen}</button>
+                  <button onclick="nextQuestion()" style="${_btnBase}background:var(--card-hover);color:var(--text);">${_cont}</button>
+                </div>
+              </div>`;
           } else {
             renderEntonSeqUI();
             // Re-attach mic after re-render — buscamos el nuevo singBtn
@@ -2706,7 +2804,7 @@ async function toggleSingingSeq() {
       }
     }, 100);
   } catch(e) {
-    alert('Error: ' + (e.message || e));
+    alert(se.micError);
     micStream = null;
   }
 }
@@ -2973,7 +3071,111 @@ function resetProgress() {
 }
 
 // ==================== CHAT ====================
-function toggleChat() { document.getElementById('chatContainer').classList.toggle('open'); }
+let _chatCtx = null;
+
+function toggleChat() {
+  const cont = document.getElementById('chatContainer');
+  const opening = !cont.classList.contains('open');
+  if (opening) {
+    _chatCtx = (currentQuestion && currentQuestion.name)
+      ? { mode: currentMode, name: currentQuestion.name } : null;
+    _renderChatDefault();
+  }
+  cont.classList.toggle('open');
+}
+
+function _renderChatDefault() {
+  const L = ui[currentLang];
+  const cw = document.getElementById('chatWelcome');
+  const chipsEl = document.getElementById('chatChips');
+  const cst = document.getElementById('chatSubtitle');
+
+  if (_chatCtx && _chatCtx.name) {
+    const modeLabels = { intervalos:'Intervalos',triadas:'Tríadas',inversiones:'Inversiones',
+      septimas:'Séptimas',escalas:'Escalas',notas:'Notas',alturas:'Alturas',
+      intervals:'Intervals',chords:'Chords',inversions:'Inversions',
+      sevenths:'Sevenths',scales:'Scales',notes:'Notes',pitch:'Pitch' };
+    const mLabel = (currentLang==='es')
+      ? {intervalos:'Intervalos',triadas:'Tríadas',inversiones:'Inversiones',septimas:'Séptimas',escalas:'Escalas',notas:'Notas',alturas:'Alturas'}[_chatCtx.mode] || _chatCtx.mode
+      : {intervalos:'Intervals',triadas:'Triads',inversiones:'Inversions',septimas:'Sevenths',escalas:'Scales',notas:'Notes',alturas:'Pitch'}[_chatCtx.mode] || _chatCtx.mode;
+    if (cst) cst.innerHTML = `${L.chatSubtitle} <span class="chat-context-tag">${_chatCtx.name}</span>`;
+    if (cw) cw.innerHTML = currentLang==='es'
+      ? `Estás practicando <strong>${_chatCtx.name}</strong>. ¿Tienes preguntas sobre este tema o cualquier otro término de la app? Puedo responderlas.`
+      : `You're practicing <strong>${_chatCtx.name}</strong>. Do you have questions about this topic or any other term in the app? I can answer them.`;
+    if (chipsEl) chipsEl.innerHTML = '';
+  } else {
+    if (cst) cst.textContent = L.chatSubtitle;
+    if (cw) cw.innerHTML = L.chatWelcome;
+    if (chipsEl) chipsEl.innerHTML = '';
+  }
+}
+
+function _buildCtxChips(mode, name) {
+  if (currentLang === 'es') {
+    if (mode==='intervalos') return [
+      {text:`¿Qué es ${name}?`,      q:`¿Qué es ${name}?`},
+      {text:'¿Cuántos semitonos?',   q:`¿Cuántos semitonos tiene ${name}?`},
+      {text:'Canción referencia',    q:`¿Qué canción me ayuda a recordar ${name}?`},
+      {text:'Consonancia',           q:'¿Qué es consonancia y disonancia?'}
+    ];
+    if (mode==='triadas'||mode==='acordes') return [
+      {text:`¿Qué es ${name}?`,      q:`¿Qué es el acorde ${name}?`},
+      {text:'Estructura',            q:`¿Cuál es la estructura de ${name}?`},
+      {text:'Función tonal',         q:'¿Qué es función tonal?'},
+      {text:'Inversiones',           q:'Explica las inversiones de acordes'}
+    ];
+    if (mode==='septimas') return [
+      {text:`¿Qué es ${name}?`,      q:`¿Qué es el acorde ${name}?`},
+      {text:'Conducción de voces',   q:'¿Qué es conducción de voces?'},
+      {text:'ii-V-I',                q:'¿Qué es la progresión ii-V-I?'},
+      {text:'Función tonal',         q:'¿Qué es función tonal?'}
+    ];
+    if (mode==='inversiones') return [
+      {text:'Inversiones',           q:'Explica las inversiones de acordes'},
+      {text:'Conducción de voces',   q:'¿Qué es conducción de voces?'},
+      {text:`Acorde ${name}`,        q:`¿Qué es el acorde ${name}?`}
+    ];
+    if (mode==='escalas') return [
+      {text:`Escala ${name}`,        q:`Escala ${name}`},
+      {text:'Función tonal',         q:'¿Qué es función tonal?'},
+      {text:'Modos',                 q:'¿Qué son los modos?'},
+      {text:'Modulación',            q:'¿Qué es modulación?'}
+    ];
+    return [{text:'Intervalos',q:'¿Qué es un intervalo?'},{text:'Acordes',q:'¿Qué es un acorde?'},{text:'Escalas',q:'¿Qué es una escala?'}];
+  } else {
+    if (mode==='intervalos') return [
+      {text:`What is ${name}?`,      q:`What is a ${name}?`},
+      {text:'How many semitones?',   q:`How many semitones in a ${name}?`},
+      {text:'Song reference',        q:`What song helps remember a ${name}?`},
+      {text:'Consonance',            q:'What is consonance and dissonance?'}
+    ];
+    if (mode==='triadas'||mode==='acordes') return [
+      {text:`What is ${name}?`,      q:`What is a ${name} chord?`},
+      {text:'Structure',             q:`What is the structure of ${name}?`},
+      {text:'Tonal function',        q:'What is tonal function?'},
+      {text:'Inversions',            q:'Explain chord inversions'}
+    ];
+    if (mode==='septimas') return [
+      {text:`What is ${name}?`,      q:`What is a ${name} chord?`},
+      {text:'Voice leading',         q:'What is voice leading?'},
+      {text:'ii-V-I',                q:'What is the ii-V-I progression?'},
+      {text:'Tonal function',        q:'What is tonal function?'}
+    ];
+    if (mode==='inversiones') return [
+      {text:'Inversions',            q:'Explain chord inversions'},
+      {text:'Voice leading',         q:'What is voice leading?'},
+      {text:`${name} chord`,         q:`What is the ${name} chord?`}
+    ];
+    if (mode==='escalas') return [
+      {text:`${name} scale`,         q:`${name} scale`},
+      {text:'Tonal function',        q:'What is tonal function?'},
+      {text:'Modes',                 q:'What are the modes?'},
+      {text:'Modulation',            q:'What is modulation?'}
+    ];
+    return [{text:'Intervals',q:'What is an interval?'},{text:'Chords',q:'What is a chord?'},{text:'Scales',q:'What is a scale?'}];
+  }
+}
+
 function handleChatKeyPress(e) { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
 function askQuestion(q) { document.getElementById('chatInput').value = q; sendMessage(); }
 
@@ -2985,7 +3187,7 @@ function sendMessage() {
   addMsg('user', msg);
   const btn = document.getElementById('sendButton');
   btn.disabled = true;
-  const lid = addMsg('loading','🎼 Pensando...');
+  const lid = addMsg('loading', currentLang === 'es' ? '🎼 Pensando...' : '🎼 Thinking...');
   setTimeout(() => { removeMsg(lid); addMsg('assistant', getResponse(msg)); btn.disabled = false; }, 550);
 }
 
@@ -3024,7 +3226,7 @@ function getResponse(question) {
   const n = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   const q = n(question);
   const has = (...w) => w.some(x => q.includes(n(x)));
-  const musicWords = ['interval','acorde','escala','progresion','intervalo','tonica','dominante','cadencia','modo','triada','septima','inversion','pentatonica','blues','jazz','rock','nota','semitono','tono','octava','quinta','cuarta','tercera','segunda','sexta','septima','mayor','menor','disminuido','aumentado','armonico','melodico','ritmo','compas','tiempo','armonia','consonancia','disonancia','sus2','sus4','dim','maj','consejo','oido','estudiar','practicar','altura','agudo','grave','entonacion','entonación','afinar','afinacion','voz','circulo','quintas','arpegio','absoluto','relativo','transponer','transposicion','frigio','lidio','mixolidio','locrio','pulso'];
+  const musicWords = ['interval','acorde','escala','progresion','intervalo','tonica','dominante','cadencia','modo','triada','septima','inversion','pentatonica','blues','jazz','rock','nota','semitono','tono','octava','quinta','cuarta','tercera','segunda','sexta','septima','mayor','menor','disminuido','aumentado','armonico','melodico','ritmo','compas','tiempo','armonia','consonancia','disonancia','sus2','sus4','dim','maj','consejo','oido','estudiar','practicar','altura','agudo','grave','entonacion','entonación','afinar','afinacion','voz','voces','circulo','quintas','arpegio','absoluto','relativo','transponer','transposicion','frigio','lidio','mixolidio','locrio','pulso','funcion','enharmon','modulacion','conduccion','cromatica','cromatico','jonico','eolio','contrapunto'];
   if (!musicWords.some(w => q.includes(w))) return ui.es.chatOffTopic;
 
   // Definiciones generales
@@ -3051,7 +3253,7 @@ function getResponse(question) {
     return '🎵 <strong>Segunda Menor (m2)</strong><br><br>Distancia: <strong>1 semitono</strong><br><br>• Sonido muy tenso, casi rozante<br>• Ejemplo: Do→Do♯, Mi→Fa<br>• Referencia: "Tiburón" (Jaws) 🦈<br><br>En la app: actívala en Intervalos → Configuración.';
 
   if (has('segunda mayor','2da mayor'))
-    return '🎵 <strong>Segunda Mayor (M2)</strong><br><br>Distancia: <strong>2 semitonos</strong> (1 tono)<br><br>• Paso natural de escala, sonido suave<br>• Ejemplo: Do→Re, Sol→La<br>• Referencia: primeras notas de "Cumpleaños Feliz" 🎂';
+    return '🎵 <strong>Segunda Mayor (M2)</strong><br><br>Distancia: <strong>2 semitonos</strong> (1 tono)<br><br>• Paso natural de escala, sonido suave<br>• Ejemplo: Do→Re, Sol→La<br>• Referencia: "Fra Martín / Frère Jacques" — las dos primeras notas Do→Re 🎶';
 
   if (has('tercera menor','m3','3ra menor','3ª menor'))
     return '🎵 <strong>Tercera Menor (m3)</strong><br><br>Distancia: <strong>3 semitonos</strong><br><br>• Sonido oscuro y melancólico<br>• Base de todos los acordes menores<br>• Ejemplo: La→Do, Re→Fa<br>• Referencia: "Greensleeves", "Smoke on the Water" 🎸';
@@ -3069,13 +3271,13 @@ function getResponse(question) {
     return '🎵 <strong>Quinta Justa (P5)</strong><br><br>Distancia: <strong>7 semitonos</strong><br><br>• Muy consonante, base de todos los acordes<br>• Ejemplo: Do→Sol<br>• Referencia: "Star Wars" ⭐';
 
   if (has('sexta menor','m6','6ta menor'))
-    return '🎵 <strong>Sexta Menor (m6)</strong><br><br>Distancia: <strong>8 semitonos</strong><br><br>• Sonido expresivo y melancólico<br>• Ejemplo: Mi→Do';
+    return '🎵 <strong>Sexta Menor (m6)</strong><br><br>Distancia: <strong>8 semitonos</strong><br><br>• Sonido expresivo y melancólico<br>• Ejemplo: Mi→Do, La→Fa<br>• Referencia: apertura de "Love Story" (Francis Lai, 1970) — el intervalo ascendente de la melodía principal 🎬';
 
   if (has('sexta mayor','6ta mayor'))
     return '🎵 <strong>Sexta Mayor (M6)</strong><br><br>Distancia: <strong>9 semitonos</strong><br><br>• Sonido luminoso y alegre<br>• Ejemplo: Do→La<br>• Referencia: "My Bonnie" 🎶';
 
   if (has('septima menor','m7','7ma menor') && !has('acorde'))
-    return '🎵 <strong>Séptima Menor (m7)</strong><br><br>Distancia: <strong>10 semitonos</strong><br><br>• Sonido tenso, quiere resolver<br>• Clave en el acorde dominante 7<br>• Ejemplo: Sol→Fa';
+    return '🎵 <strong>Séptima Menor (m7)</strong><br><br>Distancia: <strong>10 semitonos</strong><br><br>• Sonido tenso, quiere resolver hacia abajo<br>• Intervalo clave en el acorde dominante 7<br>• Ejemplo: Sol→Fa, Re→Do<br>• Referencia: "Somewhere" (West Side Story) — el salto inicial ascendente 🎭';
 
   if (has('septima mayor','7ma mayor') && !has('acorde'))
     return '🎵 <strong>Séptima Mayor (M7)</strong><br><br>Distancia: <strong>11 semitonos</strong><br><br>• Sonido sofisticado, casi chocante<br>• Ejemplo: Do→Si<br>• Referencia: "Take On Me" 🎸';
@@ -3203,18 +3405,42 @@ function getResponse(question) {
   if (has('transponer','transposicion','transposición','transposition','transpose'))
     return '🎼 <strong>Transposición</strong><br><br>Mover toda una melodía o acorde a otra altura manteniendo las mismas relaciones de intervalos.<br><br>Pasos para transponer:<br>1. Identifica el intervalo entre la tonalidad original y la destino<br>2. Mueve cada nota ese mismo intervalo<br><br>Ejemplo: transponer "Do mayor" a "Re mayor" = subir una 2ª mayor a todo.<br><br>Usos: acompañar a cantantes, aprender en distintas tonalidades, transponer instrumentos (trompeta en Si♭, etc.) 🎯';
 
+  if (has('enharmon','enharmóni','enarmon'))
+    return '🎹 <strong>Enharmonía</strong><br><br>En el sistema de <strong>temperamento igual</strong>, la enharmonía designa la relación entre dos notas que comparten la misma frecuencia acústica pero reciben grafías distintas dentro del sistema de notación occidental. El fenómeno surge de la tensión entre la serie de quintas (que genera una espiral infinita de alturas teóricas) y el temperamento de doce semitonos iguales (que cierra esa espiral).<br><br><strong>Equivalencias fundamentales:</strong><br>• Do♯ = Re♭ (misma tecla en el piano)<br>• Fa♯ = Sol♭ &nbsp;• Si = Do♭ &nbsp;• Mi♯ = Fa<br><br><strong>Criterio de escritura:</strong> La elección entre dos notas enarmónicas no es arbitraria. Responde al contexto tonal y a la dirección melódica implícita: una nota con sostenido implica tendencia ascendente; con bemol, descendente.<br><br><strong>Relevancia armónica:</strong> La enharmonía es el fundamento de la <em>modulación enarmónica</em>. Al reinterpretar un acorde bajo otra grafía, es posible transitar hacia tonalidades lejanas. El acorde de séptima disminuida es el recurso enarmónico por excelencia: su estructura simétrica de terceras menores admite cuatro interpretaciones tonales distintas. 🎯';
+
+  if (has('funcion tonal','función tonal','funcion armonica','función armónica','tonica dominante subdominante','T S D'))
+    return '🎼 <strong>Función Tonal</strong><br><br>Concepto sistematizado por Hugo Riemann (1893) que clasifica cada acorde de una tonalidad según su <strong>comportamiento funcional</strong> dentro de la jerarquía tonal, independientemente de su posición en la escala.<br><br><strong>Tónica (T)</strong> — reposo y estabilidad; punto de llegada y partida<br>→ Grados I y VI (sustituto de tónica)<br><br><strong>Subdominante (S)</strong> — tensión moderada; movimiento que se aleja de la tónica<br>→ Grados II y IV<br><br><strong>Dominante (D)</strong> — tensión máxima generada por la sensible (VII°); exige resolución a la tónica<br>→ Grados V y VII<br><br><strong>Progresiones funcionales típicas:</strong><br>• Cadencia auténtica perfecta: D→T (V→I)<br>• Cadencia plagal: S→T (IV→I)<br>• Progresión ii–V–I: S→D→T (fundamental en jazz y armonía tonal clásica)<br><br>El movimiento funcional opera con mayor peso cuando hay resolución de disonancias (la séptima del dominante baja, la sensible sube). 🎯';
+
+  if (has('modulacion','modulación','modulation','cambio de tonalidad','cambio tonal'))
+    return '🔁 <strong>Modulación</strong><br><br>Cambio de un centro tonal a otro dentro de una pieza musical.<br><br><strong>Tipos más comunes:</strong><br><br>• <strong>Por acorde pivote:</strong> un acorde pertenece a ambas tonalidades y sirve de puente<br>→ La más suave y frecuente<br><br>• <strong>Cromática:</strong> alteración directa de una nota que conduce a la nueva tónica<br><br>• <strong>Enarmónica:</strong> reinterpretación de un acorde (ej: dim7 puede resolver en 4 tonalidades)<br><br>• <strong>A la tonalidad relativa:</strong> Do Mayor → La menor (mismas notas, diferente tónica)<br>• <strong>A la dominante:</strong> Do Mayor → Sol Mayor (la más común en música clásica)<br><br>El oído entrenado reconoce el momento en que el centro tonal cambia. 🎯';
+
+  if (has('consonancia','disonancia','consonante','disonante','consonance','dissonance'))
+    return '🔊 <strong>Consonancia y Disonancia</strong><br><br><strong>Consonancia:</strong> intervalos que suenan estables, sin tensión.<br><strong>Disonancia:</strong> intervalos que crean tensión y buscan resolver.<br><br><strong>Intervalos consonantes:</strong><br>• Perfectos: Unísono, 4ª Justa, 5ª Justa, Octava<br>• Imperfectos: 3ª Mayor, 3ª Menor, 6ª Mayor, 6ª Menor<br><br><strong>Intervalos disonantes:</strong><br>• 2ª Mayor y Menor<br>• 7ª Mayor y Menor<br>• Tritono (el más disonante)<br><br>La disonancia no es "mala" — es tensión que busca resolución. El movimiento armónico de la música occidental es el juego entre disonancia y consonancia. 🎵';
+
+  if (has('conduccion de voces','conducción de voces','voice leading'))
+    return '🎼 <strong>Conducción de Voces</strong><br><br>Principio de armonía que establece cómo cada voz (soprano, alto, tenor, bajo) <strong>se mueve de un acorde al siguiente</strong> con el mínimo desplazamiento posible.<br><br><strong>Principios básicos:</strong><br>• <strong>Movimiento mínimo:</strong> cada voz se mueve la distancia más corta posible<br>• <strong>Evitar quintas y octavas paralelas:</strong> pérdida de independencia de voces<br>• <strong>La sensible sube:</strong> el VII grado resuelve al I<br>• <strong>La séptima baja:</strong> el 7° del acorde dominante resuelve un semitono abajo<br><br>Ejemplo: G7 → C (Sol7 → Do)<br>• Sol permanece<br>• Si sube a Do (sensible)<br>• Re baja a Do o sube a Mi<br>• Fa baja a Mi (séptima resuelve)<br><br>La conducción de voces es la base del contrapunto y la armonía funcional. 🎯';
+
+  if (has('escala cromatica','escala cromática','chromatic scale'))
+    return '🎶 <strong>Escala Cromática</strong><br><br>Incluye los <strong>12 semitonos</strong> de la octava, sin omitir ninguno.<br><br>En Do: Do-Do♯-Re-Re♯-Mi-Fa-Fa♯-Sol-Sol♯-La-La♯-Si-Do<br><br>• No tiene patrón de tonos/semitonos: <strong>todo es semitonos</strong><br>• No pertenece a ninguna tonalidad específica<br>• Es la base de los 12 sonidos a partir de los cuales se construyen todas las escalas<br>• Usada en pasajes de adorno, glissandos y música dodecafónica 🎹';
+
+  if (has('jonico','jónico','ionian') || (has('modo') && has('primero','primer grado','i grado')))
+    return '🎶 <strong>Modo Jónico (I)</strong><br><br>Patrón: T-T-st-T-T-T-st<br><br>En Do: Do-Re-Mi-Fa-Sol-La-Si-Do<br>• <strong>Es idéntico a la escala Mayor</strong><br>• El modo más brillante y estable de todos<br>• Centro de la música tonal occidental desde el siglo XVII<br>• Jónico I es la referencia desde la cual se derivan los demás modos 🎵';
+
+  if (has('eolio','eólico','aeolian') || (has('modo') && has('sexto','sexta grado','vi grado')))
+    return '🎶 <strong>Modo Eolio (VI)</strong><br><br>Patrón: T-st-T-T-st-T-T<br><br>En La: La-Si-Do-Re-Mi-Fa-Sol-La<br>• <strong>Es idéntico a la escala Menor Natural</strong><br>• Las mismas notas que Do Mayor, comenzando desde La<br>• Oscuro y melancólico<br>• El más usado de los modos en música popular y folk 🌙';
+
   if (has('no puedo afinar','no afino','voz desafinada','cantar desafinado','problemas con la voz','no puedo cantar'))
     return '🎤 <strong>¿Problemas para afinar?</strong><br><br>Es muy normal al principio. El oído y la voz son un circuito que se calibra con práctica.<br><br>Estrategias:<br>1. <strong>Escucha primero</strong>, canta después — no te apures<br>2. Usa la tarjeta de Entonación en Audikus: te muestra si vas alto o bajo en tiempo real<br>3. Empieza con intervalos pequeños (2ª, 3ª)<br>4. Grábate y escucha sin juzgarte<br>5. Canta suave y lento al principio<br><br>La voz es un músculo. Con constancia, la afinación mejora. 🎯';
 
   // Fallback con sugerencia
-  return '🎵 No encontré una respuesta específica para eso.<br><br>Puedo ayudarte con:<br>• <strong>Intervalos:</strong> "¿Qué es una quinta justa?"<br>• <strong>Escalas:</strong> "Escala menor armónica" / "Modo Lidio"<br>• <strong>Progresiones:</strong> "Explica el ii-V-I"<br>• <strong>Acordes:</strong> "¿Qué es el acorde dominante 7?"<br>• <strong>Conceptos:</strong> "Círculo de quintas" / "Oído absoluto"<br><br><button class="chat-feedback-btn" onclick="saveChatFeedback()">💡 Esta pregunta no tuvo respuesta — enviarla como sugerencia para mejorar Audikus</button>';
+  return '🎵 Por ahora no tengo una respuesta para esa pregunta.<br><br><button class="chat-feedback-btn" onclick="saveChatFeedback()">💡 Enviar esta pregunta como sugerencia de contenido para Audikus</button>';
 }
 
 function getResponseEN(question) {
   const n = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   const q = n(question);
   const has = (...w) => w.some(x => q.includes(n(x)));
-  const musicWords = ['interval','chord','scale','progression','tonic','dominant','cadence','mode','triad','seventh','inversion','pentatonic','blues','jazz','note','semitone','tone','octave','fifth','fourth','third','second','sixth','major','minor','diminished','augmented','harmonic','melodic','rhythm','harmony','consonance','dissonance','sus','dim','maj','tip','ear','study','practice','theory','pitch','high','low','intonation','tune','tuning','sing','voice','circle','fifths','arpeggio','absolute','relative','transpose','phrygian','lydian','mixolydian','locrian','pulse','meter'];
+  const musicWords = ['interval','chord','scale','progression','tonic','dominant','cadence','mode','triad','seventh','inversion','pentatonic','blues','jazz','note','semitone','tone','octave','fifth','fourth','third','second','sixth','major','minor','diminished','augmented','harmonic','melodic','rhythm','harmony','consonance','dissonance','sus','dim','maj','tip','ear','study','practice','theory','pitch','high','low','intonation','tune','tuning','sing','voice','circle','fifths','arpeggio','absolute','relative','transpose','phrygian','lydian','mixolydian','locrian','pulse','meter','modulation','tonal','enharmonic','chromatic','ionian','aeolian','counterpoint','leading','function'];
   if (!musicWords.some(w => q.includes(w))) return ui.en.chatOffTopic;
 
   // General definitions
@@ -3239,8 +3465,8 @@ function getResponseEN(question) {
   // Intervals
   if (has('minor second','m2','minor 2nd'))
     return '🎵 <strong>Minor Second (m2)</strong><br><br>Distance: <strong>1 semitone</strong><br><br>• Very tense, almost scraping sound<br>• Example: C→C♯, E→F<br>• Reference: Jaws Theme 🦈<br><br>In the app: activate it in Intervals → Settings.';
-  if (has('major second','m2','major 2nd'))
-    return '🎵 <strong>Major Second (M2)</strong><br><br>Distance: <strong>2 semitones</strong> (1 whole tone)<br><br>• Natural scale step, smooth sound<br>• Example: C→D, G→A<br>• Reference: opening notes of "Happy Birthday" 🎂';
+  if (has('major second','major 2nd'))
+    return '🎵 <strong>Major Second (M2)</strong><br><br>Distance: <strong>2 semitones</strong> (1 whole tone)<br><br>• Natural scale step, smooth sound<br>• Example: C→D, G→A<br>• Reference: "Frère Jacques" — the first two ascending notes C→D 🎶';
   if (has('minor third','m3','minor 3rd'))
     return '🎵 <strong>Minor Third (m3)</strong><br><br>Distance: <strong>3 semitones</strong><br><br>• Dark and melancholic sound<br>• Foundation of all minor chords<br>• Example: A→C, D→F<br>• Reference: "Greensleeves", "Smoke on the Water" 🎸';
   if (has('major third','M3','major 3rd'))
@@ -3252,11 +3478,11 @@ function getResponseEN(question) {
   if (has('perfect fifth','p5','5th'))
     return '🎵 <strong>Perfect Fifth (P5)</strong><br><br>Distance: <strong>7 semitones</strong><br><br>• Very consonant, foundation of all chords<br>• Example: C→G<br>• Reference: "Star Wars" ⭐';
   if (has('minor sixth','m6','minor 6th'))
-    return '🎵 <strong>Minor Sixth (m6)</strong><br><br>Distance: <strong>8 semitones</strong><br><br>• Expressive and melancholic sound<br>• Example: E→C<br>• Reference: "The Entertainer" — Scott Joplin 🎹';
+    return '🎵 <strong>Minor Sixth (m6)</strong><br><br>Distance: <strong>8 semitones</strong><br><br>• Expressive and melancholic sound<br>• Example: E→C, A→F<br>• Reference: opening melody of "Love Story" (Francis Lai, 1970) — the ascending main theme 🎬';
   if (has('major sixth','major 6th'))
     return '🎵 <strong>Major Sixth (M6)</strong><br><br>Distance: <strong>9 semitones</strong><br><br>• Bright and luminous sound<br>• Example: C→A<br>• Reference: "My Bonnie Lies Over the Ocean" 🎶';
   if (has('minor seventh','m7','minor 7th') && !has('chord'))
-    return '🎵 <strong>Minor Seventh (m7)</strong><br><br>Distance: <strong>10 semitones</strong><br><br>• Tense, wants to resolve<br>• Key interval in the dominant 7th chord<br>• Example: G→F';
+    return '🎵 <strong>Minor Seventh (m7)</strong><br><br>Distance: <strong>10 semitones</strong><br><br>• Tense, wants to resolve downward<br>• Key interval in the dominant 7th chord<br>• Example: G→F, D→C<br>• Reference: "Somewhere" (West Side Story) — the opening ascending leap 🎭';
   if (has('major seventh','major 7th') && !has('chord'))
     return '🎵 <strong>Major Seventh (M7)</strong><br><br>Distance: <strong>11 semitones</strong><br><br>• Sophisticated, almost jarring sound<br>• Example: C→B<br>• Reference: "Somewhere" — West Side Story 🎸';
   if (has('octave','p8','8th','8ve'))
@@ -3359,10 +3585,34 @@ function getResponseEN(question) {
   if (has('transpose','transposition','transposing'))
     return '🎼 <strong>Transposition</strong><br><br>Moving a melody or chord to a different pitch while keeping the same interval relationships.<br><br>Steps to transpose:<br>1. Find the interval between the original and target key<br>2. Move every note that same interval<br><br>Example: transposing "C major" to "D major" = raise everything a major 2nd.<br><br>Uses: accompanying singers, learning in different keys, transposing instruments (B♭ trumpet, etc.) 🎯';
 
+  if (has('enharm','enharmonic'))
+    return '🎹 <strong>Enharmonics</strong><br><br>In <strong>equal temperament</strong>, enharmonic equivalents are two pitches sharing the same acoustic frequency but represented by different notational symbols. This phenomenon arises from the tension between the theoretical series of fifths (which generates an infinite spiral of distinct pitches) and the practical tuning system of twelve equal semitones (which closes that spiral).<br><br><strong>Primary equivalences:</strong><br>• C♯ = D♭ (same piano key)<br>• F♯ = G♭ &nbsp;• B = C♭ &nbsp;• E♯ = F<br><br><strong>Notational criterion:</strong> The choice between enharmonic spellings is not arbitrary — it is governed by harmonic context and implied melodic direction. Sharps signal ascending tendency; flats signal descending.<br><br><strong>Harmonic significance:</strong> Enharmonic equivalence is the basis of <em>enharmonic modulation</em>. By reinterpreting a chord\'s spelling, composers gain access to distantly related tonal areas. The fully diminished seventh chord is the principal vehicle: its symmetrical structure of stacked minor thirds allows reinterpretation as the leading-tone seventh of four different keys. 🎯';
+
+  if (has('tonal function','function harmony','functional harmony','tonic dominant subdominant'))
+    return '🎼 <strong>Tonal Function</strong><br><br>A concept systematized by Hugo Riemann (1893) that classifies each chord in a key according to its <strong>functional behavior</strong> within the tonal hierarchy, regardless of its scalar position.<br><br><strong>Tonic (T)</strong> — rest and stability; point of arrival and departure<br>→ Chords I and VI (tonic substitute)<br><br><strong>Subdominant (S)</strong> — moderate tension; motion away from the tonic<br>→ Chords II and IV<br><br><strong>Dominant (D)</strong> — maximum tension generated by the leading tone (VII°); demands resolution to tonic<br>→ Chords V and VII<br><br><strong>Typical functional progressions:</strong><br>• Perfect authentic cadence: D→T (V→I)<br>• Plagal cadence: S→T (IV→I)<br>• ii–V–I progression: S→D→T (foundational in jazz and classical tonal harmony)<br><br>Functional motion carries the greatest weight when dissonances resolve: the dominant seventh descends, the leading tone ascends. 🎯';
+
+  if (has('modulation','key change','change key','pivot chord'))
+    return '🔁 <strong>Modulation</strong><br><br>A change from one tonal center to another within a piece of music.<br><br><strong>Most common types:</strong><br><br>• <strong>Pivot chord:</strong> a chord belonging to both keys serves as a bridge<br>→ The smoothest and most common type<br><br>• <strong>Chromatic:</strong> direct alteration of a note leading to the new tonic<br><br>• <strong>Enharmonic:</strong> reinterpreting a chord (e.g. dim7 can resolve to 4 different keys)<br><br>• <strong>To the relative key:</strong> C Major → A minor (same notes, different tonic)<br>• <strong>To the dominant:</strong> C Major → G Major (most common in classical music)<br><br>A trained ear recognizes the moment the tonal center shifts. 🎯';
+
+  if (has('consonance','dissonance','consonant','dissonant'))
+    return '🔊 <strong>Consonance and Dissonance</strong><br><br><strong>Consonance:</strong> intervals that sound stable, without tension.<br><strong>Dissonance:</strong> intervals that create tension and seek resolution.<br><br><strong>Consonant intervals:</strong><br>• Perfect: Unison, Perfect 4th, Perfect 5th, Octave<br>• Imperfect: M3, m3, M6, m6<br><br><strong>Dissonant intervals:</strong><br>• Major and Minor 2nd<br>• Major and Minor 7th<br>• Tritone (most dissonant)<br><br>Dissonance is not "bad" — it is tension seeking resolution. The motion of Western harmony is the interplay of consonance and dissonance. 🎵';
+
+  if (has('voice leading','voice-leading'))
+    return '🎼 <strong>Voice Leading</strong><br><br>The principle governing how each voice (soprano, alto, tenor, bass) <strong>moves from one chord to the next</strong> with minimum displacement.<br><br><strong>Basic principles:</strong><br>• <strong>Minimal movement:</strong> each voice moves the shortest distance possible<br>• <strong>Avoid parallel 5ths and octaves:</strong> they reduce independence between voices<br>• <strong>The leading tone resolves up:</strong> scale degree VII resolves to I<br>• <strong>The seventh resolves down:</strong> the 7th of the dominant chord moves one semitone down<br><br>Example: G7 → C<br>• G stays<br>• B rises to C (leading tone)<br>• D falls to C or rises to E<br>• F falls to E (seventh resolves)<br><br>Voice leading is the foundation of counterpoint and functional harmony. 🎯';
+
+  if (has('chromatic scale','chromatic'))
+    return '🎶 <strong>Chromatic Scale</strong><br><br>Includes all <strong>12 semitones</strong> of the octave without omitting any.<br><br>In C: C-C♯-D-D♯-E-F-F♯-G-G♯-A-A♯-B-C<br><br>• No pattern of tones/semitones: <strong>every step is a semitone</strong><br>• Does not belong to any specific key<br>• It is the set of 12 pitches from which all scales are drawn<br>• Used in ornamental passages, glissandos and twelve-tone music 🎹';
+
+  if (has('ionian') || (has('mode') && has('first mode','mode i')))
+    return '🎶 <strong>Ionian Mode (I)</strong><br><br>Pattern: W-W-H-W-W-W-H<br><br>In C: C-D-E-F-G-A-B-C<br>• <strong>Identical to the Major scale</strong><br>• The brightest and most stable of all modes<br>• Center of Western tonal music since the 17th century<br>• Ionian I is the reference from which all other modes are derived 🎵';
+
+  if (has('aeolian') || (has('mode') && has('sixth mode','mode vi')))
+    return '🎶 <strong>Aeolian Mode (VI)</strong><br><br>Pattern: W-H-W-W-H-W-W<br><br>In A: A-B-C-D-E-F-G-A<br>• <strong>Identical to the Natural Minor scale</strong><br>• Same notes as C Major, starting from A<br>• Dark and melancholic<br>• The most used mode in popular and folk music 🌙';
+
   if (has('can\'t sing in tune','out of tune','can\'t pitch','singing problems','voice problems'))
     return '🎤 <strong>Trouble Staying in Tune?</strong><br><br>This is very common at first. The ear and voice form a circuit that calibrates with practice.<br><br>Strategies:<br>1. <strong>Listen first</strong>, then sing — don\'t rush<br>2. Use Audikus\' Intonation card: it shows in real time if you\'re sharp or flat<br>3. Start with small intervals (2nd, 3rd)<br>4. Record yourself and listen without judging<br>5. Sing softly and slowly at first<br><br>The voice is a muscle. With consistency, intonation improves. 🎯';
 
-  return '🎵 I couldn\'t find a specific answer for that.<br><br>I can help with:<br>• <strong>Intervals:</strong> "What is a perfect fifth?"<br>• <strong>Scales:</strong> "Harmonic minor scale" / "Lydian mode"<br>• <strong>Progressions:</strong> "Explain ii-V-I"<br>• <strong>Chords:</strong> "What is a dominant 7th?"<br>• <strong>Concepts:</strong> "Circle of fifths" / "Absolute pitch"<br><br><button class="chat-feedback-btn" onclick="saveChatFeedback()">💡 This question had no answer — send it as a suggestion to improve Audikus</button>';
+  return '🎵 I don\'t have an answer for that question yet.<br><br><button class="chat-feedback-btn" onclick="saveChatFeedback()">💡 Send this question as a content suggestion for Audikus</button>';
 }
 
 updateStaticText();
@@ -3450,108 +3700,108 @@ const COMPOSERS_DATA = [
    factEN:'Every great master started where you are now. The first day is the most important.'},
   {id:'hildegard',  day:7,   name:'Hildegard von Bingen',  nameEN:'Hildegard von Bingen',   tier:'#a892d6',
    full:'1098 — Compositora y mística', fullEN:'1098 — Composer and mystic',
-   fact:'Compuso 77 obras litúrgicas sin saber leer música convencional. Escuchaba melodías en visiones.',
-   factEN:'She composed 77 liturgical works without knowing conventional music notation. She heard melodies in visions.'},
+   fact:'Sus 77 composiciones litúrgicas presentan un ámbito melódico de hasta dos octavas y media, excepcional para el canto gregoriano del siglo XII. Es autora del Ordo Virtutum, la pieza teatral con música más antigua que se conserva completa.',
+   factEN:'Her 77 liturgical compositions display a melodic range of up to two and a half octaves, exceptional for 12th-century Gregorian chant. She also authored the Ordo Virtutum, the oldest surviving musical theatrical work.'},
   {id:'vivaldi',    day:14,  name:'Antonio Vivaldi',        nameEN:'Antonio Vivaldi',        tier:'#e8794a',
    full:'1678 — El Sacerdote Rojo',     fullEN:'1678 — The Red Priest',
-   fact:'Memorizaba conciertos enteros y los transcribía de oído. Escribió más de 500 conciertos.',
-   factEN:'He memorized entire concertos and transcribed them by ear. He wrote over 500 concertos.'},
+   fact:'Sistematizó la forma del concierto en tres movimientos (rápido-lento-rápido) y desarrolló la estructura ritornello, modelo formal del concierto barroco. Sus más de 500 conciertos fueron concebidos como material pedagógico para los músicos del Ospedale della Pietà de Venecia.',
+   factEN:'He systematized the three-movement concerto form (fast-slow-fast) and developed the ritornello structure, the formal model of the Baroque concerto. His 500+ concertos were conceived as pedagogical material for the musicians of Venice\'s Ospedale della Pietà.'},
   {id:'bach',       day:21,  name:'J.S. Bach',              nameEN:'J.S. Bach',              tier:'#42e5a3',
    full:'1685 — El Gran Contrapuntista',fullEN:'1685 — The Great Contrapuntist',
-   fact:'Copiaba a mano partituras de otros compositores para internalizarlas. Su oído era su escuela.',
-   factEN:'He hand-copied scores by other composers to internalize them. His ear was his school.'},
+   fact:'Su método de aprendizaje incluyó la copia manual de partituras de Vivaldi, Buxtehude y Pachelbel. El Clave Bien Temperado demostró sistemáticamente las posibilidades expresivas de los 24 tonos en el temperamento igual.',
+   factEN:'His learning method included hand-copying scores by Vivaldi, Buxtehude, and Pachelbel. The Well-Tempered Clavier systematically demonstrated the expressive possibilities of all 24 keys in equal temperament.'},
   {id:'haydn',      day:35,  name:'Joseph Haydn',           nameEN:'Joseph Haydn',           tier:'#cfd3da',
    full:'1732 — Padre de la Sinfonía',  fullEN:'1732 — Father of the Symphony',
-   fact:'Desarrolló su oído tocando en la calle de niño. Dijo: "Dios me dio un oído alegre."',
-   factEN:'He developed his ear playing in the street as a child. He said: "God gave me a cheerful ear."'},
+   fact:'Sistematizó la forma sonata y estableció la sinfonía en cuatro movimientos y el cuarteto de cuerdas como géneros estándar. Su estudio autodidacta del contrapunto a partir del Versuch de C.P.E. Bach fue determinante en su formación.',
+   factEN:'He systematized sonata form and established the four-movement symphony and string quartet as standard genres. His self-directed study of counterpoint from C.P.E. Bach\'s Versuch was decisive in his training.'},
   {id:'mozart',     day:50,  name:'W.A. Mozart',            nameEN:'W.A. Mozart',            tier:'#ff5a8a',
    full:'1756 — El Niño Prodigio',      fullEN:'1756 — The Child Prodigy',
-   fact:'A los 4 años reproducía de memoria cualquier pieza escuchada una sola vez.',
-   factEN:'At age 4 he could reproduce from memory any piece heard just once.'},
+   fact:'En 1770, a los 14 años, transcribió de memoria el Miserere de Allegri tras escucharlo una sola vez en la Capilla Sixtina, cuya partitura estaba reservada exclusivamente para la Capilla Pontificia. Es uno de los casos más documentados de memoria musical absoluta en la historia.',
+   factEN:'In 1770, at age 14, he transcribed from memory Allegri\'s Miserere after hearing it once in the Sistine Chapel, whose score was reserved exclusively for the Papal Chapel. It is one of the most documented cases of absolute musical memory in history.'},
   {id:'beethoven',  day:65,  name:'Ludwig van Beethoven',   nameEN:'Ludwig van Beethoven',   tier:'#5ad6ff',
    full:'1770 — El Titán Sordo',        fullEN:'1770 — The Deaf Titan',
-   fact:'Cuando perdió el oído, compuso sus obras más profundas desde su oído interior.',
-   factEN:'When he lost his hearing, he composed his most profound works from his inner ear.'},
+   fact:'A partir de 1798 comenzó a perder la audición progresivamente. Continuó componiendo mediante el oído interior (inneres Hören). Sus últimas obras —el Cuarteto Op. 131 y la Sinfonía n.º 9— fueron compuestas en condición de sordera total.',
+   factEN:'From 1798 he progressively lost his hearing. He continued composing through inner hearing (inneres Hören). His final works — String Quartet Op. 131 and the 9th Symphony — were composed in total deafness.'},
   {id:'fannyM',     day:80,  name:'Fanny Mendelssohn',      nameEN:'Fanny Mendelssohn',      tier:'#e0a3d6',
    full:'1805 — Genio Silenciado',      fullEN:'1805 — Silenced Genius',
-   fact:'Fanny memorizaba sinfonías completas y las tocaba de oído para su hermano Felix.',
-   factEN:'Fanny memorized full symphonies and played them by ear for her brother Felix.'},
+   fact:'Compuso más de 460 obras, entre ellas el ciclo para piano Das Jahr y la Easter Sonata. Sus Sonntagsmusiken en Berlín fueron instituciones culturales de referencia en el siglo XIX. Sus lieder circularon inicialmente publicados bajo el nombre de su hermano Felix.',
+   factEN:'She composed over 460 works, including the piano cycle Das Jahr and the Easter Sonata. Her Sonntagsmusiken in Berlin were key cultural institutions of the 19th century. Her lieder initially circulated published under her brother Felix\'s name.'},
   {id:'chopin',     day:95,  name:'Frédéric Chopin',        nameEN:'Frédéric Chopin',        tier:'#b48ef0',
    full:'1810 — El Poeta del Piano',    fullEN:'1810 — The Poet of the Piano',
-   fact:'Improvisaba durante horas, entrenando el oído para captar matices imperceptibles.',
-   factEN:'He improvised for hours, training his ear to capture imperceptible nuances.'},
+   fact:'Transformó el Estudio de ejercicio técnico puro en forma artística autónoma. Sus 27 Estudios (Op. 10 y Op. 25) constituyen un sistema pedagógico integral del piano y son al mismo tiempo obras de concierto de primer nivel.',
+   factEN:'He transformed the Étude from pure technical exercise into an autonomous artistic form. His 27 Études (Op. 10 and Op. 25) constitute a comprehensive pedagogical system for piano and are simultaneously top-level concert works.'},
   {id:'wagner',     day:110, name:'Richard Wagner',         nameEN:'Richard Wagner',         tier:'#e8794a',
    full:'1813 — El Maestro del Drama',  fullEN:'1813 — The Master of Drama',
-   fact:'Wagner escuchaba toda su orquesta en la mente antes de escribir una sola nota.',
-   factEN:'Wagner heard his entire orchestra in his mind before writing a single note.'},
+   fact:'Desarrolló el sistema de Leitmotivs como principio estructural de la ópera a gran escala: cada personaje, objeto o concepto dramático posee un tema musical identificable. Su Gesamtkunstwerk (obra de arte total) redefinió la relación entre música, texto, drama y escenografía.',
+   factEN:'He developed the Leitmotiv system as a structural principle of large-scale opera: each character, object, or dramatic concept has an identifiable musical theme. His Gesamtkunstwerk (total work of art) redefined the relationship between music, text, drama, and staging.'},
   {id:'claraS',     day:125, name:'Clara Schumann',         nameEN:'Clara Schumann',         tier:'#d68aa3',
    full:'1819 — La Virtuosa',           fullEN:'1819 — The Virtuoso',
-   fact:'Primera pianista en tocar de memoria en concierto. Su oído era su guía absoluta.',
-   factEN:'First pianist to perform entirely from memory in concert. Her ear was her absolute guide.'},
+   fact:'Fue una de las primeras intérpretes en establecer la práctica de tocar de memoria en concierto público. Su trabajo editorial sobre la obra completa de Robert Schumann estableció estándares de práctica musical vigentes hasta hoy.',
+   factEN:'She was among the first performers to establish the practice of playing from memory in public concert. Her editorial work on Robert Schumann\'s complete works established musical practice standards still in use today.'},
   {id:'brahms',     day:140, name:'Johannes Brahms',        nameEN:'Johannes Brahms',        tier:'#b4afbe',
    full:'1833 — El Arquitecto',         fullEN:'1833 — The Architect',
-   fact:'Brahms quemó muchas de sus obras porque su oído exigía perfección absoluta.',
-   factEN:'Brahms burned many of his works because his ear demanded absolute perfection.'},
+   fact:'Desarrolló la técnica de la variación en desarrollo (entwickelnde Variation): la transformación continua de una célula melódica como principio estructural. Su rigor autocrítico lo llevó a destruir numerosas obras tempranas, incluidos veinte cuartetos de cuerda, antes de publicar el primero a los 43 años.',
+   factEN:'He developed the technique of developing variation (entwickelnde Variation): the continuous transformation of a melodic cell as a structural principle. His self-critical rigor led him to destroy numerous early works, including twenty string quartets, before publishing his first at age 43.'},
   {id:'tchaikovsky',day:155, name:'Tchaikovsky',            nameEN:'Tchaikovsky',            tier:'#5ec8a0',
    full:'1840 — El Alma Rusa',          fullEN:'1840 — The Russian Soul',
-   fact:'Escuchaba melodías en sueños. Dijo: "Tengo que capturarlas antes de despertar."',
-   factEN:'He heard melodies in dreams. He said: "I have to capture them before waking up."'},
+   fact:'Integró la forma sinfónica centroeuropea con elementos del folklore y la música litúrgica rusa. Su tratamiento del color orquestal y la melodía de amplio aliento influyó directamente en el sinfonismo europeo del siglo XX.',
+   factEN:'He integrated the Central European symphonic form with elements of Russian folk and liturgical music. His treatment of orchestral color and broad melodic line directly influenced European symphonism of the 20th century.'},
   {id:'mahler',     day:170, name:'Gustav Mahler',          nameEN:'Gustav Mahler',          tier:'#7a8edb',
    full:'1860 — El Visionario',         fullEN:'1860 — The Visionary',
-   fact:'Escuchaba el universo en sus sinfonías. Integraba sonidos naturales que oía internamente.',
-   factEN:'He heard the universe in his symphonies. He integrated natural sounds he perceived internally.'},
+   fact:'Extendió la sinfonía a sus dimensiones formales máximas, integrando elementos extra-musicales —cencerros, bandas a distancia, llamadas de pájaros— como componentes estructurales. Afirmó: "Una sinfonía debe ser como el mundo: debe contenerlo todo."',
+   factEN:'He extended the symphony to its maximum formal dimensions, integrating extra-musical elements — cowbells, distant bands, bird calls — as structural components. He stated: "A symphony must be like the world: it must contain everything."'},
   {id:'debussy',    day:185, name:'Claude Debussy',         nameEN:'Claude Debussy',         tier:'#7fb3e8',
    full:'1862 — El Impresionista',      fullEN:'1862 — The Impressionist',
-   fact:'Escuchaba colores. Transformó sonidos de la naturaleza en texturas armónicas únicas.',
-   factEN:'He heard colors. He transformed sounds of nature into unique harmonic textures.'},
+   fact:'Su contacto con el gamelán javanés en la Exposición Universal de París de 1889 influyó decisivamente en su uso no funcional de la armonía. Introdujo sistemáticamente la escala de tonos enteros y la modalidad pentatónica, disolviendo la armonía tonal-funcional.',
+   factEN:'His contact with the Javanese gamelan at the 1889 Paris World Exhibition decisively influenced his non-functional use of harmony. He systematically introduced the whole-tone scale and pentatonic modality, dissolving tonal-functional harmony.'},
   {id:'straussR',   day:200, name:'Richard Strauss',        nameEN:'Richard Strauss',        tier:'#c9a84a',
    full:'1864 — El Maestro Tardío',     fullEN:'1864 — The Late Master',
-   fact:'Strauss orquestó desde el oído puro — nunca tocó sus obras al piano antes de escribirlas.',
-   factEN:'Strauss orchestrated from pure ear — he never played his works on piano before writing them.'},
+   fact:'Llevó el poema sinfónico a su mayor complejidad programática y orquestal. Su revisión del Tratado de Instrumentación de Berlioz sigue siendo referencia académica en orquestación. Sus poemas sinfónicos —Don Juan, Till Eulenspiegel, Así habló Zaratustra— son modelos de narrativa musical descriptiva.',
+   factEN:'He brought the tone poem to its greatest programmatic and orchestral complexity. His revision of Berlioz\'s Treatise on Instrumentation remains an academic reference in orchestration. His tone poems — Don Juan, Till Eulenspiegel, Thus Spoke Zarathustra — are models of descriptive musical narrative.'},
   {id:'sibelius',   day:215, name:'Jean Sibelius',          nameEN:'Jean Sibelius',          tier:'#5ad6ff',
    full:'1865 — La Voz del Norte',      fullEN:'1865 — The Voice of the North',
-   fact:'Escuchaba el viento de Finlandia como música. Sus sinfonías nacieron del paisaje sonoro.',
-   factEN:'He heard the Finnish wind as music. His symphonies were born from the soundscape.'},
+   fact:'Desarrolló un tratamiento altamente original de la forma sinfónica, condensada hasta su expresión máxima en la Sinfonía n.º 7 en un solo movimiento continuo. Su lenguaje tonal-modal incorpora elementos del folklore finlandés y de la épica del Kalevala.',
+   factEN:'He developed a highly original treatment of symphonic form, condensed to its maximum expression in the single-movement Symphony No. 7. His tonal-modal language incorporates elements of Finnish folklore and the Kalevala epic.'},
   {id:'rach',       day:230, name:'Rachmaninoff',           nameEN:'Rachmaninoff',           tier:'#8a7fae',
    full:'1873 — El Coloso',             fullEN:'1873 — The Colossus',
-   fact:'Podía escuchar una obra orquestal y transcribirla de memoria al día siguiente.',
-   factEN:'He could hear an orchestral work and transcribe it from memory the next day.'},
+   fact:'Su idioma pianístico se distingue por texturas polifónicas de gran densidad y una síntesis del lirismo romántico ruso con la técnica virtuosística occidental. Su Concierto para Piano n.º 2 en do menor es uno de los pilares del repertorio concertante del siglo XX.',
+   factEN:'His pianistic idiom is distinguished by dense polyphonic textures and a synthesis of Russian Romantic lyricism with Western virtuosic technique. His Piano Concerto No. 2 in C minor is one of the cornerstones of 20th-century concerto repertoire.'},
   {id:'schoenberg', day:245, name:'Schoenberg',             nameEN:'Schoenberg',             tier:'#4a3550',
    full:'1874 — El Revolucionario',     fullEN:'1874 — The Revolutionary',
-   fact:'Inventó un nuevo sistema auditivo: el dodecafonismo, entrenando el oído más allá de la tonalidad.',
-   factEN:'He invented a new auditory system: twelve-tone music, training the ear beyond tonality.'},
+   fact:'Desarrolló el dodecafonismo (técnica de doce tonos) hacia 1921-1923 como respuesta sistemática a la disolución de la tonalidad. Su Harmonielehre (1911) es un texto fundacional en la teoría musical del siglo XX. Lideró la Segunda Escuela de Viena junto a Berg y Webern.',
+   factEN:'He developed twelve-tone technique around 1921-1923 as a systematic response to the dissolution of tonality. His Harmonielehre (1911) is a foundational text in 20th-century music theory. He led the Second Viennese School alongside Berg and Webern.'},
   {id:'ravel',      day:260, name:'Maurice Ravel',          nameEN:'Maurice Ravel',          tier:'#9a93a0',
    full:'1875 — El Relojero',           fullEN:'1875 — The Clockmaker',
-   fact:'Ravel escuchaba cada timbre de orquesta con precisión quirúrgica. El oído era su bisturí.',
-   factEN:'Ravel heard every orchestral timbre with surgical precision. The ear was his scalpel.'},
+   fact:'Reconocido por su precisión orquestal y claridad neoclásica de la forma. Su orquestación de los Cuadros de una exposición de Mussorgsky es modelo académico del uso del color instrumental. El Bolero (1928) es un estudio sistemático de crescendo orquestal sobre una estructura armónico-rítmica invariable.',
+   factEN:'Known for his orchestral precision and neoclassical clarity of form. His orchestration of Mussorgsky\'s Pictures at an Exhibition is an academic model of instrumental color. Boléro (1928) is a systematic study of orchestral crescendo over an invariable harmonic-rhythmic structure.'},
   {id:'bartok',     day:275, name:'Béla Bartók',            nameEN:'Béla Bartók',            tier:'#c7c2cf',
    full:'1881 — El Etnomusicólogo',     fullEN:'1881 — The Ethnomusicologist',
-   fact:'Grabó y transcribió miles de melodías folklóricas de oído en campo. El oído como archivo vivo.',
-   factEN:'He recorded and transcribed thousands of folk melodies by ear in the field. The ear as a living archive.'},
+   fact:'Recopiló y transcribió más de 10.000 melodías folklóricas de Hungría, Rumania, Bulgaria, Turquía y el norte de África mediante fonógrafo de cilindros. Desarrolló un lenguaje compositivo que integra la modalidad folklórica con técnicas cromáticas, expresado en su sistema de ejes tonales.',
+   factEN:'He collected and transcribed over 10,000 folk melodies from Hungary, Romania, Bulgaria, Turkey, and North Africa using a cylinder phonograph. He developed a compositional language integrating folk modality with chromatic techniques, expressed in his system of tonal axes.'},
   {id:'stravinsky', day:290, name:'Igor Stravinsky',        nameEN:'Igor Stravinsky',        tier:'#46414a',
    full:'1882 — El Camaleón',           fullEN:'1882 — The Chameleon',
-   fact:'Cada estilo de Stravinsky nacía de escuchar con oídos nuevos, como un niño cada vez.',
-   factEN:'Each Stravinsky style was born from listening with fresh ears, like a child each time.'},
+   fact:'Atravesó tres períodos compositivos claramente diferenciados: ruso (1907-1920), neoclásico (1920-1954) y serial (1954-1968). La Consagración de la Primavera (1913) revolucionó el tratamiento rítmico en la música orquestal mediante métricas irregulares y acentuaciones desplazadas.',
+   factEN:'He passed through three clearly differentiated compositional periods: Russian (1907-1920), Neoclassical (1920-1954), and Serial (1954-1968). The Rite of Spring (1913) revolutionized rhythmic treatment in orchestral music through irregular meters and displaced accents.'},
   {id:'webern',     day:305, name:'Anton Webern',           nameEN:'Anton Webern',           tier:'#5a5468',
    full:'1883 — El Miniaturista',       fullEN:'1883 — The Miniaturist',
-   fact:'Webern escuchaba el silencio tanto como los sonidos. Cada nota era un mundo entero.',
-   factEN:'Webern heard silence as much as sound. Each note was an entire world.'},
+   fact:'Desarrolló una compresión extrema de la forma y una textura puntillista (Klangfarbenmelodie). Su producción total no supera las cuatro horas de audio y se caracteriza por la organización serial rigurosa y el tratamiento del silencio como elemento compositivo equivalente al sonido.',
+   factEN:'He developed extreme compression of form and a pointillist texture (Klangfarbenmelodie). His total output does not exceed four hours of audio and is characterized by rigorous serial organization and the treatment of silence as a compositional element equivalent to sound.'},
   {id:'berg',       day:320, name:'Alban Berg',             nameEN:'Alban Berg',             tier:'#7a6abe',
    full:'1885 — El Romántico Serial',   fullEN:'1885 — The Serial Romantic',
-   fact:'Berg fusionó emoción romántica con técnica serial. Su oído tendía puentes entre mundos.',
-   factEN:'Berg fused romantic emotion with serial technique. His ear built bridges between worlds.'},
+   fact:'Integró la técnica dodecafónica con elementos expresivos del romanticismo tardío. Su Concierto para Violín (1935) incorpora un coral de Bach como cita estructural; su ópera Wozzeck (1925) utiliza formas clásicas —suite, passacaglia, sonata— dentro de un lenguaje atonal.',
+   factEN:'He integrated twelve-tone technique with expressive elements of late Romanticism. His Violin Concerto (1935) incorporates a Bach chorale as a structural quotation; his opera Wozzeck (1925) uses classical forms — suite, passacaglia, sonata — within an atonal language.'},
   {id:'price',      day:335, name:'Florence Price',         nameEN:'Florence Price',         tier:'#c4574a',
    full:'1887 — La Pionera',            fullEN:'1887 — The Pioneer',
-   fact:'Primera compositora afroamericana con sinfonía estrenada por una orquesta mayor de EE.UU.',
-   factEN:'First African-American woman composer to have a symphony premiered by a major US orchestra.'},
+   fact:'Primera compositora afroamericana en estrenar una sinfonía con una gran orquesta estadounidense (Orquesta Sinfónica de Chicago, 1933). Integró ritmos de espirituales afroamericanos y danzas juba en la tradición sinfónica académica, ampliando sus fundamentos expresivos y culturales.',
+   factEN:'First African-American woman composer to premiere a symphony with a major US orchestra (Chicago Symphony Orchestra, 1933). She integrated African-American spiritual rhythms and juba dance into the academic symphonic tradition, broadening its expressive and cultural foundations.'},
   {id:'boulanger',  day:345, name:'Nadia Boulanger',        nameEN:'Nadia Boulanger',        tier:'#a08bc2',
    full:'1887 — La Gran Maestra',       fullEN:'1887 — The Great Teacher',
-   fact:'Formó el oído de Bernstein, Copland, Piazzolla y cientos más. Maestra suprema de maestros.',
-   factEN:'She shaped the ears of Bernstein, Copland, Piazzolla and hundreds more. Supreme teacher of masters.'},
+   fact:'La pedagoga más influyente de la música de arte occidental del siglo XX. Profesora en el Conservatorio Americano de Fontainebleau y en el Conservatorio de París, formó a Copland, Bernstein, Piazzolla, Philip Glass y Elliott Carter, entre cientos. Su método enfatizaba el contrapunto, el análisis armónico y el desarrollo del oído interior.',
+   factEN:'The most influential pedagogue in 20th-century Western art music. Professor at the American Conservatory in Fontainebleau and at the Paris Conservatoire, she trained Copland, Bernstein, Piazzolla, Philip Glass, and Elliott Carter, among hundreds. Her method emphasized counterpoint, harmonic analysis, and the development of inner hearing.'},
   {id:'shostakovich',day:355,name:'Shostakovich',           nameEN:'Shostakovich',           tier:'#d6443a',
    full:'1906 — El Testigo',            fullEN:'1906 — The Witness',
-   fact:'Codificó mensajes en su música que solo el oído entrenado podía descifrar.',
-   factEN:'He encoded messages in his music that only the trained ear could decipher.'},
+   fact:'Desarrolló un lenguaje de múltiples capas semánticas bajo las restricciones del realismo socialista soviético. Su monograma musical DSCH (Re-Mib-Do-Si en notación alemana) opera como motivo estructural recurrente en su obra. La Sinfonía n.º 5 (1937) puede analizarse simultáneamente como cumplimiento del mandato ideológico y como discurso crítico velado.',
+   factEN:'He developed a personal language of multiple semantic layers under the constraints of Soviet socialist realism. His musical monogram DSCH (D-Eb-C-B in German notation) functions as a recurring structural motif throughout his work. Symphony No. 5 (1937) can be analyzed simultaneously as fulfillment of ideological mandate and as veiled critical discourse.'},
   {id:'maestro',    day:365, name:'Maestro del Oído',       nameEN:'Ear Master',             tier:'#f5b54a',
    full:'365 días · Un año entero',     fullEN:'365 days · A full year',
    fact:'Has completado un año de entrenamiento auditivo. Tu oído ya escucha lo que antes era invisible.',

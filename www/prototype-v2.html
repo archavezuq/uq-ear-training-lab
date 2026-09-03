@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Audikus v2 — Prototipo</title>
+<script src="https://cdn.jsdelivr.net/npm/tone@14/build/Tone.js"></script>
+<style>
+/* ── Audikus Color Tokens ─────────────────────────────────────── */
+:root {
+  --bg:          #0f0f1e;
+  --card:        #1a1a2e;
+  --card-high:   #232340;
+  --primary:     #6c63ff;
+  --pri-dim:     rgba(108,99,255,0.18);
+  --pri-cont:    rgba(108,99,255,0.28);
+  --success:     #06d6a0;
+  --succ-dim:    rgba(6,214,160,0.18);
+  --danger:      #ef476f;
+  --dang-dim:    rgba(239,71,111,0.18);
+  --warning:     #fbbf24;
+  --text:        #e0e0e0;
+  --muted:       #8888aa;
+  --border:      rgba(255,255,255,0.08);
+  --nav-h:       72px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #07071a;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Phone frame on desktop */
+.phone-shell {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  border-radius: 44px;
+  box-shadow: 0 0 0 10px #1a1a2e, 0 0 0 12px #0d0d1a, 0 40px 100px rgba(0,0,0,0.85);
+}
+@media (max-width: 430px) {
+  body { display: block; background: var(--bg); }
+  .phone-shell { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+}
+
+/* ── Top Bar ─────────────────────────────────────────────────── */
+.top-bar {
+  height: 56px;
+  padding: 0 8px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.top-bar-logo { width: 34px; height: 34px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.top-bar-logo img { width: 100%; height: 100%; object-fit: cover; }
+.top-bar-title { flex: 1; font-size: 19px; font-weight: 700; color: var(--text); }
+.pill-btn {
+  height: 28px; padding: 0 11px; border-radius: 14px;
+  border: 1.5px solid var(--primary); background: transparent;
+  color: var(--primary); font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.pill-btn:active { background: var(--pri-dim); }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 18px; transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active { background: var(--card-high); }
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.content-area { flex: 1; overflow: hidden; position: relative; }
+.screen {
+  position: absolute; inset: 0; overflow-y: auto;
+  -webkit-overflow-scrolling: touch; display: none; flex-direction: column;
+}
+.screen.active { display: flex; }
+
+/* ── Chips Bar ───────────────────────────────────────────────── */
+.chips-bar {
+  display: flex; gap: 8px; padding: 10px 14px; overflow-x: auto;
+  scrollbar-width: none; flex-shrink: 0; border-bottom: 1px solid var(--border);
+  background: var(--bg); position: sticky; top: 0; z-index: 5;
+}
+.chips-bar::-webkit-scrollbar { display: none; }
+.chip {
+  height: 30px; padding: 0 12px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: transparent; color: var(--muted); font-size: 12px; font-weight: 500;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+}
+.chip.active { background: var(--pri-cont); border-color: var(--primary); color: var(--primary); font-weight: 700; }
+
+/* ── Cards Grid ──────────────────────────────────────────────── */
+.cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 14px; }
+.m3-card {
+  background: var(--card); border-radius: 18px; padding: 14px 12px 12px;
+  cursor: pointer; transition: transform 0.15s, background 0.15s;
+  border: 1.5px solid var(--border); user-select: none; -webkit-tap-highlight-color: transparent; overflow: hidden;
+}
+.m3-card:active { transform: scale(0.97); background: var(--card-high); }
+.m3-card.featured { border-color: var(--primary); background: var(--pri-dim); }
+.card-img { width: 100%; height: 66px; object-fit: contain; margin-bottom: 8px; opacity: 0.88; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
+.card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.card-ref   { font-size: 10px; color: var(--primary); font-style: italic; margin-top: 4px;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Exercise Overlay ────────────────────────────────────────── */
+.exercise-overlay {
+  position: absolute; inset: 0; background: var(--bg); z-index: 50;
+  display: flex; flex-direction: column;
+  transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.2,0,0,1);
+}
+.exercise-overlay.open { transform: translateY(0); }
+
+.ex-top-bar {
+  height: 56px; display: flex; align-items: center; padding: 0 6px; gap: 2px;
+  flex-shrink: 0; background: var(--card); border-bottom: 1px solid var(--border);
+}
+.ex-mode-label { flex: 1; font-size: 15px; font-weight: 700; padding: 0 6px; color: var(--text); }
+.seg-control { display: flex; background: var(--bg); border-radius: 100px; padding: 3px; gap: 2px; }
+.seg-btn {
+  padding: 4px 12px; border-radius: 100px; border: none; background: transparent;
+  font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.seg-btn.active { background: var(--primary); color: #fff; box-shadow: 0 1px 6px rgba(108,99,255,0.4); }
+
+.ex-progress-track { height: 3px; background: var(--border); flex-shrink: 0; }
+.ex-progress-fill  { height: 100%; background: var(--primary); border-radius: 2px; transition: width 0.5s cubic-bezier(0.2,0,0,1); }
+
+.ex-body {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 18px 16px 8px; gap: 14px; overflow-y: auto;
+}
+.ex-question-label { font-size: 13px; color: var(--muted); text-align: center; font-weight: 500; }
+.ex-card {
+  width: 100%; max-width: 300px; background: var(--pri-dim); border: 1.5px solid var(--primary);
+  border-radius: 24px; padding: 22px 18px; text-align: center;
+}
+.ex-card-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.ex-card-main  { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.ex-card-sub   { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.ex-card-ref   { font-size: 10px; color: var(--primary); background: var(--pri-dim);
+                  border-radius: 100px; padding: 3px 10px; margin-top: 8px; display: inline-block; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--primary); color: #fff; border: none; border-radius: 100px;
+  padding: 12px 24px; font-size: 14px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(108,99,255,0.35); -webkit-tap-highlight-color: transparent; transition: all 0.2s;
+}
+.btn-primary:active { transform: scale(0.96); box-shadow: none; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--card-high); color: var(--text); border: 1.5px solid var(--border);
+  border-radius: 100px; padding: 11px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: all 0.2s;
+}
+.btn-secondary:active { background: var(--card); }
+
+.answer-grid { width: 100%; max-width: 320px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.answer-btn {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 16px;
+  padding: 14px 8px 12px; cursor: pointer; text-align: center; transition: all 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.answer-btn-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.answer-btn-sub  { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.answer-btn:active { transform: scale(0.96); }
+.answer-btn.correct { background: var(--succ-dim); border-color: var(--success); }
+.answer-btn.correct .answer-btn-name { color: var(--success); }
+.answer-btn.wrong   { background: var(--dang-dim);  border-color: var(--danger); }
+.answer-btn.wrong .answer-btn-name   { color: var(--danger); }
+
+.ex-stats {
+  display: flex; justify-content: center; gap: 22px; padding: 10px 16px 14px;
+  background: var(--card); border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.stat { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 700; }
+.stat.ok  { color: var(--success); }
+.stat.err { color: var(--danger); }
+.stat.str { color: var(--warning); }
+.stat.tot { color: var(--muted); font-weight: 500; }
+
+/* ── Bottom Sheet ────────────────────────────────────────────── */
+.sheet-backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,0); z-index: 60;
+  pointer-events: none; transition: background 0.3s;
+}
+.sheet-backdrop.open { background: rgba(0,0,0,0.55); pointer-events: all; }
+.bottom-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--card); border-radius: 24px 24px 0 0; z-index: 61;
+  max-height: 70%; overflow-y: auto; transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.2,0,0,1); padding: 0 0 28px;
+  border-top: 1px solid var(--border);
+}
+.bottom-sheet.open { transform: translateY(0); }
+.sheet-drag { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 6px; }
+.sheet-header { padding: 6px 18px 12px; font-size: 16px; font-weight: 700; color: var(--text); }
+.sheet-section { padding: 2px 18px 12px; }
+.sheet-section-label { font-size: 10px; font-weight: 700; color: var(--primary);
+                        text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── Progress Screen ─────────────────────────────────────────── */
+.progress-wrap { padding: 14px; }
+.screen-title { font-size: 20px; font-weight: 800; margin-bottom: 14px; color: var(--text); }
+.prog-card {
+  background: var(--card); border-radius: 18px; padding: 16px 18px;
+  margin-bottom: 10px; border: 1px solid var(--border);
+}
+.prog-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.prog-card-name { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.prog-card-img  { width: 20px; height: 20px; object-fit: contain; }
+.prog-card-pct  { font-size: 14px; font-weight: 800; }
+.prog-track { height: 7px; background: var(--card-high); border-radius: 4px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 4px; transition: width 1s; }
+.prog-detail { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+/* ── Settings Screen ─────────────────────────────────────────── */
+.settings-wrap { padding: 14px; }
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border); gap: 12px;
+}
+.setting-info-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.setting-info-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.setting-value     { font-size: 12px; color: var(--primary); font-weight: 700; white-space: nowrap; }
+.app-footer { margin-top: 28px; text-align: center; }
+.app-footer p { font-size: 11px; color: var(--muted); line-height: 1.9; }
+
+/* ── Bottom Navigation ───────────────────────────────────────── */
+.bottom-nav {
+  height: var(--nav-h); background: var(--card); border-top: 1px solid var(--border);
+  display: flex; flex-shrink: 0;
+}
+.nav-btn {
+  flex: 1; border: none; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 6px 4px 8px; -webkit-tap-highlight-color: transparent;
+}
+.nav-indicator {
+  width: 52px; height: 28px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+}
+.nav-btn.active .nav-indicator { background: var(--pri-cont); }
+.nav-icon { width: 20px; height: 20px; fill: var(--muted); transition: fill 0.2s; }
+.nav-btn.active .nav-icon { fill: var(--primary); }
+.nav-label-text { font-size: 10px; font-weight: 500; color: var(--muted); }
+.nav-btn.active .nav-label-text { color: var(--primary); font-weight: 700; }
+
+/* ── Snackbar ────────────────────────────────────────────────── */
+.snackbar {
+  position: absolute; bottom: calc(var(--nav-h) + 10px); left: 14px; right: 14px;
+  background: #1e1e3a; color: var(--text); border: 1px solid var(--border);
+  border-radius: 12px; padding: 11px 16px; font-size: 12px; font-weight: 500;
+  z-index: 80; display: flex; align-items: center; gap: 10px;
+  opacity: 0; transform: translateY(6px); transition: all 0.3s cubic-bezier(0.2,0,0,1);
+  pointer-events: none;
+}
+.snackbar.show { opacity: 1; transform: translateY(0); }
+.snackbar.ok  { background: #0a2a1e; color: var(--success); border-color: var(--success); }
+.snackbar.err { background: #2a0a10; color: var(--danger);  border-color: var(--danger); }
+
+/* ── Chatbot ─────────────────────────────────────────────────── */
+.chat-fab {
+  position: absolute; bottom: calc(var(--nav-h) + 14px); right: 14px;
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--primary), #9c5cff);
+  border-radius: 50%; border: none; cursor: pointer; z-index: 70;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(108,99,255,0.5); transition: transform 0.2s;
+  font-size: 22px; color: #fff;
+}
+.chat-fab:active { transform: scale(0.93); }
+
+.chat-panel {
+  position: absolute; bottom: calc(var(--nav-h) + 72px); left: 10px; right: 10px;
+  height: 360px;
+  background: var(--card); border-radius: 20px;
+  border: 1px solid rgba(108,99,255,0.3);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  display: none; flex-direction: column; z-index: 75; overflow: hidden;
+}
+.chat-panel.open { display: flex; }
+.chat-head {
+  background: linear-gradient(135deg, var(--primary), #9c5cff);
+  padding: 14px 16px; color: #fff; display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.chat-head h4 { margin: 0; font-size: 14px; }
+.chat-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; line-height: 1; }
+.chat-msgs {
+  flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.chat-msg {
+  max-width: 85%; padding: 9px 12px; border-radius: 12px;
+  line-height: 1.5; font-size: 12px;
+}
+.chat-msg.user      { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-msg.assistant { background: var(--pri-dim); color: var(--text); align-self: flex-start;
+                       border-bottom-left-radius: 4px; border: 1px solid rgba(108,99,255,0.2); }
+.chat-msg.loading   { background: var(--card-high); color: var(--muted); align-self: flex-start; }
+.chat-chips { padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 5px;
+               border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.chat-chip {
+  background: var(--pri-dim); border: 1px solid rgba(108,99,255,0.3);
+  padding: 4px 10px; border-radius: 20px; font-size: 10px; cursor: pointer;
+  color: var(--text); transition: all 0.2s;
+}
+.chat-chip:hover, .chat-chip:active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.chat-input-row {
+  padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 7px; flex-shrink: 0;
+}
+.chat-input {
+  flex: 1; background: var(--card-high); border: 1.5px solid rgba(108,99,255,0.3);
+  border-radius: 10px; padding: 8px 10px; color: var(--text); font-size: 12px; resize: none;
+  font-family: inherit;
+}
+.chat-input:focus { outline: none; border-color: var(--primary); }
+.chat-send {
+  background: var(--primary); border: none; border-radius: 10px; padding: 8px 12px;
+  color: #fff; cursor: pointer; font-size: 14px; transition: opacity 0.2s;
+}
+.chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Audio ring ──────────────────────────────────────────────── */
+@keyframes ring { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(1.7); opacity:0; } }
+.ring {
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--primary); position: relative; margin-right: 4px;
+}
+.ring::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: var(--primary); animation: ring 0.9s ease-out infinite;
+}
+</style>
+</head>
+<body>
+<div class="phone-shell">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-logo">
+      <img src="img/audikus_icon.png" alt="Audikus"
+           onerror="this.parentElement.style.background='#6c63ff';this.style.display='none'">
+    </div>
+    <div class="top-bar-title">Audikus</div>
+    <button class="pill-btn" id="tuningPill" onclick="toggleTuning()">A=440Hz</button>
+    <button class="icon-btn" onclick="toggleLang()" title="Idioma">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- APRENDER -->
+    <div class="screen active" id="screen-learn">
+      <div class="chips-bar" id="learnChips"></div>
+      <div class="cards-grid" id="learnCards"></div>
+    </div>
+
+    <!-- PRACTICAR -->
+    <div class="screen" id="screen-practice">
+      <div class="chips-bar" id="practiceChips"></div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:32px 16px;">
+        <div style="text-align:center;max-width:260px;">
+          <img src="img/intervalos.png" style="width:76px;height:76px;object-fit:contain;opacity:0.45;margin-bottom:16px;" onerror="this.style.display='none'">
+          <div style="font-size:17px;font-weight:700;margin-bottom:8px;color:var(--text);">Modo Práctica</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;">
+            Selecciona un modo arriba y toca Comenzar, o entra desde las tarjetas de Aprender.
+          </div>
+          <button class="btn-primary" onclick="openExercise('intervalos','test')">&#9654; Comenzar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESO -->
+    <div class="screen" id="screen-progress">
+      <div class="progress-wrap" id="progressContent"></div>
+    </div>
+
+    <!-- AJUSTES -->
+    <div class="screen" id="screen-settings">
+      <div class="settings-wrap" id="settingsContent"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-learn" onclick="switchTab('learn')">
+      <div class="nav-indicator">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+      </div>
+      <div class="nav-label-text">Aprender</div>
+    </button>
+    <button class="nav-btn" id="nav-practice" onclick="switchTab('practice')">
+      <div class="nav-indicator">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+      <div class="nav-label-text">Practicar</div>
+    </button>
+    <button class="nav-btn" id="nav-progress" onclick="switchTab('progress')">
+      <div class="nav-indicator">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      </div>
+      <div class="nav-label-text">Progreso</div>
+    </button>
+    <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')">
+      <div class="nav-indicator">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+      </div>
+      <div class="nav-label-text">Ajustes</div>
+    </button>
+  </div>
+
+  <!-- EXERCISE OVERLAY -->
+  <div class="exercise-overlay" id="exerciseOverlay">
+    <div class="ex-top-bar">
+      <button class="icon-btn" onclick="closeExercise()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--muted)"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      </button>
+      <div class="ex-mode-label" id="exLabel">Intervalos</div>
+      <div class="seg-control">
+        <button class="seg-btn" id="segStudy" onclick="setExMode('study')">Estudio</button>
+        <button class="seg-btn active" id="segTest"  onclick="setExMode('test')">Prueba</button>
+      </div>
+      <button class="icon-btn" onclick="openSheet()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--muted)"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+    </div>
+    <div class="ex-progress-track">
+      <div class="ex-progress-fill" id="exProgress" style="width:0%"></div>
+    </div>
+    <div class="ex-body" id="exBody"></div>
+    <div class="ex-stats">
+      <div class="stat ok">&#10003; <span id="sOk">0</span></div>
+      <div class="stat err">&#10007; <span id="sErr">0</span></div>
+      <div class="stat str">&#9733; <span id="sStr">0</span></div>
+      <div class="stat tot">/ <span id="sTot">0</span></div>
+    </div>
+
+    <!-- Sheet backdrop inside overlay -->
+    <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-drag"></div>
+      <div class="sheet-header">Configuración — <span id="sheetModeLabel">Intervalos</span></div>
+      <div class="sheet-section">
+        <div class="sheet-section-label">Intervalos activos</div>
+        <div class="chip-group" id="sheetIntervalChips"></div>
+      </div>
+      <div class="sheet-section">
+        <div class="sheet-section-label">Presentación</div>
+        <div class="chip-group">
+          <button class="chip active" onclick="toggleChip(this)">Melódico</button>
+          <button class="chip" onclick="toggleChip(this)">Armónico</button>
+        </div>
+      </div>
+      <div class="sheet-section">
+        <div class="sheet-section-label">Dirección</div>
+        <div class="chip-group">
+          <button class="chip active" onclick="toggleChip(this)">Ascendente</button>
+          <button class="chip" onclick="toggleChip(this)">Descendente</button>
+        </div>
+      </div>
+      <div class="sheet-section">
+        <div class="sheet-section-label">Registro vocal</div>
+        <div class="chip-group">
+          <button class="chip" onclick="toggleChip(this)">Grave</button>
+          <button class="chip active" onclick="toggleChip(this)">Medio</button>
+          <button class="chip" onclick="toggleChip(this)">Agudo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHATBOT FAB -->
+  <button class="chat-fab" id="chatFab" onclick="toggleChat()">💬</button>
+
+  <!-- CHAT PANEL -->
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-head">
+      <h4>🎵 Asistente de Teoría Musical</h4>
+      <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-chips" id="chatChips"></div>
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="chat-msg assistant">¡Hola! Soy tu asistente de teoría musical. Pregúntame sobre intervalos, acordes, escalas o estrategias de estudio. 🎵</div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chatInput" placeholder="Pregunta sobre teoría musical..." rows="1"
+                onkeypress="chatKey(event)"></textarea>
+      <button class="chat-send" onclick="sendChat()" id="chatSendBtn">&#9658;</button>
+    </div>
+  </div>
+
+  <!-- SNACKBAR -->
+  <div class="snackbar" id="snackbar"></div>
+
+</div><!-- /phone-shell -->
+
+<script>
+// ── AUDIO (Tone.js — idéntico al app real) ─────────────────────
+let synth = null;
+let audioReady = false;
+let tuningA = 440;
+
+async function initAudio() {
+  if (audioReady) return;
+  await Tone.start();
+  synth = new Tone.PolySynth(Tone.Synth).toDestination();
+  audioReady = true;
+}
+
+function getFreq(semitones, octave = 4) {
+  const c4 = tuningA * Math.pow(2, -9/12);
+  return c4 * Math.pow(2, octave - 4) * Math.pow(2, semitones / 12);
+}
+
+function playInterval(semi, harmonic) {
+  if (!audioReady) { initAudio().then(() => playInterval(semi, harmonic)); return; }
+  synth.releaseAll();
+  const now = Tone.now();
+  if (harmonic) {
+    synth.triggerAttackRelease(getFreq(0),    '1.5', now);
+    synth.triggerAttackRelease(getFreq(semi), '1.5', now);
+  } else {
+    synth.triggerAttackRelease(getFreq(0),    '0.5', now);
+    synth.triggerAttackRelease(getFreq(semi), '0.6', now + 0.65);
+  }
+}
+
+// ── DATA ───────────────────────────────────────────────────────
+const MODES = [
+  { id:'intervalos',   img:'img/intervalos.png',   label:'Intervalos',    sub:'12 tipos' },
+  { id:'triadas',      img:'img/triadas.png',       label:'Tríadas',       sub:'4 tipos'  },
+  { id:'inversiones',  img:'img/inversiones.png',   label:'Inversiones',   sub:'Tríadas'  },
+  { id:'septimas',     img:'img/septimas.png',       label:'Séptimas',      sub:'4 notas'  },
+  { id:'progresiones', img:'img/progresiones.png',  label:'Progresiones',  sub:'Armonía'  },
+  { id:'escalas',      img:'img/escalas.png',       label:'Escalas',       sub:'Modos'    },
+  { id:'notas',        img:'img/nota_absoluta.png', label:'Nota Absoluta', sub:'Altura'   },
+  { id:'entonacion',   img:'img/intervalos.png',    label:'Entonación',    sub:'Canta'    },
+];
+
+// Nombres exactos del app real, con canciones de referencia reales
+const INTERVALS = [
+  { name:'Segunda menor (m2)', abbr:'2m', semi:1,  ref:'Für Elise — Beethoven' },
+  { name:'Segunda mayor (M2)', abbr:'2M', semi:2,  ref:'Cumpleaños Feliz — tradicional' },
+  { name:'Tercera menor (m3)', abbr:'3m', semi:3,  ref:'Greensleeves — tradicional' },
+  { name:'Tercera mayor (M3)', abbr:'3M', semi:4,  ref:'La Hormiguita — tradicional' },
+  { name:'Cuarta justa (P4)',  abbr:'4J', semi:5,  ref:'El San Juanero — colombiana' },
+  { name:'Tritono (TT)',       abbr:'TT', semi:6,  ref:'Los Simpsons — Danny Elfman' },
+  { name:'Quinta justa (P5)',  abbr:'5J', semi:7,  ref:'Estrellita — tradicional' },
+  { name:'Sexta menor (m6)',   abbr:'6m', semi:8,  ref:'The Entertainer — Scott Joplin' },
+  { name:'Sexta mayor (M6)',   abbr:'6M', semi:9,  ref:'Mambrú — tradicional' },
+  { name:'Séptima menor (m7)', abbr:'7m', semi:10, ref:'The Winner Takes It All — ABBA' },
+  { name:'Séptima mayor (M7)', abbr:'7M', semi:11, ref:'Somewhere — West Side Story' },
+  { name:'Octava (P8)',        abbr:'P8', semi:12, ref:'My Bonnie Lies Over the Ocean' },
+];
+
+const TRIADAS = [
+  { name:'Mayor — Fundamental',   intervals:[0,4,7]  },
+  { name:'Mayor — 1ª Inversión',  intervals:[0,3,8]  },
+  { name:'Mayor — 2ª Inversión',  intervals:[0,5,9]  },
+  { name:'Menor — Fundamental',   intervals:[0,3,7]  },
+  { name:'Menor — 1ª Inversión',  intervals:[0,4,9]  },
+  { name:'Menor — 2ª Inversión',  intervals:[0,5,8]  },
+  { name:'Aumentado — Fundamental',intervals:[0,4,8] },
+  { name:'Disminuido — Fundamental',intervals:[0,3,6]},
+];
+
+const PROGRESS_DATA = [
+  { mode:'Intervalos',  img:'img/intervalos.png',  correct:45, total:60, best:'Tercera Mayor (M3)', worst:'Tritono (TT)' },
+  { mode:'Tríadas',     img:'img/triadas.png',      correct:28, total:40, best:'Mayor',            worst:'Disminuida'   },
+  { mode:'Escalas',     img:'img/escalas.png',      correct:12, total:20, best:'Mayor',            worst:'Frigio'       },
+  { mode:'Séptimas',    img:'img/septimas.png',     correct:8,  total:15, best:'Dom7',             worst:'Semi-dis.'    },
+];
+
+// ── STATE ──────────────────────────────────────────────────────
+let currentMode  = 'intervalos';
+let exerciseMode = 'test';
+let exModeId     = 'intervalos';
+let stats        = { ok:0, err:0, streak:0, total:0 };
+let answered     = false;
+let currentQ     = null;
+let lang         = 'es';
+
+// ── INIT ───────────────────────────────────────────────────────
+function init() {
+  // init audio on first interaction
+  document.addEventListener('click', initAudio, { once: true });
+  renderLearnChips();
+  renderPracticeChips();
+  renderLearnCards();
+  renderProgress();
+  renderSettings();
+  renderSheetIntervals();
+  renderChatChips();
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+}
+
+// ── CHIPS ──────────────────────────────────────────────────────
+function renderChips(id, fn) {
+  document.getElementById(id).innerHTML = MODES.map(m =>
+    '<button class="chip' + (m.id === currentMode ? ' active' : '') +
+    '" onclick="' + fn + '(\'' + m.id + '\')">' + m.label + '</button>'
+  ).join('');
+}
+function renderLearnChips()    { renderChips('learnChips',    'selectMode'); }
+function renderPracticeChips() { renderChips('practiceChips', 'selectMode'); }
+
+function selectMode(id) {
+  currentMode = id;
+  renderLearnChips();
+  renderPracticeChips();
+  renderLearnCards();
+}
+
+// ── LEARN CARDS ────────────────────────────────────────────────
+function renderLearnCards() {
+  const c = document.getElementById('learnCards');
+  const m = MODES.find(x => x.id === currentMode);
+
+  if (currentMode === 'intervalos') {
+    c.innerHTML = INTERVALS.map((iv, i) =>
+      '<div class="m3-card' + (i===0?' featured':'') +
+      '" onclick="openExercise(\'intervalos\',\'study\',' + i + ')">' +
+        '<img class="card-img" src="img/intervalos.png" alt="" onerror="this.style.display=\'none\'">' +
+        '<div class="card-title">' + iv.name + '</div>' +
+        '<div class="card-sub">' + iv.semi + ' semitono' + (iv.semi!==1?'s':'') + '</div>' +
+        '<div class="card-ref">' + iv.ref + '</div>' +
+      '</div>'
+    ).join('');
+
+  } else if (currentMode === 'triadas') {
+    c.innerHTML = TRIADAS.map((t, i) =>
+      '<div class="m3-card' + (i===0?' featured':'') +
+      '" onclick="openExercise(\'triadas\',\'study\',' + i + ')">' +
+        '<img class="card-img" src="img/triadas.png" alt="" onerror="this.style.display=\'none\'">' +
+        '<div class="card-title">' + t.name + '</div>' +
+        '<div class="card-sub">' + t.intervals.join(' — ') + ' sem.</div>' +
+      '</div>'
+    ).join('');
+
+  } else {
+    // Para los otros modos: placeholder representativo
+    c.innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:36px 16px;">' +
+        '<img src="' + m.img + '" style="width:80px;height:80px;object-fit:contain;margin-bottom:16px;" onerror="this.style.display=\'none\'">' +
+        '<div style="font-size:17px;font-weight:800;margin-bottom:6px;color:var(--text);">' + m.label + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.6;">' + m.sub + '</div>' +
+        '<div style="font-size:11px;color:var(--primary);margin-bottom:20px;">(Prototipo — el contenido real se migra del app actual)</div>' +
+        '<button class="btn-primary" style="margin:4px;" onclick="openExercise(\'' + m.id + '\',\'study\')">Estudiar</button>' +
+        '<button class="btn-secondary" style="margin:4px;" onclick="openExercise(\'' + m.id + '\',\'test\')">Practicar</button>' +
+      '</div>';
+  }
+}
+
+// ── EXERCISE OVERLAY ───────────────────────────────────────────
+function openExercise(modeId, mode, idx) {
+  exModeId     = modeId || currentMode;
+  exerciseMode = mode || 'test';
+  stats        = { ok:0, err:0, streak:0, total:0 };
+  answered     = false;
+  const m = MODES.find(x => x.id === exModeId);
+  document.getElementById('exLabel').textContent        = m.label;
+  document.getElementById('sheetModeLabel').textContent = m.label;
+  document.getElementById('segStudy').classList.toggle('active', exerciseMode === 'study');
+  document.getElementById('segTest').classList.toggle('active',  exerciseMode === 'test');
+  updateStats();
+  if (exerciseMode === 'study') renderStudyCard(idx || 0);
+  else nextQuestion();
+  document.getElementById('exerciseOverlay').classList.add('open');
+}
+
+function closeExercise() {
+  document.getElementById('exerciseOverlay').classList.remove('open');
+  closeSheet();
+}
+
+function setExMode(mode) {
+  exerciseMode = mode;
+  document.getElementById('segStudy').classList.toggle('active', mode === 'study');
+  document.getElementById('segTest').classList.toggle('active',  mode === 'test');
+  if (mode === 'study') renderStudyCard(0);
+  else nextQuestion();
+}
+
+// ── STUDY CARD ─────────────────────────────────────────────────
+function renderStudyCard(idx) {
+  const pool = exModeId === 'triadas' ? TRIADAS : INTERVALS;
+  const item = pool[idx];
+  const pct  = Math.round((idx + 1) / pool.length * 100);
+  document.getElementById('exProgress').style.width = pct + '%';
+
+  const prev = idx > 0
+    ? '<button class="icon-btn" onclick="renderStudyCard(' + (idx-1) + ')" style="background:var(--card);">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="var(--muted)"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>'
+    : '<div style="width:40px"></div>';
+  const next = idx < pool.length - 1
+    ? '<button class="icon-btn" onclick="renderStudyCard(' + (idx+1) + ')" style="background:var(--card);">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="var(--muted)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>'
+    : '<div style="width:40px"></div>';
+
+  const isInterval = exModeId !== 'triadas';
+  const cardHtml = isInterval
+    ? '<div class="ex-card">' +
+        '<div class="ex-card-label">Nombre</div>' +
+        '<div class="ex-card-main">' + item.name + '</div>' +
+        '<div class="ex-card-sub">Do → ' + noteFromSemi(item.semi) + ' · ' + item.semi + ' semitono' + (item.semi!==1?'s':'') + '</div>' +
+        '<div class="ex-card-ref">' + item.ref + '</div>' +
+      '</div>'
+    : '<div class="ex-card">' +
+        '<div class="ex-card-label">Acorde</div>' +
+        '<div class="ex-card-main">' + item.name + '</div>' +
+        '<div class="ex-card-sub">Semitonos: ' + item.intervals.join(' — ') + '</div>' +
+      '</div>';
+
+  const playBtn = isInterval
+    ? '<button class="btn-primary" onclick="playInterval(' + item.semi + ', false); showSnack(\'Reproduciendo: ' + item.name.replace(/'/g,"\\'") + '\', \'\')">&#9654; Melódico</button>' +
+      '<button class="btn-secondary" onclick="playInterval(' + item.semi + ', true); showSnack(\'Armónico: ' + item.name.replace(/'/g,"\\'") + '\', \'\')">&#9834; Armónico</button>'
+    : '<button class="btn-primary" onclick="playTriada(' + JSON.stringify(item.intervals) + ', false)">&#9654; Arpegio</button>' +
+      '<button class="btn-secondary" onclick="playTriada(' + JSON.stringify(item.intervals) + ', true)">&#9834; Armónico</button>';
+
+  document.getElementById('exBody').innerHTML =
+    '<div class="ex-question-label">Elemento ' + (idx+1) + ' de ' + pool.length + '</div>' +
+    cardHtml + playBtn +
+    '<div style="display:flex;gap:12px;align-items:center;">' + prev +
+    '<div style="font-size:11px;color:var(--muted);">' + item.name + '</div>' + next + '</div>';
+}
+
+function playTriada(intervals, harmonic) {
+  if (!audioReady) { initAudio().then(() => playTriada(intervals, harmonic)); return; }
+  synth.releaseAll();
+  const now = Tone.now();
+  if (harmonic) {
+    intervals.forEach(s => synth.triggerAttackRelease(getFreq(s), '1.5', now));
+  } else {
+    intervals.forEach((s, i) => synth.triggerAttackRelease(getFreq(s), '0.4', now + i * 0.35));
+  }
+}
+
+// ── TEST QUESTION ──────────────────────────────────────────────
+function nextQuestion() {
+  answered = false;
+  const pool = exModeId === 'triadas' ? TRIADAS : INTERVALS;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  currentQ  = pick;
+  const others  = pool.filter(x => x.name !== pick.name).sort(() => Math.random()-0.5).slice(0,3);
+  const options = [...others, pick].sort(() => Math.random()-0.5);
+
+  document.getElementById('exBody').innerHTML =
+    '<div class="ex-question-label">¿Qué ' + (exModeId==='triadas'?'acorde':'intervalo') + ' escuchas?</div>' +
+    '<div class="ex-card" style="background:var(--card-high);border-color:var(--border);">' +
+      '<div class="ex-card-label">Reproduciendo...</div>' +
+      '<div class="ex-card-main" style="font-size:40px;">?</div>' +
+      '<div class="ex-card-sub">Escucha y elige la respuesta</div>' +
+    '</div>' +
+    '<button class="btn-primary" id="playBtn" onclick="doPlay()">&#9654; Reproducir</button>' +
+    '<div class="answer-grid">' +
+      options.map(op =>
+        '<button class="answer-btn" onclick="answerQ(this,' + (op.name===pick.name) + ',\'' + pick.name.replace(/'/g,"\\'") + '\'' +
+        (pick.ref ? ',\'' + pick.ref.replace(/'/g,"\\'") + '\'' : ",''" ) + ')">' +
+          '<div class="answer-btn-name">' + op.name + '</div>' +
+          (op.semi !== undefined ? '<div class="answer-btn-sub">' + op.semi + ' sem.</div>' : '') +
+        '</button>'
+      ).join('') +
+    '</div>';
+
+  setTimeout(doPlay, 400);
+}
+
+function doPlay() {
+  if (exModeId === 'triadas') {
+    playTriada(currentQ.intervals, false);
+  } else {
+    playInterval(currentQ.semi, false);
+  }
+  const btn = document.getElementById('playBtn');
+  if (btn) {
+    btn.innerHTML = '<span class="ring"></span> Reproduciendo...';
+    setTimeout(() => { if (btn) btn.innerHTML = '&#9654; Reproducir'; }, 1800);
+  }
+}
+
+function answerQ(btn, correct, correctName, ref) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.answer-btn').forEach(b => {
+    b.onclick = null; b.style.opacity = '0.35';
+    if (b.querySelector('.answer-btn-name').textContent === correctName) {
+      b.classList.add('correct'); b.style.opacity = '1';
+    }
+  });
+  btn.style.opacity = '1';
+  if (!correct) btn.classList.add('wrong');
+  if (correct) {
+    stats.ok++; stats.streak++;
+    showSnack('¡Correcto! ' + (ref ? '· ' + ref : ''), 'ok');
+  } else {
+    stats.err++; stats.streak = 0;
+    showSnack('Era ' + correctName + (ref ? ' — ' + ref : ''), 'err');
+  }
+  stats.total++;
+  updateStats();
+  setTimeout(nextQuestion, 2200);
+}
+
+function updateStats() {
+  document.getElementById('sOk').textContent  = stats.ok;
+  document.getElementById('sErr').textContent = stats.err;
+  document.getElementById('sStr').textContent = stats.streak;
+  document.getElementById('sTot').textContent = stats.total;
+  const pct = stats.total ? Math.round(stats.ok / stats.total * 100) : 0;
+  document.getElementById('exProgress').style.width = pct + '%';
+}
+
+// ── SETTINGS SHEET ─────────────────────────────────────────────
+function openSheet()  {
+  document.getElementById('sheetBackdrop').classList.add('open');
+  document.getElementById('bottomSheet').classList.add('open');
+}
+function closeSheet() {
+  document.getElementById('sheetBackdrop').classList.remove('open');
+  document.getElementById('bottomSheet').classList.remove('open');
+}
+function renderSheetIntervals() {
+  document.getElementById('sheetIntervalChips').innerHTML = INTERVALS.map(iv =>
+    '<button class="chip active" onclick="toggleChip(this)">' + iv.abbr + '</button>'
+  ).join('');
+}
+function toggleChip(btn) { btn.classList.toggle('active'); }
+
+// ── PROGRESS ───────────────────────────────────────────────────
+function renderProgress() {
+  document.getElementById('progressContent').innerHTML =
+    '<div class="screen-title">Mi Progreso</div>' +
+    PROGRESS_DATA.map(p => {
+      const pct = Math.round(p.correct / p.total * 100);
+      const col = pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)';
+      return '<div class="prog-card">' +
+        '<div class="prog-card-header">' +
+          '<div class="prog-card-name">' +
+            '<img class="prog-card-img" src="' + p.img + '" alt="" onerror="this.style.display=\'none\'">' +
+            p.mode + '</div>' +
+          '<div class="prog-card-pct" style="color:' + col + ';">' + pct + '%</div>' +
+        '</div>' +
+        '<div class="prog-track"><div class="prog-fill" style="width:' + pct + '%;background:' + col + ';"></div></div>' +
+        '<div class="prog-detail">Correctas: ' + p.correct + '/' + p.total +
+        ' · Mejor: ' + p.best + ' · Pendiente: ' + p.worst + '</div>' +
+      '</div>';
+    }).join('') +
+    '<div class="prog-card" style="text-align:center;">' +
+      '<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--muted);">Racha de hoy</div>' +
+      '<div style="font-size:38px;font-weight:900;color:var(--warning);">' + stats.streak + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:4px;">ejercicios consecutivos correctos</div>' +
+    '</div>';
+}
+
+// ── SETTINGS ───────────────────────────────────────────────────
+function renderSettings() {
+  document.getElementById('settingsContent').innerHTML =
+    '<div class="screen-title">Ajustes</div>' +
+    row('Afinación',              'Frecuencia de referencia A',   '<button class="pill-btn" id="sTuning" onclick="toggleTuning()">A=440Hz</button>') +
+    row('Idioma',                 'Language / Idioma',            '<span class="setting-value">ES</span>') +
+    row('Tolerancia vocal',       'Margen en Entonación',         '<span class="setting-value">±50 cents</span>') +
+    row('Modo oscuro',            'Tema de la aplicación',        '<span class="setting-value">Sistema</span>') +
+    row('Sonido de confirmación', 'Beep al responder correctamente', '<span class="setting-value">Activado</span>') +
+    '<div class="app-footer">' +
+      '<p>Audikus — Oído Musical<br>Mtro. Andrés Chávez · Educación Musical<br>Versión 2.0 (prototipo)</p>' +
+    '</div>';
+}
+function row(n, s, a) {
+  return '<div class="setting-row"><div><div class="setting-info-name">' + n +
+    '</div><div class="setting-info-sub">' + s + '</div></div><div>' + a + '</div></div>';
+}
+
+// ── CHATBOT ────────────────────────────────────────────────────
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  const fab   = document.getElementById('chatFab');
+  panel.classList.toggle('open');
+  fab.textContent = panel.classList.contains('open') ? '×' : '💬';
+}
+
+const CHAT_CHIPS = [
+  { text:'¿Qué es un intervalo?',  q:'¿Qué es un intervalo?' },
+  { text:'Tercera mayor',          q:'¿Qué es una tercera mayor?' },
+  { text:'Tritono',                q:'¿Qué es el tritono?' },
+  { text:'Consejo de estudio',     q:'¿Cómo mejorar el oído musical?' },
+];
+
+function renderChatChips() {
+  document.getElementById('chatChips').innerHTML = CHAT_CHIPS.map(c =>
+    '<button class="chat-chip" onclick="askChat(\'' + c.q.replace(/'/g,"\\'") + '\')">' + c.text + '</button>'
+  ).join('');
+}
+
+function chatKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+function askChat(q) { document.getElementById('chatInput').value = q; sendChat(); }
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg   = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addChatMsg('user', msg);
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true;
+  const lid = addChatMsg('loading', '🎼 Pensando...');
+  setTimeout(() => {
+    removeChatMsg(lid);
+    addChatMsg('assistant', getChatResponse(msg));
+    btn.disabled = false;
+  }, 500);
+}
+
+function addChatMsg(type, content) {
+  const c = document.getElementById('chatMsgs');
+  const d = document.createElement('div');
+  const id = 'cm' + Date.now();
+  d.className = 'chat-msg ' + type; d.id = id;
+  d.innerHTML = content.replace(/\n/g,'<br>');
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  return id;
+}
+function removeChatMsg(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+function getChatResponse(q) {
+  const n = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const t = n(q);
+  const has = (...w) => w.some(x => t.includes(n(x)));
+  const musical = ['intervalo','acorde','escala','progresion','triada','septima','inversion',
+                   'tonica','dominante','cadencia','modo','nota','semitono','tono','octava',
+                   'quinta','cuarta','tercera','segunda','sexta','mayor','menor','disminuido',
+                   'aumentado','armonico','melodico','ritmo','oido','estudiar','practicar',
+                   'afinar','afinacion','altura','agudo','grave','entonacion','tritono'];
+  if (!musical.some(w => t.includes(w)))
+    return '⚠️ Solo puedo responder preguntas sobre <strong>teoría musical</strong> y los temas de la app: intervalos, acordes, escalas y estrategias de estudio. ¿Tienes una pregunta musical?';
+
+  if (has('intervalo') && !has('segunda','tercera','cuarta','quinta','sexta','septima','octava','tritono'))
+    return '🎵 <strong>¿Qué es un Intervalo?</strong><br><br>Es la <strong>distancia en altura</strong> entre dos notas musicales, medida en semitonos.<br><br>• Melódico: notas una después de otra<br>• Armónico: notas simultáneas<br><br>Se clasifican por tamaño: 2ª · 3ª · 4ª · 5ª · 6ª · 7ª · 8ª<br>Y por calidad: Mayor / Menor / Justa / Aumentada / Disminuida 🎯';
+
+  if (has('tercera mayor','3ª mayor','m3','tercera mayor'))
+    return '🎵 <strong>Tercera Mayor (M3)</strong><br><br>Distancia de <strong>4 semitonos</strong>. Es el intervalo más característico de los acordes <strong>mayores</strong> — suena brillante y alegre.<br><br>Referencia: <em>La Hormiguita</em> / <em>When the Saints Go Marching In</em><br><br>Do → Mi = Tercera Mayor ☀️';
+
+  if (has('tritono','triton','tt'))
+    return '⚡ <strong>Tritono (TT)</strong><br><br>Distancia de <strong>6 semitonos</strong>. Es el intervalo más tenso y disonante de la música occidental — históricamente llamado <em>diabolus in musica</em>.<br><br>Referencia: <em>Los Simpsons</em> — Danny Elfman / <em>Danse Macabre</em><br><br>Se resuelve naturalmente a la 5ª justa o la 6ª menor. 💢';
+
+  if (has('estudiar','mejorar','oido','consejos','practicar','como','cómo'))
+    return '🎯 <strong>Consejos para desarrollar el oído</strong><br><br>1. <strong>Consistencia diaria</strong> — 15 minutos cada día supera a 2 horas una vez a la semana<br>2. <strong>Asocia con canciones</strong> — cada intervalo tiene su canción de referencia<br>3. <strong>Canta mientras escuchas</strong> — activa el aprendizaje activo<br>4. <strong>Empieza por los más fáciles</strong> — 4ª justa, 5ª justa, octava, 3ª mayor<br>5. <strong>Usa el modo Estudio</strong> antes de ir a Prueba 📚';
+
+  if (has('quinta justa','5ª justa','p5'))
+    return '⭐ <strong>Quinta Justa (P5)</strong><br><br>Distancia de <strong>7 semitonos</strong>. Uno de los intervalos más consonantes y estables — es la base de la armonía tonal.<br><br>Referencia: <em>Estrellita / Twinkle Twinkle</em> · <em>Star Wars</em><br><br>Do → Sol = Quinta Justa 🌟';
+
+  if (has('cuarta justa','4ª justa','p4'))
+    return '🎵 <strong>Cuarta Justa (P4)</strong><br><br>Distancia de <strong>5 semitonos</strong>. Consonante, relacionada directamente con la quinta por inversión.<br><br>Referencia: <em>El San Juanero</em> / <em>Here Comes the Bride</em><br><br>Do → Fa = Cuarta Justa';
+
+  if (has('segunda mayor','2ª mayor','m2 mayor'))
+    return '🎵 <strong>Segunda Mayor (M2)</strong><br><br>Distancia de <strong>2 semitonos</strong>. Es el paso de una nota a la siguiente en la escala mayor — muy común en melodías.<br><br>Referencia: <em>Cumpleaños Feliz</em> (primeras dos notas)<br><br>Do → Re = Segunda Mayor';
+
+  if (has('segunda menor','2ª menor','m2'))
+    return '🎵 <strong>Segunda Menor (m2)</strong><br><br>Distancia de <strong>1 semitono</strong>. El intervalo más pequeño del sistema temperado occidental — crea tensión y suspenso.<br><br>Referencia: <em>Für Elise</em> — Beethoven<br><br>Do → Do♯ = Segunda Menor 😰';
+
+  if (has('acorde','triada','tríada'))
+    return '🎹 <strong>¿Qué es un Acorde?</strong><br><br>Conjunto de <strong>3+ notas</strong> que suenan simultáneamente.<br><br><strong>Tríadas básicas:</strong><br>• Mayor: 0-4-7 sem. ☀️ brillante<br>• Menor: 0-3-7 sem. 🌙 oscuro<br>• Aumentado: 0-4-8 sem. ⚡ tenso<br>• Disminuido: 0-3-6 sem. 💢 inestable<br><br>Se construyen apilando <strong>terceras</strong> sobre una nota raíz.';
+
+  return '🎵 Buena pregunta. Los intervalos son la base del entrenamiento auditivo. Te recomiendo practicar en el <strong>Modo Estudio</strong> de Intervalos para familiarizarte con cada uno. ¿Tienes alguna duda específica sobre un intervalo en particular?';
+}
+
+// ── UTILS ──────────────────────────────────────────────────────
+const NOTES = ['Do','Do♯','Re','Re♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si'];
+function noteFromSemi(s) { return NOTES[s % 12]; }
+
+let snackTimer;
+function showSnack(msg, type) {
+  const s = document.getElementById('snackbar');
+  s.textContent = msg;
+  s.className   = 'snackbar show' + (type ? ' ' + type : '');
+  clearTimeout(snackTimer);
+  snackTimer = setTimeout(() => s.classList.remove('show'), 2600);
+}
+
+function toggleTuning() {
+  tuningA = tuningA === 440 ? 442 : 440;
+  const txt = 'A=' + tuningA + 'Hz';
+  ['tuningPill','sTuning'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = txt; });
+  showSnack('Afinación cambiada a ' + txt, '');
+}
+
+function toggleLang() {
+  lang = lang === 'es' ? 'en' : 'es';
+  showSnack('Language: ' + (lang === 'es' ? 'Español' : 'English'), '');
+}
+
+init();
+</script>
+</body>
+</html>
