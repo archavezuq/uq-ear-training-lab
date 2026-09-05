@@ -1255,15 +1255,15 @@ const musicData = {
     { name:'Mayor 7#5',    intervals:[0,4,8,11] }, { name:'Disminuido 7', intervals:[0,3,6,9]  }
   ],
   progresiones: [
-    // Conducción de voces: cada voz se mueve al intervalo más cercano
-    { name:'I - IV - V - I (Mayor)',    chords:[[0,4,7],[0,5,9],[-1,2,7],[0,4,7]] },
-    { name:'I - V - vi - IV (Mayor)',   chords:[[0,4,7],[-1,2,7],[0,4,9],[0,5,9]] },
-    { name:'ii - V - I (Mayor)',        chords:[[2,5,9],[2,7,11],[4,7,12]] },
-    { name:'I - vi - IV - V (Mayor)',   chords:[[0,4,7],[0,4,9],[0,5,9],[-1,2,7]] },
-    { name:'I - IV - I (Mayor)',        chords:[[0,4,7],[0,5,9],[0,4,7]] },
-    { name:'I - V - I (Mayor)',         chords:[[0,4,7],[-1,2,7],[0,4,7]] },
-    { name:'i - iv - v - i (Menor)',    chords:[[0,3,7],[0,5,8],[2,7,10],[0,3,7]] },
-    { name:'i - VI - III - VII (Menor)',chords:[[0,3,7],[0,3,8],[-2,3,7],[-2,2,5]] }
+    // roots = raíz de cada acorde (relativo a C4); chords = 3 voces superiores con conducción suave
+    { name:'I - IV - V - I (Mayor)',    roots:[0,5,7,0],   chords:[[0,4,7],[0,5,9],[-1,2,7],[0,4,7]] },
+    { name:'I - V - vi - IV (Mayor)',   roots:[0,7,9,5],   chords:[[0,4,7],[-1,2,7],[0,4,9],[0,5,9]] },
+    { name:'ii - V - I (Mayor)',        roots:[2,7,0],     chords:[[2,5,9],[2,7,11],[4,7,12]] },
+    { name:'I - vi - IV - V (Mayor)',   roots:[0,9,5,7],   chords:[[0,4,7],[0,4,9],[0,5,9],[-1,2,7]] },
+    { name:'I - IV - I (Mayor)',        roots:[0,5,0],     chords:[[0,4,7],[0,5,9],[0,4,7]] },
+    { name:'I - V - I (Mayor)',         roots:[0,7,0],     chords:[[0,4,7],[-1,2,7],[0,4,7]] },
+    { name:'i - iv - v - i (Menor)',    roots:[0,5,7,0],   chords:[[0,3,7],[0,5,8],[2,7,10],[0,3,7]] },
+    { name:'i - VI - III - VII (Menor)',roots:[0,8,3,10],  chords:[[0,3,7],[0,3,8],[-2,3,7],[-2,2,5]] }
   ],
   notas: [
     { name:'Do',     semitones:0  }, { name:'Do♯',    semitones:1  },
@@ -1857,7 +1857,11 @@ function playStudyItem(item) {
     item.intervals.map(i => getFreq(i)).forEach((f,i) => t(2000 + i * 300, f, '0.4'));
   } else if (currentMode === 'progresiones') {
     const ko = (currentQuestion && currentQuestion.keyOffset) || 0;
-    item.chords.forEach((ch, ci) => ch.map(s => getFreq(s + ko)).forEach(f => t(ci * 1000, f, '0.8')));
+    item.chords.forEach((ch, ci) => {
+      const bassS = (item.roots ? item.roots[ci] : ch[0]) - 12 + ko;
+      t(ci * 1100, getFreq(bassS), '1.1');
+      ch.map(s => getFreq(s + ko)).forEach(f => t(ci * 1100, f, '0.95'));
+    });
   } else if (currentMode === 'escalas') {
     const root = item.root || 0;
     const up = item.intervals;
@@ -2277,7 +2281,11 @@ async function playSound() {
     }
   } else if (currentMode === 'progresiones') {
     const ko = currentQuestion.keyOffset || 0;
-    currentQuestion.chords.forEach((ch,ci) => ch.map(s=>getFreq(s + ko)).forEach(f => t(ci * 1000, f, '0.8')));
+    currentQuestion.chords.forEach((ch, ci) => {
+      const bassS = (currentQuestion.roots ? currentQuestion.roots[ci] : ch[0]) - 12 + ko;
+      t(ci * 1100, getFreq(bassS), '1.1');
+      ch.map(s => getFreq(s + ko)).forEach(f => t(ci * 1100, f, '0.95'));
+    });
   } else if (currentMode === 'escalas') {
     const ko = currentQuestion.keyOffset || 0;
     const gap = 380;
