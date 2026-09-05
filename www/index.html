@@ -1256,14 +1256,23 @@ const musicData = {
   ],
   progresiones: [
     // roots = raíz de cada acorde (relativo a C4); chords = 3 voces superiores con conducción suave
-    { name:'I - IV - V - I (Mayor)',    roots:[0,5,7,0],   chords:[[0,4,7],[0,5,9],[-1,2,7],[0,4,7]] },
-    { name:'I - V - vi - IV (Mayor)',   roots:[0,7,9,5],   chords:[[0,4,7],[-1,2,7],[0,4,9],[0,5,9]] },
-    { name:'ii - V - I (Mayor)',        roots:[2,7,0],     chords:[[2,5,9],[2,7,11],[4,7,12]] },
-    { name:'I - vi - IV - V (Mayor)',   roots:[0,9,5,7],   chords:[[0,4,7],[0,4,9],[0,5,9],[-1,2,7]] },
-    { name:'I - IV - I (Mayor)',        roots:[0,5,0],     chords:[[0,4,7],[0,5,9],[0,4,7]] },
-    { name:'I - V - I (Mayor)',         roots:[0,7,0],     chords:[[0,4,7],[-1,2,7],[0,4,7]] },
-    { name:'i - iv - v - i (Menor)',    roots:[0,5,7,0],   chords:[[0,3,7],[0,5,8],[2,7,10],[0,3,7]] },
-    { name:'i - VI - III - VII (Menor)',roots:[0,8,3,10],  chords:[[0,3,7],[0,3,8],[-2,3,7],[-2,2,5]] }
+    // Voicings diseñados para conducción por grado en las 3 voces superiores + bajo por roots
+    // I→IV: voz común + movimiento por tono; IV→V: voces suben por tono; V→I: bajan por tono
+    { name:'I - IV - V - I (Mayor)',    roots:[0,5,7,0],  chords:[[0,4,7],[0,5,9],[2,7,11],[4,7,12]] },
+    // I→V: 3 voces bajan por grado; V→vi: 3 voces suben; vi→IV: 2 comunes + 1 sube
+    { name:'I - V - vi - IV (Mayor)',   roots:[0,7,9,5],  chords:[[0,4,7],[-1,2,7],[0,4,9],[0,5,9]] },
+    // ii→V: D común + 2 suben; V→I: E sube, G común, B sube semitono
+    { name:'ii - V - I (Mayor)',        roots:[2,7,0],    chords:[[2,5,9],[2,7,11],[4,7,12]] },
+    // I→vi: 2 comunes + G sube; vi→IV: 2 comunes + E sube; IV→V: 3 voces suben por tono
+    { name:'I - vi - IV - V (Mayor)',   roots:[0,9,5,7],  chords:[[0,4,7],[0,4,9],[0,5,9],[2,7,11]] },
+    // I→IV: C común + 2 suben; IV→I: C común + 2 bajan
+    { name:'I - IV - I (Mayor)',        roots:[0,5,0],    chords:[[0,4,7],[0,5,9],[0,4,7]] },
+    // I→V: G común + C y E bajan; V→I: G común + B y D suben
+    { name:'I - V - I (Mayor)',         roots:[0,7,0],    chords:[[0,4,7],[-1,2,7],[0,4,7]] },
+    // i→iv: C común + 2 suben; iv→v: 3 voces suben por tono; v→i: G común + 2 bajan por grado
+    { name:'i - iv - v - i (Menor)',    roots:[0,5,7,0],  chords:[[0,3,7],[0,5,8],[-2,2,7],[0,3,7]] },
+    // i→VI: C y Eb comunes + G sube; VI→III: Eb común + 2 bajan; III→VII: Bb común + 2 bajan
+    { name:'i - VI - III - VII (Menor)',roots:[0,8,3,10], chords:[[0,3,7],[0,3,8],[-2,3,7],[-2,2,5]] }
   ],
   notas: [
     { name:'Do',     semitones:0  }, { name:'Do♯',    semitones:1  },
