@@ -545,14 +545,14 @@ const musicData = {
     { name:'Mayor 7#5',    intervals:[0,4,8,11] }, { name:'Disminuido 7', intervals:[0,3,6,9]  }
   ],
   progresiones: [
-    { name:'I - IV - V - I (Mayor)',    chords:[[0,4,7],[5,9,12],[7,11,14],[0,4,7]] },
-    { name:'I - V - vi - IV (Mayor)',   chords:[[0,4,7],[7,11,14],[9,12,16],[5,9,12]] },
-    { name:'ii - V - I (Mayor)',        chords:[[2,5,9],[7,11,14],[0,4,7]] },
-    { name:'I - vi - IV - V (Mayor)',   chords:[[0,4,7],[9,12,16],[5,9,12],[7,11,14]] },
-    { name:'I - IV - I (Mayor)',        chords:[[0,4,7],[5,9,12],[0,4,7]] },
-    { name:'I - V - I (Mayor)',         chords:[[0,4,7],[7,11,14],[0,4,7]] },
-    { name:'i - iv - v - i (Menor)',    chords:[[0,3,7],[5,8,12],[7,10,14],[0,3,7]] },
-    { name:'i - VI - III - VII (Menor)',chords:[[0,3,7],[8,12,15],[3,7,10],[10,14,17]] }
+    { name:'I - IV - V - I (Mayor)',    roots:[0,5,7,0],  chords:[[0,4,7],[0,5,9],[2,7,11],[4,7,12]] },
+    { name:'I - V - vi - IV (Mayor)',   roots:[0,7,9,5],  chords:[[0,4,7],[-1,2,7],[0,4,9],[0,5,9]] },
+    { name:'ii - V - I (Mayor)',        roots:[2,7,0],    chords:[[2,5,9],[2,7,11],[4,7,12]] },
+    { name:'I - vi - IV - V (Mayor)',   roots:[0,9,5,7],  chords:[[0,4,7],[0,4,9],[0,5,9],[2,7,11]] },
+    { name:'I - IV - I (Mayor)',        roots:[0,5,0],    chords:[[0,4,7],[0,5,9],[0,4,7]] },
+    { name:'I - V - I (Mayor)',         roots:[0,7,0],    chords:[[0,4,7],[-1,2,7],[0,4,7]] },
+    { name:'i - iv - v - i (Menor)',    roots:[0,5,7,0],  chords:[[0,3,7],[0,5,8],[-2,2,7],[0,3,7]] },
+    { name:'i - VI - III - VII (Menor)',roots:[0,8,3,10], chords:[[0,3,7],[0,3,8],[-2,3,7],[-2,2,5]] }
   ],
   notas: [
     { name:'Do',     semitones:0  }, { name:'Do♯',    semitones:1  },
@@ -784,7 +784,12 @@ function playStudyItem(item) {
     item.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f, '1.5', now));
     item.intervals.map(i => getFreq(i)).forEach((f,i) => synth.triggerAttackRelease(f, '0.4', now + 2 + i * 0.3));
   } else if (currentMode === 'progresiones') {
-    item.chords.forEach((ch,i) => ch.map(s => getFreq(s)).forEach(f => synth.triggerAttackRelease(f,'0.8',now+i*1)));
+    const ko0 = (currentQuestion && currentQuestion.keyOffset) || 0;
+    item.chords.forEach((ch,ci) => {
+      const bassF = getFreq((item.roots ? item.roots[ci] : ch[0]) - 12 + ko0);
+      synth.triggerAttackRelease(bassF,'1.1',now+ci*1.1);
+      ch.forEach(s => synth.triggerAttackRelease(getFreq(s+ko0),'0.95',now+ci*1.1));
+    });
   } else if (currentMode === 'escalas') {
     item.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+i*0.25));
     [...item.intervals].reverse().forEach((s,i) => synth.triggerAttackRelease(getFreq(s),'0.3',now+item.intervals.length*0.25+0.3+i*0.25));
@@ -1000,7 +1005,12 @@ async function playSound() {
       currentQuestion.intervals.map(i => getFreq(i)).forEach(f => synth.triggerAttackRelease(f,'1.5',now));
     }
   } else if (currentMode === 'progresiones') {
-    currentQuestion.chords.forEach((ch,i) => ch.map(s=>getFreq(s)).forEach(f=>synth.triggerAttackRelease(f,'0.8',now+i*1)));
+    const ko1 = currentQuestion.keyOffset || 0;
+    currentQuestion.chords.forEach((ch,ci) => {
+      const bassF1 = getFreq((currentQuestion.roots ? currentQuestion.roots[ci] : ch[0]) - 12 + ko1);
+      synth.triggerAttackRelease(bassF1,'1.1',now+ci*1.1);
+      ch.forEach(s => synth.triggerAttackRelease(getFreq(s+ko1),'0.95',now+ci*1.1));
+    });
   } else if (currentMode === 'escalas') {
     const ko = currentQuestion.keyOffset || 0;
     currentQuestion.intervals.forEach((s,i) => synth.triggerAttackRelease(getFreq(s+ko),'0.3',now+i*0.25));
@@ -1050,7 +1060,7 @@ function nextQuestion(autoPlay = true) {
     if (!options.length) { alert('Selecciona al menos una opción'); return; }
     correctIndex = Math.floor(Math.random() * options.length);
     currentQuestion = { ...options[correctIndex] };
-    if (currentMode === 'escalas') {
+    if (currentMode === 'escalas' || currentMode === 'progresiones') {
       currentQuestion.keyOffset = Math.floor(Math.random() * 12);
     }
     if (currentMode === 'inversiones') {
