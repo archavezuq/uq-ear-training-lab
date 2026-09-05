@@ -1856,7 +1856,8 @@ function playStudyItem(item) {
     item.intervals.map(i => getFreq(i)).forEach(f => t(0, f, '1.5'));
     item.intervals.map(i => getFreq(i)).forEach((f,i) => t(2000 + i * 300, f, '0.4'));
   } else if (currentMode === 'progresiones') {
-    item.chords.forEach((ch, ci) => ch.map(s => getFreq(s)).forEach(f => t(ci * 1000, f, '0.8')));
+    const ko = (currentQuestion && currentQuestion.keyOffset) || 0;
+    item.chords.forEach((ch, ci) => ch.map(s => getFreq(s + ko)).forEach(f => t(ci * 1000, f, '0.8')));
   } else if (currentMode === 'escalas') {
     const root = item.root || 0;
     const up = item.intervals;
@@ -2275,7 +2276,8 @@ async function playSound() {
       currentQuestion.intervals.map(i => getFreq(i)).forEach(f => t(0, f, '1.5'));
     }
   } else if (currentMode === 'progresiones') {
-    currentQuestion.chords.forEach((ch,ci) => ch.map(s=>getFreq(s)).forEach(f => t(ci * 1000, f, '0.8')));
+    const ko = currentQuestion.keyOffset || 0;
+    currentQuestion.chords.forEach((ch,ci) => ch.map(s=>getFreq(s + ko)).forEach(f => t(ci * 1000, f, '0.8')));
   } else if (currentMode === 'escalas') {
     const ko = currentQuestion.keyOffset || 0;
     const gap = 380;
@@ -2409,7 +2411,7 @@ function nextQuestion(autoPlay = true) {
     if (!options.length) { alert('Selecciona al menos una opción'); return; }
     correctIndex = Math.floor(Math.random() * options.length);
     currentQuestion = { ...options[correctIndex] };
-    if (currentMode === 'escalas') {
+    if (currentMode === 'escalas' || currentMode === 'progresiones') {
       currentQuestion.keyOffset = Math.floor(Math.random() * 12);
     }
     if (currentMode === 'inversiones') {
