@@ -68,6 +68,16 @@ Los módulos de entonación usan micrófono nativo (`window.Capacitor.Plugins.Mi
 
 `currentLang` ('es' / 'en') — función `tx(key)` para acceder al objeto `ui`. Función `dn(name)` para términos musicales. Cambio sincrónico sin recargar la página. Cualquier texto nuevo debe agregarse en ambos idiomas en el objeto `ui`.
 
+## Checklist antes de cada build
+
+- [ ] Buscar variables declaradas pero no usadas (`let`, `const`, `var` huérfanas)
+- [ ] Buscar funciones definidas pero nunca llamadas
+- [ ] Buscar assets en `www/audio/` e `www/img/` que no se referencien en el código
+- [ ] Verificar que `versionCode` en `android/app/build.gradle` fue incrementado
+- [ ] Confirmar que `android/keystore.properties` existe en la máquina local
+- [ ] Hacer `npx cap sync` antes de `./gradlew bundleRelease`
+- [ ] Probar el APK en dispositivo antes de subir a Play Console
+
 ## Convenciones al modificar el código
 
 - Un cambio a la vez — el archivo es grande y único. Terminar, hacer commit y push antes de empezar el siguiente cambio
