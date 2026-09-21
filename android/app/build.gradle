@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file("app/keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     namespace "com.archavez.eartraining"
     compileSdk rootProject.ext.compileSdkVersion
@@ -18,10 +22,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('C:/Users/rodo/uq-ear-training-lab/keystore/ear-training.keystore')
-            storePassword 'EarTraining2025!'
-            keyAlias 'ear-training'
-            keyPassword 'EarTraining2025!'
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
     buildTypes {
